@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohamed Aziz Ghazouani · Portfolio</title>
+<meta name="description" content="Mohamed Aziz Ghazouani: I build data products end to end. Founder of Kalori, Business Intelligence student at IHEC Carthage.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://azizgh69.github.io/">
+<meta property="og:title" content="Mohamed Aziz Ghazouani · Portfolio">
+<meta property="og:description" content="I build data products end to end. Founder of Kalori · Business Intelligence student at IHEC Carthage.">
+<meta property="og:image" content="https://azizgh69.github.io/img/aziz.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#040A1C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M12 6h50l-10 52H2z' fill='%231749D1'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='28' text-anchor='middle' fill='%23fff'%3EAG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,600;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#040A1C;
+  --navy:#0B1E57;
+  --blue:#1749D1;
+  --cyan:#4FE6FF;
+  --ice:#D6F7FF;
+  --muted:#A9BEEA;
+  --amber:#FFC547;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Barlow",system-ui,sans-serif;
+  --snap:cubic-bezier(.2,1.4,.35,1);
+  --out:cubic-bezier(.16,1,.3,1);
+  --slant:polygon(4% 0,100% 0,96% 100%,0 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--ink);color:#fff;font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+a{color:inherit}
+
+/* ---------- background ---------- */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(120% 95% at 88% 8%,#1C5CF0 0%,#0B1E57 42%,#040A1C 100%)}
+.band{position:absolute;left:-25%;width:150%;transform:rotate(-14deg);background:linear-gradient(90deg,transparent 0%,rgba(79,230,255,.13) 45%,rgba(79,230,255,.04) 70%,transparent 100%);animation:drift 16s ease-in-out infinite alternate}
+.band.b1{top:14%;height:20vh}
+.band.b2{top:50%;height:8vh;animation-duration:22s;opacity:.8}
+.band.b3{top:74%;height:3vh;animation-duration:12s}
+.streak{position:absolute;left:-30%;width:160%;height:2px;transform:rotate(-14deg);background:linear-gradient(90deg,transparent,var(--cyan) 50%,transparent);opacity:.3}
+.streak.s1{top:36%}.streak.s2{top:66%;opacity:.18}.streak.s3{top:88%;opacity:.25}
+@keyframes drift{from{translate:-3% 0}to{translate:3% 0}}
+.watermark{position:absolute;right:-3vw;bottom:-8vh;margin:0;font:900 italic 30vw/.8 var(--display);color:transparent;-webkit-text-stroke:2px rgba(214,247,255,.07);transform:rotate(-8deg);white-space:nowrap;user-select:none;pointer-events:none}
+
+/* ---------- top bar ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:flex-start;padding:20px 32px;pointer-events:none}
+.topbar>*{pointer-events:auto}
+.clock{display:flex;flex-direction:column;gap:6px}
+.clock-row{display:flex;align-items:stretch;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9))}
+.clock-date{background:#fff;color:var(--ink);font:900 italic 50px/1 var(--display);padding:4px 24px 0 16px;clip-path:var(--slant)}
+.clock-dow{background:var(--cyan);color:var(--ink);font:800 italic 22px/1 var(--display);padding:0 18px;display:flex;align-items:center;margin-left:-8px;clip-path:var(--slant);letter-spacing:.06em}
+.clock-tod{font:800 italic 17px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);padding-left:10px}
+.clock-day{font:600 italic 14px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ice);padding-left:22px}
+.quick{display:flex;gap:8px;align-items:center}
+.chipbtn{all:unset;display:inline-block;cursor:pointer;font:800 italic 15px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;padding:10px 18px 9px;background:rgba(4,10,28,.66);color:var(--ice);clip-path:var(--slant);transition:background .12s,color .12s}
+.chipbtn:hover{background:rgba(23,73,209,.8);color:#fff}
+.chipbtn[aria-pressed="true"],.chipbtn[aria-selected="true"]{background:#fff;color:var(--ink)}
+.chipbtn.solid{background:var(--cyan);color:var(--ink)}
+.chipbtn[hidden]{display:none}
+.chipbtn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+.chipbtn:focus-visible{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.chipbtn.snd{padding:6px 16px 5px;line-height:0}
+.snd svg{display:block;width:30px;height:22px;overflow:visible}
+.snd .cone{fill:currentColor}
+.snd .wave,.snd .slash{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:square}
+.snd .wave{transition:opacity .15s}
+.snd .slash{transition:opacity .15s}
+.snd[aria-pressed="false"] .wave{opacity:0}
+.snd[aria-pressed="true"] .slash{opacity:0}
+.snd[aria-pressed="true"] .w1{animation:beat 1.1s ease-in-out infinite}
+.snd[aria-pressed="true"] .w2{animation:beat 1.1s .28s ease-in-out infinite}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.3}}
+.chipbtn kbd{font:inherit;background:var(--cyan);color:var(--ink);padding:2px 6px;margin-right:6px}
+
+/* ---------- screens ---------- */
+main{position:relative;z-index:5;height:100%}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+.screen[hidden]{display:none!important}
+
+/* ---------- main menu ---------- */
+#menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:minmax(0,1fr);padding:120px 4vw 80px;overflow:hidden}
+.hero{position:relative;min-height:0}
+.nameplate{position:relative;z-index:3;animation:rise .6s var(--out) both}
+.np-plates{filter:drop-shadow(7px 7px 0 rgba(79,230,255,.6))}
+.np-first,.np-last{display:block;width:max-content;max-width:100%;text-transform:uppercase;clip-path:var(--slant);margin:0}
+.np-first{background:#fff;color:var(--ink);font:900 italic clamp(44px,min(5.2vw,8vh),84px)/.92 var(--display);padding:8px 34px 2px 18px}
+.np-last{background:var(--blue);color:#fff;font:800 italic clamp(28px,min(3.2vw,5vh),50px)/.95 var(--display);padding:7px 26px 3px 18px;margin:6px 0 0 46px;letter-spacing:.04em}
+.np-tag{margin:18px 0 0 92px;max-width:400px;font:600 16px/1.45 var(--body);color:var(--ice);text-shadow:0 2px 14px rgba(4,10,28,.9)}
+.np-tag b{color:var(--cyan);font-weight:700}
+.portrait{position:absolute;right:5vw;bottom:30px;width:min(19vw,29vh,330px);margin:0;z-index:2;rotate:-4deg;animation:rise .7s .08s var(--out) both}
+.pframe{position:relative;aspect-ratio:4/5;--cut:polygon(12% 0,100% 0,88% 100%,0 100%);filter:drop-shadow(0 0 22px rgba(79,230,255,.28))}
+.pframe .plate{position:absolute;inset:0;clip-path:var(--cut);transition:transform .35s var(--snap)}
+.pframe .p1{background:var(--cyan);transform:translate(16px,12px)}
+.pframe .p2{background:var(--blue);transform:translate(-12px,22px)}
+.portrait:hover .p1{transform:translate(22px,16px)}
+.portrait:hover .p2{transform:translate(-18px,28px)}
+.pshot{display:block;position:relative;height:100%;clip-path:var(--cut)}
+.pshot img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.82) contrast(1.06)}
+.pshot::before{content:"";position:absolute;inset:0;z-index:1;background:rgba(23,73,209,.28);mix-blend-mode:color;pointer-events:none}
+.pshot::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,transparent 52%,rgba(11,30,87,.5) 82%,rgba(4,10,28,.82));pointer-events:none}
+.ripples{position:absolute;left:50%;bottom:-30px;width:150%;height:56px;transform:translateX(-50%);pointer-events:none;z-index:0}
+.ripples span{position:absolute;inset:0;border:2px solid rgba(79,230,255,.55);border-radius:50%;animation:ripple 3.6s ease-out infinite;opacity:0}
+.ripples span:nth-child(2){animation-delay:1.2s}
+.ripples span:nth-child(3){animation-delay:2.4s}
+@keyframes ripple{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.15);opacity:0}}
+@keyframes rise{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
+
+.menu{align-self:start;justify-self:end;position:relative;z-index:4;margin:1vh 3vw 0 0}
+.menu ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;transform:rotate(-7deg);transform-origin:100% 50%}
+.menu li{--x:calc(var(--i) * 20px);transform:translateX(var(--x));animation:slide .55s var(--snap) both;animation-delay:calc(120ms + var(--i) * 55ms)}
+@keyframes slide{from{opacity:0;transform:translateX(calc(var(--x) + 140px))}to{opacity:1;transform:translateX(var(--x))}}
+.menu button{all:unset;cursor:pointer;position:relative;display:flex;align-items:baseline;gap:14px;padding:4px 28px 0 20px;-webkit-tap-highlight-color:transparent}
+.menu button::before{content:"";position:absolute;left:-10px;right:-8px;top:10%;bottom:4%;background:var(--cyan);clip-path:polygon(3% 0,100% 0,97% 100%,0 100%);transform:scaleX(0);transform-origin:0 50%;transition:transform .2s var(--snap)}
+.menu button::after{content:"";position:absolute;left:-54px;top:50%;width:30px;height:32px;margin-top:-16px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);opacity:0;transform:translateX(-12px);transition:opacity .15s,transform .2s var(--snap)}
+.menu .label{position:relative;font:900 italic clamp(38px,min(5.3vw,8.4vh),84px)/.9 var(--display);text-transform:uppercase;text-shadow:4px 4px 0 rgba(4,10,28,.6);transition:transform .22s var(--snap),color .12s}
+.menu .sub{position:relative;font:800 italic 14px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color .12s,transform .22s var(--snap)}
+.menu li.sel button::before{transform:scaleX(1)}
+.menu li.sel button::after{opacity:1;transform:none;animation:nudge .7s ease-in-out .2s infinite alternate}
+.menu li.sel .label{color:var(--ink);transform:translateX(12px) scale(1.05);text-shadow:5px 5px 0 #fff}
+.menu li.sel .sub{color:var(--ink);transform:translateX(22px)}
+.menu button:focus-visible .sub{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+@keyframes nudge{to{transform:translateX(-8px)}}
+
+.status{position:absolute;right:3vw;bottom:64px;z-index:6;display:flex;flex-direction:column;align-items:flex-end;gap:8px;width:min(380px,32vw);animation:rise .6s .35s var(--out) both}
+.card{width:100%;display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:3px 12px;padding:10px 30px 12px 24px;background:rgba(4,10,28,.8);clip-path:var(--slant)}
+.card:nth-child(2){width:94%}.card:nth-child(3){width:88%}
+.card-k{font:800 italic 19px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.card-v{font:800 italic 19px/1 var(--display);color:var(--cyan);text-transform:uppercase;letter-spacing:.06em}
+.card-meta{grid-column:1/-1;font:500 13px/1.3 var(--body);color:var(--muted)}
+.segs{grid-column:1/-1;display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:5px}
+.segs i{height:8px;background:rgba(214,247,255,.16);transform:skewX(-24deg)}
+.segs i.on{background:var(--cyan)}
+@media (max-height:800px) and (min-width:901px){.card-meta{display:none}}
+
+.keys{position:fixed;left:24px;bottom:16px;z-index:20;display:flex;gap:18px;padding:8px 22px 8px 12px;background:rgba(4,10,28,.88);clip-path:var(--slant);font:800 italic 14px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ice);pointer-events:none;margin:0}
+.keys kbd{display:inline-block;font:inherit;background:#fff;color:var(--ink);padding:4px 10px 3px;margin-right:7px;clip-path:var(--slant);letter-spacing:.04em}
+@media (hover:none){.keys{display:none}}
+
+/* ---------- inner screens ---------- */
+.inner{padding:150px 4vw 84px;display:flex;flex-direction:column;gap:22px}
+/* Never let the column squeeze a block: a squeezed scroller (the year row) scrolls inside itself and cuts its cards. */
+.inner>*{flex-shrink:0}
+.head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;animation:rise .45s var(--out) both}
+.head h2{margin:0;font:900 italic clamp(60px,min(8vw,13vh),124px)/.82 var(--display);text-transform:uppercase;transform:rotate(-4deg);transform-origin:0 100%;text-shadow:7px 7px 0 var(--blue)}
+.head .sub{font:800 italic 17px/1 var(--display);letter-spacing:.24em;text-transform:uppercase;background:var(--cyan);color:var(--ink);padding:7px 20px 6px;clip-path:var(--slant);margin:0 0 12px}
+.head .count{font:700 italic 16px/1 var(--display);letter-spacing:.18em;color:var(--muted);margin:0 0 16px;text-transform:uppercase}
+.head .back{margin:0 0 12px auto}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.qgrid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px;align-items:start}
+.qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 400px);overflow-y:auto}
+.qrow{all:unset;box-sizing:border-box;cursor:pointer;width:calc(100% - 18px);display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 22px 9px 18px;background:rgba(4,10,28,.62);clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);transition:transform .2s var(--snap),background .12s}
+.qrow:hover{background:rgba(23,73,209,.6)}
+.qn{font:800 italic 20px/1 var(--display);color:var(--cyan)}
+.qtitle{display:flex;flex-direction:column;gap:4px;min-width:0}
+.qt{font:800 italic 24px/1 var(--display);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qd{font:600 12px/1.2 var(--body);color:var(--muted);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow[aria-current="true"]{background:var(--cyan);color:var(--ink);transform:translateX(16px)}
+.qrow[aria-current="true"] .qn,.qrow[aria-current="true"] .qd{color:var(--ink)}
+.qrow:focus-visible .qt{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.st{font:800 italic 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;padding:5px 9px 4px;white-space:nowrap;background:rgba(214,247,255,.14);color:var(--ice)}
+.st.live{background:#fff;color:var(--ink)}
+.st.progress{background:var(--blue);color:#fff}
+.st.prize{background:var(--amber);color:var(--ink)}
+.st.dropped{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px rgba(169,190,234,.55)}
+.qrow[aria-current="true"] .st{background:var(--ink);color:#fff;box-shadow:none}
+.qrow[aria-current="true"] .st.prize{background:var(--amber);color:var(--ink)}
+
+.qdetail{position:relative;background:rgba(4,10,28,.84);padding:26px 34px 30px;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%);max-height:calc(100vh - 400px);overflow-y:auto;animation:pop .35s var(--snap) both}
+@keyframes pop{from{opacity:0;translate:24px 0}to{opacity:1;translate:0 0}}
+.kind{margin:0;font:800 italic 14px/1 var(--display);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
+.qdetail h3{margin:8px 0 16px;font:900 italic clamp(40px,4.2vw,62px)/.9 var(--display);text-transform:uppercase}
+.meta{display:flex;flex-wrap:wrap;gap:10px 30px;margin:0}
+.meta div{display:flex;flex-direction:column;gap:5px}
+.meta dt{font:800 italic 12px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.meta dd{margin:0;font:700 italic 19px/1.1 var(--display)}
+.obj{font:500 17px/1.5 var(--body);color:var(--ice);margin:18px 0 0;max-width:62ch}
+.h{margin:22px 0 10px;font:800 italic 14px/1 var(--display);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
+.results{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.results li{position:relative;padding-left:22px;font:500 16px/1.45 var(--body)}
+.results li::before{content:"";position:absolute;left:0;top:.5em;width:11px;height:7px;background:var(--cyan);transform:skewX(-24deg)}
+.results b{color:var(--cyan);font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font:600 13px/1 var(--body);padding:6px 10px;background:rgba(214,247,255,.1);color:var(--ice)}
+.proof{display:flex;flex-wrap:wrap;gap:8px}
+.proof a{display:inline-block;text-decoration:none;font:800 italic 15px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;padding:10px 20px 9px;background:#fff;color:var(--ink);clip-path:var(--slant)}
+.proof a:hover{background:var(--cyan)}
+.proof a:focus-visible{text-decoration:underline}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;margin:0}
+.legend p{flex-basis:100%;margin:0;font:500 15px/1.4 var(--body);color:var(--muted)}
+.lg{display:flex;align-items:center;gap:8px;font:800 italic 13px/1 var(--display);letter-spacing:.16em;text-transform:uppercase}
+.lg small{font:500 13px/1 var(--body);letter-spacing:0;text-transform:none;color:var(--muted)}
+.pips{display:inline-flex;gap:3px}
+.pips i{width:15px;height:9px;background:rgba(214,247,255,.16);transform:skewX(-24deg)}
+.pips i.on{background:var(--cyan)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.sgroup{background:rgba(4,10,28,.74);padding:18px 22px 18px;clip-path:polygon(0 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%);animation:pop .4s var(--snap) both;animation-delay:calc(var(--i) * 50ms)}
+.sgroup h3{margin:0 0 8px;font:900 italic 28px/1 var(--display);text-transform:uppercase;display:flex;gap:10px;align-items:baseline}
+.sgroup h3 small{font:800 italic 14px/1 var(--display);color:var(--cyan);letter-spacing:.1em}
+.skill{display:grid;grid-template-columns:minmax(0,1fr) auto 82px;align-items:center;gap:10px;padding:7px 0;border-top:1px solid rgba(214,247,255,.08);font:600 15px/1.25 var(--body)}
+.skill .rk{font:800 italic 11px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:right}
+
+.log{display:flex;flex-direction:column;gap:14px;max-width:1100px}
+.entry{display:grid;grid-template-columns:220px minmax(0,1fr);gap:26px;background:rgba(4,10,28,.74);padding:20px 30px;clip-path:polygon(1.2% 0,100% 0,98.8% 100%,0 100%);animation:pop .4s var(--snap) both;animation-delay:calc(var(--i) * 60ms)}
+.entry .when{font:900 italic 26px/1 var(--display);color:var(--cyan);text-transform:uppercase}
+.entry .when small{display:block;margin-top:8px;font:700 italic 14px/1.3 var(--display);letter-spacing:.12em;color:var(--muted)}
+.entry h3{margin:0;font:900 italic 32px/1 var(--display);text-transform:uppercase}
+.entry .org{font:700 italic 17px/1.25 var(--display);letter-spacing:.08em;color:var(--ice);margin:5px 0 10px;text-transform:uppercase}
+
+.years{display:flex;gap:16px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x proximity}
+.year{flex:0 0 290px;scroll-snap-align:start;background:rgba(4,10,28,.7);padding:16px 18px 18px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%);animation:fadein .4s ease-out both;animation-delay:calc(var(--i) * 50ms)}
+/* Year cards fade rather than slide: they sit in a snapping scroller, and a card that is still
+   moving when the screen opens gets snapped to mid-slide, leaving the row 24px scrolled. */
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.year h3{margin:0 0 10px;font:900 italic 64px/.85 var(--display);color:transparent;-webkit-text-stroke:2px var(--cyan)}
+.year.now h3{color:var(--cyan);-webkit-text-stroke:0}
+.ev{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid rgba(214,247,255,.08);font:500 14px/1.4 var(--body);color:var(--ice)}
+.ev .m{font:800 italic 15px/1.3 var(--display);letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.ev b{color:#fff;font-weight:700}
+
+.pgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;align-items:start;max-width:1200px}
+.panel{background:rgba(4,10,28,.76);padding:22px 30px 24px;clip-path:polygon(0 0,100% 0,100% calc(100% - 24px),calc(100% - 24px) 100%,0 100%);animation:pop .4s var(--snap) both}
+.panel p{font:500 17px/1.6 var(--body);color:var(--ice);margin:0 0 14px;max-width:64ch}
+.panel p:last-child{margin-bottom:0}
+.facts{margin:0;display:grid;gap:16px}
+.facts dt{font:800 italic 13px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--cyan)}
+.facts dd{margin:6px 0 0;font:600 15px/1.5 var(--body)}
+.facts dd span{display:block;color:var(--muted);font-weight:500}
+
+.sysgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;max-width:1200px}
+.panel h3{margin:0 0 12px;font:900 italic 28px/1 var(--display);text-transform:uppercase}
+.bigl{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;padding:14px 24px 12px;background:rgba(214,247,255,.08);clip-path:var(--slant);margin-top:8px;transition:background .12s,color .12s}
+.bigl strong{font:800 italic 22px/1 var(--display);text-transform:uppercase}
+.bigl span{font:600 14px/1.2 var(--body);color:var(--muted);text-align:right;overflow-wrap:anywhere}
+.bigl:hover,.bigl:focus-visible{background:var(--cyan);color:var(--ink);outline:none}
+.bigl:hover span,.bigl:focus-visible span{color:var(--ink)}
+.setrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.setrow .lbl{flex-basis:100%;font:800 italic 13px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-top:6px}
+
+/* ---------- screen wipe ---------- */
+.wipe{position:fixed;inset:0;z-index:60;pointer-events:none;visibility:hidden}
+.wipe::before,.wipe::after{content:"";position:absolute;inset:0;clip-path:polygon(120% 0,140% 0,120% 100%,100% 100%)}
+.wipe::before{background:#fff}
+.wipe::after{background:var(--cyan)}
+.wipe.in,.wipe.out{visibility:visible}
+.wipe.in::before{animation:wipeIn .24s var(--out) forwards}
+.wipe.in::after{animation:wipeIn .26s .06s var(--out) forwards}
+.wipe.out::before,.wipe.out::after{clip-path:polygon(-40% 0,140% 0,120% 100%,-60% 100%);animation:wipeOut .3s var(--out) forwards}
+.wipe.out::before{animation-delay:.06s}
+@keyframes wipeIn{from{clip-path:polygon(120% 0,140% 0,120% 100%,100% 100%)}to{clip-path:polygon(-40% 0,140% 0,120% 100%,-60% 100%)}}
+@keyframes wipeOut{from{clip-path:polygon(-40% 0,140% 0,120% 100%,-60% 100%)}to{clip-path:polygon(-40% 0,-20% 0,-40% 100%,-60% 100%)}}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
+
+/* ---------- phones and narrow windows ---------- */
+@media (max-width:900px){
+  .topbar{padding:14px 16px}
+  .clock-date{font-size:36px}
+  .clock-dow{font-size:18px}
+  .quick{gap:5px}
+  .quick .chipbtn{padding:8px 11px 7px;font-size:13px}
+  #menu{display:flex;flex-direction:column;gap:30px;padding:130px 18px 48px;overflow-y:auto}
+  #menu>*{flex-shrink:0}
+  .hero{display:contents}
+  .nameplate{order:1}
+  .menu{order:2}
+  .portrait{order:3}
+  .status{order:4}
+  .keys{display:none}
+  .np-tag{margin-left:40px}
+  .portrait{position:relative;right:auto;bottom:auto;width:min(52vw,230px);margin:0 auto 44px}
+  .menu{justify-self:auto;align-self:stretch;margin:0 0 0 34px}
+  .menu button{gap:10px;padding:4px 18px 0 14px}
+  .menu .sub{font-size:12px;letter-spacing:.14em}
+  .menu li.sel .sub{transform:translateX(14px)}
+  .menu ol{transform:rotate(-4deg);transform-origin:0 50%}
+  .menu li{--x:calc(var(--i) * 8px)}
+  .menu .label{font-size:clamp(36px,11vw,58px)}
+  .status{position:relative;right:auto;bottom:auto;width:100%;align-items:stretch}
+  .card:nth-child(n){width:100%}
+  .inner{padding:140px 16px 40px}
+  .qgrid,.pgrid{grid-template-columns:1fr}
+  .qlist,.qdetail{max-height:none}
+  .qt,.qd{white-space:normal}
+  .entry{grid-template-columns:1fr;gap:8px}
+  .head h2{font-size:clamp(52px,15vw,84px)}
+  .watermark{font-size:60vw}
+}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="band b1"></div><div class="band b2"></div><div class="band b3"></div>
+  <div class="streak s1"></div><div class="streak s2"></div><div class="streak s3"></div>
+  <p class="watermark" id="wm">MENU</p>
+</div>
+
+<header class="topbar">
+  <div class="clock" data-ta="aria-label:today">
+    <div class="clock-row"><span class="clock-date" id="cDate">--/--</span><span class="clock-dow" id="cDow">---</span></div>
+    <span class="clock-tod" id="cTod">&nbsp;</span>
+    <span class="clock-day" id="cDay">&nbsp;</span>
+  </div>
+  <div class="quick">
+    <button class="chipbtn snd" id="sound" type="button" aria-pressed="false" data-ta="aria-label:music" hidden>
+      <svg viewBox="0 0 32 24" aria-hidden="true">
+        <path class="cone" d="M3 8h6l8-6v20l-8-6H3z"/>
+        <path class="wave w1" d="M21 8.5q2.5 3.5 0 7"/>
+        <path class="wave w2" d="M24.5 4.5q5 7.5 0 15"/>
+        <path class="slash" d="M2 22L29 1"/>
+      </svg>
+    </button>
+    <audio id="bgm" preload="none" loop></audio>
+    <button class="chipbtn lang" type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
+    <button class="chipbtn lang" type="button" data-lang="fr" lang="fr" aria-label="Français" aria-pressed="false">FR</button>
+    <button class="chipbtn solid" type="button" data-go="system">CV ↓</button>
+  </div>
+</header>
+
+<main>
+  <!-- MAIN MENU -->
+  <section class="screen" id="menu" data-ta="aria-label:mainMenu">
+    <div class="hero">
+      <div class="nameplate">
+        <h1 class="np-plates"><span class="np-first">Mohamed Aziz</span><span class="np-last">Ghazouani</span></h1>
+        <p class="np-tag" data-th="tagline"></p>
+      </div>
+      <figure class="portrait">
+        <div class="pframe">
+          <span class="plate p1" aria-hidden="true"></span><span class="plate p2" aria-hidden="true"></span>
+          <picture class="pshot">
+            <source srcset="img/aziz.webp" type="image/webp">
+            <img src="img/aziz.jpg" data-ta="alt:photoAlt" alt="" width="640" height="800" decoding="async">
+          </picture>
+        </div>
+        <div class="ripples" aria-hidden="true"><span></span><span></span><span></span></div>
+      </figure>
+    </div>
+    <nav class="menu" data-ta="aria-label:sections"><ol id="menuList"></ol></nav>
+    <aside class="status" id="status" data-ta="aria-label:statusNow"></aside>
+  </section>
+
+  <!-- QUESTS -->
+  <section class="screen inner" id="quests" aria-labelledby="qH" hidden>
+    <div class="head">
+      <h2 id="qH"></h2><p class="sub"></p><p class="count" id="qCount"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="tabs" role="tablist" data-ta="aria-label:filter" id="qTabs"></div>
+    <div class="qgrid">
+      <ul class="qlist" id="qList"></ul>
+      <article class="qdetail" id="qDetail" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="screen inner" id="stats" aria-labelledby="sH" hidden>
+    <div class="head">
+      <h2 id="sH"></h2><p class="sub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="legend" id="sLegend"></div>
+    <div class="sgrid" id="sGrid"></div>
+  </section>
+
+  <!-- LOG -->
+  <section class="screen inner" id="log" aria-labelledby="lH" hidden>
+    <div class="head">
+      <h2 id="lH"></h2><p class="sub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="log" id="lList"></div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="screen inner" id="calendar" aria-labelledby="cH" hidden>
+    <div class="head">
+      <h2 id="cH"></h2><p class="sub" data-t="calSub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="years" id="cYears"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen inner" id="profile" aria-labelledby="pH" hidden>
+    <div class="head">
+      <h2 id="pH"></h2><p class="sub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="pgrid">
+      <div class="panel" id="about"></div>
+      <div class="panel"><dl class="facts" id="facts"></dl></div>
+    </div>
+  </section>
+
+  <!-- SYSTEM -->
+  <section class="screen inner" id="system" aria-labelledby="yH" hidden>
+    <div class="head">
+      <h2 id="yH"></h2><p class="sub" data-t="sysSub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="sysgrid">
+      <div class="panel">
+        <h3>Contact</h3>
+        <a class="bigl" href="mailto:aziz19ghazouani@gmail.com"><strong data-t="email"></strong><span>aziz19ghazouani@gmail.com</span></a>
+        <a class="bigl" href="https://www.linkedin.com/in/aziz-ghazouani/" target="_blank" rel="noopener"><strong>LinkedIn</strong><span>in/aziz-ghazouani</span></a>
+        <a class="bigl" href="https://github.com/AzizGh69" target="_blank" rel="noopener"><strong>GitHub</strong><span>AzizGh69</span></a>
+        <a class="bigl" href="https://kalori-app.com" target="_blank" rel="noopener"><strong>Kalori</strong><span>kalori-app.com</span></a>
+      </div>
+      <div class="panel">
+        <h3>CV</h3>
+        <a class="bigl" href="cv/Mohamed-Aziz-Ghazouani-CV-Data-Engineering.pdf" target="_blank" rel="noopener"><strong>Data Engineering</strong><span data-t="cvMeta"></span></a>
+        <a class="bigl" href="cv/Mohamed-Aziz-Ghazouani-CV-GenAI-LLM.pdf" target="_blank" rel="noopener"><strong>GenAI &amp; LLM</strong><span data-t="cvMeta"></span></a>
+        <h3 style="margin-top:22px" data-t="settings"></h3>
+        <div class="setrow">
+          <span class="lbl" data-t="language"></span>
+          <button class="chipbtn" type="button" data-lang="en" lang="en" aria-pressed="true">English</button>
+          <button class="chipbtn" type="button" data-lang="fr" lang="fr" aria-pressed="false">Français</button>
+        </div>
+        <div class="setrow">
+          <span class="lbl" data-t="motion"></span>
+          <button class="chipbtn" type="button" id="motionFull" aria-pressed="true" data-t="full"></button>
+          <button class="chipbtn" type="button" id="motionCalm" aria-pressed="false" data-t="calm"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<p class="keys" aria-hidden="true"><span><kbd>↑↓</kbd><span data-t="kSelect"></span></span><span><kbd data-t="kEnter"></kbd><span data-t="kOpen"></span></span><span><kbd data-t="kEsc"></kbd><span data-t="back"></span></span></p>
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+
+<script>
+/* ---------- content (from the portfolio dossier, 2026-11-05) ----------
+   English is the base. FR below mirrors it field by field; anything FR leaves
+   out falls back to the English text (names, stacks, numbers). */
+const MENU = [
+  { id: "quests",   label: "Quests",   sub: "Projects" },
+  { id: "stats",    label: "Stats",    sub: "Skills" },
+  { id: "log",      label: "Log",      sub: "Experience" },
+  { id: "calendar", label: "Calendar", sub: "Journey" },
+  { id: "profile",  label: "Profile",  sub: "About me" },
+  { id: "system",   label: "System",   sub: "Contact · CV" }
+];
+const WATERMARK = { menu: "MENU", quests: "QUESTS", stats: "STATS", log: "LOG", calendar: "CALENDAR", profile: "PROFILE", system: "SYSTEM" };
+
+const STATUS = [
+  { k: "Kalori", v: "Live · v2.1.1", meta: "20+ users in testing · 587 commits" },
+  { k: "Data platform", v: "2 / 8", meta: "Milestones reached · next: M2 on 10 Nov", segs: [8, 2] },
+  { k: "DP-700", v: "Late Nov", meta: "Microsoft Fabric data engineer exam · preparing" }
+];
+
+const TABS = [["all", "All"], ["main", "Main"], ["data", "Data & AI"], ["lead", "Team lead"], ["hecfa", "HECFA"], ["academic", "Academic"], ["side", "Side"]];
+
+const QUESTS = [
+  { id: "kalori", cats: ["main"], kind: "Main quest", title: "Kalori", when: "06/2026 → now", status: "live", statusLabel: "Live",
+    role: "Founder & sole developer", team: "Solo",
+    obj: "A nutrition tracker built around Tunisian food: free, in English, French and Arabic, and usable offline.",
+    results: [
+      "<b>587 commits</b> and <b>v2.1.1</b> since the first commit on 3 June 2026; public launch on 28 September.",
+      "<b>~3,100 automated tests</b> behind <b>8 required CI checks</b>; blue/green deploys that roll back on their own.",
+      "LLM meal suggestions through a provider chain with an output guard, a fallback and <b>per-call cost metering</b>; a <b>648-situation</b> trust audit.",
+      "<b>106 Tunisian dishes</b> counted ingredient by ingredient, each with a page in 3 languages.",
+      "Discover: a map of home-cooked food sold near you, with reviews.",
+      "<b>20+ users</b> in testing."
+    ],
+    stack: ["NestJS", "TypeScript", "PostgreSQL", "Redis", "React PWA", "Docker", "Cloudflare", "GitHub Actions", "Sentry"],
+    proof: [{ label: "kalori-app.com", href: "https://kalori-app.com" }, { label: "Demo video", href: null }] },
+  { id: "platform", cats: ["main", "data"], kind: "Main quest", title: "Kalori Data Platform", when: "10/2026 → now", status: "progress", statusLabel: "In progress",
+    role: "Data engineer", team: "Solo",
+    obj: "Where should Kalori open its first meal-prep store, and what should its menu hold? A platform built to answer that, on synthetic data first.",
+    results: [
+      "Synthetic Tunisian users and a year of diary entries, generated from a seed (Python, uv).",
+      "A PostgreSQL source on AWS RDS, defined in Terraform.",
+      "Pseudonymised extraction, then change data capture (Debezium → Kafka) into a medallion lakehouse on Microsoft Fabric, ending in Power BI.",
+      "Run as a PMBOK project: charter, WBS, CPM schedule, risk register, change requests, ADRs. <b>2 of 8 milestones</b> reached."
+    ],
+    stack: ["Python", "Terraform", "AWS RDS", "Debezium", "Kafka", "Microsoft Fabric", "PySpark", "Power BI"],
+    proof: [{ label: "Project journal", href: null }] },
+  { id: "codelab", cats: ["hecfa"], kind: "Guild quest · HECFA", title: "CodeLab 2.0 platform", when: "12/2025 → 02/2026", status: "live", statusLabel: "Shipped",
+    role: "Technical lead", team: "IT department",
+    obj: "The software that ran the club's hackathon, from sign-up to the jury's scores.",
+    results: [
+      "<b>220 participants</b> in <b>12 teams</b>.",
+      "<b>5 apps in production</b>: registration and payments, a participant dashboard, a support desk, jury scoring, and the ambassadors tracker (built solo).",
+      "Shared work on the HR tracker, the sponsorship site and the EmailJS notification flows."
+    ],
+    stack: ["Next.js", "React", "Firebase", "EmailJS"],
+    proof: [{ label: "Video demo", href: "https://youtu.be/j-3ppU-9Ir4" }] },
+  { id: "recruit", cats: ["hecfa"], kind: "Guild quest · HECFA", title: "Recruitment platform", when: "10/2025", status: "live", statusLabel: "Shipped",
+    role: "Technical lead", team: "IT department",
+    obj: "An application form and a filtering dashboard for the club's new-member intake.",
+    results: ["<b>321 applications</b> processed.", "Both deployed and used to select the club's new members."],
+    stack: ["Next.js", "React", "Firebase"], proof: [] },
+  { id: "connect", cats: ["lead", "hecfa"], kind: "Competition, then product", title: "IHEC Connect", when: "11/2025 → 04/2026", status: "prize", statusLabel: "1st prize",
+    role: "Solution architect & project manager", team: "Team",
+    obj: "A tutoring and knowledge-exchange platform for the IHEC community.",
+    results: [
+      "The MVP won <b>1st prize at Global Entrepreneurship Week (IHEC)</b> and <b>1,500 TND</b> for the club.",
+      "Then built full stack over <b>4 Scrum sprints</b>: roles and sign-in, tutoring sessions with Meet links, documents and 1–5 star reviews, events and an internship board."
+    ],
+    stack: ["FastAPI", "PostgreSQL (Supabase)", "React", "TypeScript", "Tailwind"],
+    proof: [{ label: "Video demo", href: "https://drive.google.com/file/d/1sQWdE_1gp_459tsPIOw0Gy6PLKPTfpRs/view" }] },
+  { id: "epistemia", cats: ["lead"], kind: "Client project", title: "Epistemia", when: "2025 → now", status: "progress", statusLabel: "Ongoing",
+    role: "Project manager", team: "Team",
+    obj: "A web platform that digitises an educational board game for students.",
+    results: ["Client: the university administration.", "Ran the meetings and the client communication, and held the delivery date and the scope to what the client asked for."],
+    stack: ["Next.js", "MongoDB"], proof: [{ label: "Live site", href: null }] },
+  { id: "crypto", cats: ["data", "academic"], kind: "Academic", title: "Cryptocurrency dashboard", when: "05/2025", status: "done", statusLabel: "Academic",
+    role: "Data analysis & development", team: "Team of 5",
+    obj: "An interactive dashboard that lets data, not hype, explain crypto markets.",
+    results: [
+      "Linked historical inflation and the 2008 bank failures to the rise of Bitcoin on an animated map.",
+      "A sentiment moodboard tracing how tweets and meme coins move prices.",
+      "Linear-regression forecasts; the whole team worked on every part."
+    ],
+    stack: ["Python", "Streamlit", "pandas", "Plotly", "Linear regression"],
+    proof: [{ label: "Presentation", href: "https://prezi.com/view/eIjLZLF5wrWOMNd3JemG/" }] },
+  { id: "ihecbot", cats: ["data", "academic"], kind: "Team project", title: "IHEC BOT", when: "02/2025", status: "dropped", statusLabel: "Dropped",
+    role: "Chatbot lead", team: "Team",
+    obj: "An AI assistant for the university library.",
+    results: ["Owned the chatbot: retrieval-augmented generation with ChromaDB and Llama, plus fine-tuning.", "Cleaned and structured <b>551 catalogue records × 23 fields</b> before indexing."],
+    stack: ["Python", "RAG", "ChromaDB", "Llama"], proof: [] },
+  { id: "valorant", cats: ["data", "side"], kind: "Side quest", title: "Valorant Agent Assistant", when: "12/2025", status: "done", statusLabel: "Personal",
+    role: "Sole developer", team: "Solo",
+    obj: "Pick the right weapon for how you play, then train your decisions.",
+    results: ["A decision tree that recommends <b>1 of 19 weapons</b> from your play style, checked on a held-out test set.", "A tactical quiz over <b>180 scenarios</b>.", "Two front ends: Streamlit and Tkinter."],
+    stack: ["Python", "scikit-learn", "pandas", "Streamlit", "Tkinter"],
+    proof: [{ label: "GitHub", href: "https://github.com/AzizGh69/ValorantAgentAssistant" }] },
+  { id: "rideshare", cats: ["lead", "hecfa"], kind: "Guild quest · HECFA", title: "RideShare", when: "11/2024 → 06/2025", status: "dropped", statusLabel: "Dropped",
+    role: "Project manager", team: "Team",
+    obj: "Carpooling for IHEC students, from the club's IT department.",
+    results: ["Front end finished; the back end was partial when the project was dropped."],
+    stack: ["HTML", "CSS", "JavaScript", "PHP", "Firebase"],
+    proof: [{ label: "GitHub", href: "https://github.com/hecfaitdepartment/RideShare" }] },
+  { id: "site", cats: ["hecfa"], kind: "Guild quest · HECFA", title: "hecfa.tn", when: "09/2025 → 10/2026", status: "done", statusLabel: "Maintained",
+    role: "IT co-lead", team: "IT department",
+    obj: "The club's website, inherited when the IT department changed hands.",
+    results: ["Maintenance, deployments and domain configuration."],
+    stack: ["Next.js", "Deployment", "DNS"], proof: [] },
+  { id: "library", cats: ["academic"], kind: "Academic", title: "IHEC Library", when: "04/2025", status: "dropped", statusLabel: "Dropped",
+    role: "Team member", team: "Team",
+    obj: "Digitised the new university library.",
+    results: ["Seat and book reservations, and search over the imported catalogue."],
+    stack: ["C#", "ASP.NET", "SQL Server"],
+    proof: [{ label: "GitHub", href: "https://github.com/AzizGh69/ihec_library-" }] },
+  { id: "learnhub", cats: ["academic"], kind: "Academic", title: "LearnHub", when: "11/2025", status: "done", statusLabel: "Local",
+    role: "Team member", team: "Team",
+    obj: "A study platform for courses written by IHEC teachers.",
+    results: ["Stores teacher-made courses with interactive features; runs locally."],
+    stack: ["Java", "JavaFX"],
+    proof: [{ label: "GitHub", href: "https://github.com/AzizGh69/LearnHub" }] },
+  { id: "mic", cats: ["side"], kind: "Side quest", title: "Mic Enhancer", when: "2026", status: "done", statusLabel: "Personal",
+    role: "Sole developer", team: "Solo",
+    obj: "Real-time microphone processing that shows up as a normal mic in Discord, Valorant and OBS.",
+    results: ["A Python DSP engine feeding a virtual audio cable, controlled from a local web page."],
+    stack: ["Python", "DSP", "VB-Cable"], proof: [] },
+  { id: "first", cats: ["side"], kind: "First quest", title: "First game", when: "07/2019", status: "dropped", statusLabel: "Unreleased",
+    role: "Sole developer", team: "Team of 3",
+    obj: "A vertical platformer in Unity, built at 13.",
+    results: ["<b>9 months</b> of solo development, with an animator and a graphic designer.", "Never released."],
+    stack: ["C#", "Unity"], proof: [] }
+];
+
+const RANKS = {
+  P: { n: 4, l: "Production", d: "runs in Kalori" },
+  R: { n: 3, l: "Project", d: "used in a real project" },
+  B: { n: 2, l: "Building", d: "in the data platform now" },
+  C: { n: 2, l: "Course", d: "coursework" },
+  F: { n: 1, l: "Familiar", d: "self-taught, no project yet" }
+};
+const SKILLS = [
+  { g: "Languages", items: [["TypeScript", "P"], ["JavaScript", "P"], ["Python", "R"], ["SQL", "R"], ["Java", "R"], ["C#", "R"], ["PHP", "R"]] },
+  { g: "Web & apps", items: [["NestJS", "P"], ["React", "P"], ["Next.js", "P"], ["Vite", "P"], ["Tailwind", "P"], ["React Query", "P"], ["FastAPI", "R"], ["ASP.NET", "R"], ["Streamlit", "R"], ["Angular", "C"], ["Flutter", "C"]] },
+  { g: "Data", items: [["Data cleaning", "R"], ["ETL / ELT", "B"], ["Change data capture", "B"], ["Microsoft Fabric", "B"], ["PySpark", "B"], ["Power BI", "B"], ["Star schema", "F"], ["Airflow", "F"]] },
+  { g: "AI & ML", items: [["LLMs in production", "P"], ["RAG", "R"], ["ChromaDB", "R"], ["Llama, fine-tuning", "R"], ["scikit-learn", "R"], ["pandas, numpy", "R"], ["LangChain", "F"]] },
+  { g: "Cloud & DevOps", items: [["Docker", "P"], ["GitHub Actions", "P"], ["Blue/green deploys", "P"], ["nginx", "P"], ["Linux", "P"], ["Cloudflare", "P"], ["Sentry", "P"], ["Terraform", "B"], ["AWS", "B"], ["Azure", "F"], ["n8n", "F"]] },
+  { g: "Databases", items: [["PostgreSQL", "P"], ["Redis", "P"], ["Firebase", "P"], ["SQL Server", "R"], ["MySQL", "C"], ["Oracle PL/SQL", "C"]] },
+  { g: "Work & method", items: [["Git", "P"], ["ADRs", "P"], ["Project management", "R"], ["Salesforce, Jira", "R"], ["Client support", "R"]] }
+];
+
+const LOG = [
+  { when: "06/2026 → now", dur: "Own project", title: "Founder & sole developer", org: "Kalori",
+    points: ["Designed, built and run Kalori alone: the API, the app, the infrastructure and the releases.", "587 commits, v2.1.1, 20+ users in testing.", "Applied to Y Combinator on 1 November 2026."] },
+  { when: "06/2025 → 09/2026", dur: "16 months · full time", title: "Technical Support Agent", org: "Concentrix · Uber merchants account · Tunis",
+    points: ["Resolved technical and non-technical cases for Uber merchants, in French and English.", "Worked cases in Salesforce and Jira.", "Advisory work: understood what a merchant needed and recommended the fix."] },
+  { when: "07/2025 → 10/2026", dur: "Member since 10/2024 · now alumni", title: "Technical Lead", org: "HEC Finance Academy · IHEC Carthage",
+    points: ["Co-led the club's IT department.", "Shipped 7 apps: 5 for the CodeLab 2.0 hackathon (220 participants) and 2 for recruitment (321 applications).", "Maintained the club site, its deployments and its domain."] },
+  { when: "09/2024 → 06/2025", dur: "10 months", title: "Member", org: "IEEE Computer Society · INSAT SBC",
+    points: ["Machine learning bootcamp (2025)."] }
+];
+
+const CAL = [
+  { y: "2019", ev: [["Jul", "<b>First game</b>, a Unity platformer, built at 13 over 9 months"]] },
+  { y: "2021", ev: [["—", "<b>CodeCademy</b> web development, 6 modules"]] },
+  { y: "2023", ev: [["Dec", "<b>Najahni</b>, an app by baccalaureate students: documentation and data collection"]] },
+  { y: "2024", ev: [["Jun", "<b>Baccalaureate</b> in computer science, mention Très bien"], ["Sep", "<b>IHEC Carthage</b>, Business Intelligence · IEEE CS INSAT"], ["Oct", "Joins <b>HEC Finance Academy</b>"], ["Nov", "<b>RideShare</b>, as project manager"]] },
+  { y: "2025", ev: [["Feb", "<b>IHEC BOT</b>: RAG chatbot lead"], ["Apr", "<b>IHEC Library</b>"], ["May", "<b>Crypto dashboard</b>"], ["Jun", "<b>Concentrix</b>, full time"], ["Jul", "<b>Technical Lead</b> at HECFA"], ["Oct", "<b>Recruitment platform</b>: 321 applications"], ["Nov", "<b>IHEC Connect</b> wins 1st prize"], ["Dec", "<b>Valorant assistant</b> · CodeLab 2.0 build starts"], ["—", "<b>Epistemia</b>, as project manager"]] },
+  { y: "2026", now: true, ev: [["Feb", "<b>CodeLab 2.0</b>: 220 participants, 12 teams"], ["Apr", "<b>IHEC Connect</b>, built full stack"], ["Jun", "<b>Kalori</b>: first commit"], ["Sep", "<b>Kalori launches</b> on 28 Sep · Concentrix ends"], ["Oct", "v2.0.0 · <b>data platform</b> charter"], ["Nov", "<b>YC application</b> · Discover · DP-700"]] }
+];
+
+/* ---------- interface text ---------- */
+const UI = {
+  en: {
+    today: "Today", music: "Music", musicOn: "Music: on", musicOff: "Music: off",
+    mainMenu: "Main menu", sections: "Sections", statusNow: "Current status", filter: "Filter projects",
+    tagline: "I build data products end to end. <b>Founder of Kalori</b> · Business Intelligence student at IHEC Carthage.",
+    photoAlt: "Mohamed Aziz Ghazouani speaking at a podium",
+    back: "Back", kEsc: "Esc", kEnter: "Enter", kSelect: "Select", kOpen: "Open",
+    calSub: "Journey · 2019 → now", sysSub: "Contact · CV · Settings",
+    email: "Email", cvMeta: "PDF · 1 page", settings: "Settings", language: "Language", motion: "Motion", full: "Full", calm: "Calm",
+    of: "of", role: "Role", team: "Team", when: "When", status: "Status", results: "Results", stack: "Stack", proof: "Proof",
+    legend: "Pips show the strongest evidence behind each skill, not a self-rating.",
+    tod: ["Late night", "Morning", "Afternoon", "Evening", "Late night"], dayOf: (n) => `Day ${n} of Kalori`,
+    about: [
+      "I started building at 13: nine months on a Unity platformer with an animator and a designer. It never shipped. Seven years later, Kalori did.",
+      "I'm a third-year Business Intelligence student at IHEC Carthage. Kalori is a nutrition app built around Tunisian food, and I designed, built and run all of it: the API, the app, the servers and the releases.",
+      "On team projects I'm usually the project manager and solution architect: for the university administration on Epistemia, and on IHEC Connect, which won first prize before we built it for real. At HEC Finance Academy I co-led the IT department that ran a 220-person hackathon on our own software.",
+      "For 16 months I supported Uber merchants full time at Concentrix, in French and English. Outside all that I edit video, build tools for the games I play, and organise events.",
+      "Now: a data platform for Kalori, the DP-700 exam, and a final-year internship (PFE) in data engineering or AI from February 2027."
+    ],
+    facts: [
+      ["Education", ["Bachelor in Business Intelligence, IHEC Carthage", "09/2024 – 06/2027 · PFE from 02/2027"], ["Baccalaureate in Computer Science, mention Très bien", "06/2024"]],
+      ["Languages", ["Arabic, native · English, C1 · French, B2", "English and French levels from the Concentrix recruitment test"]],
+      ["Certifications", ["AWS Knowledge: Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) in preparation"]],
+      ["Awards", ["1st prize, Global Entrepreneurship Week, IHEC", "11/2025 · IHEC Connect · 1,500 TND for the club"]]
+    ]
+  },
+  fr: {
+    today: "Aujourd’hui", music: "Musique", musicOn: "Musique : activée", musicOff: "Musique : coupée",
+    mainMenu: "Menu principal", sections: "Rubriques", statusNow: "En ce moment", filter: "Filtrer les projets",
+    tagline: "Je construis des produits data de bout en bout. <b>Fondateur de Kalori</b> · étudiant en Business Intelligence à l’IHEC Carthage.",
+    photoAlt: "Mohamed Aziz Ghazouani prenant la parole à un pupitre",
+    back: "Retour", kEsc: "Échap", kEnter: "Entrée", kSelect: "Choisir", kOpen: "Ouvrir",
+    calSub: "Parcours · 2019 → aujourd’hui", sysSub: "Contact · CV · Réglages",
+    email: "E-mail", cvMeta: "PDF · 1 page · en anglais", settings: "Réglages", language: "Langue", motion: "Animations", full: "Complètes", calm: "Réduites",
+    of: "sur", role: "Rôle", team: "Équipe", when: "Période", status: "Statut", results: "Résultats", stack: "Stack", proof: "Liens",
+    legend: "Les pastilles montrent la preuve la plus solide derrière chaque compétence, pas une auto-évaluation.",
+    tod: ["Nuit", "Matin", "Après-midi", "Soir", "Nuit"], dayOf: (n) => `Jour ${n} de Kalori`,
+    about: [
+      "J’ai commencé à construire à 13 ans : neuf mois sur un jeu de plateforme sous Unity, avec un animateur et un graphiste. Il n’est jamais sorti. Sept ans plus tard, Kalori, si.",
+      "Je suis en troisième année de Business Intelligence à l’IHEC Carthage. Kalori est une application de nutrition pensée autour de la cuisine tunisienne ; je l’ai conçue, développée, et je la fais tourner seul : l’API, l’application, les serveurs et les mises en production.",
+      "Sur les projets d’équipe, je suis généralement chef de projet et architecte solution : pour l’administration de l’université sur Epistemia, et sur IHEC Connect, qui a remporté le premier prix avant que nous le développions pour de vrai. À HEC Finance Academy, j’ai codirigé le département IT qui a fait tourner un hackathon de 220 personnes sur nos propres logiciels.",
+      "Pendant 16 mois, j’ai accompagné à temps plein les marchands Uber chez Concentrix, en français et en anglais. En dehors de tout ça, je fais du montage vidéo, je crée des outils pour les jeux auxquels je joue et j’organise des événements.",
+      "En ce moment : une plateforme data pour Kalori, l’examen DP-700 et un stage de fin d’études (PFE) en data engineering ou en IA à partir de février 2027."
+    ],
+    facts: [
+      ["Formation", ["Licence en Business Intelligence, IHEC Carthage", "09/2024 – 06/2027 · PFE à partir de 02/2027"], ["Baccalauréat en sciences de l’informatique, mention Très bien", "06/2024"]],
+      ["Langues", ["Arabe, langue maternelle · anglais, C1 · français, B2", "Niveaux d’anglais et de français issus du test de recrutement de Concentrix"]],
+      ["Certifications", ["AWS Knowledge: Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) en préparation"]],
+      ["Distinctions", ["1er prix, Global Entrepreneurship Week, IHEC", "11/2025 · IHEC Connect · 1 500 TND pour le club"]]
+    ]
+  }
+};
+
+/* ---------- French content, keyed like the English ---------- */
+const FR = {
+  menu: { quests: ["Quêtes", "Projets"], stats: ["Stats", "Compétences"], log: ["Journal", "Expérience"], calendar: ["Calendrier", "Parcours"], profile: ["Profil", "À propos"], system: ["Système", "Contact · CV"] },
+  watermark: { menu: "MENU", quests: "QUÊTES", stats: "STATS", log: "JOURNAL", calendar: "CALENDRIER", profile: "PROFIL", system: "SYSTÈME" },
+  status: [
+    { k: "Kalori", v: "En ligne · v2.1.1", meta: "20+ utilisateurs en test · 587 commits" },
+    { k: "Plateforme data", v: "2 / 8", meta: "Jalons atteints · prochain : M2 le 10 nov." },
+    { k: "DP-700", v: "Fin nov.", meta: "Examen Microsoft Fabric Data Engineer · en préparation" }
+  ],
+  tabs: { all: "Tous", main: "Principaux", data: "Data & IA", lead: "Pilotage", hecfa: "HECFA", academic: "Académique", side: "Perso" },
+  quests: {
+    kalori: { kind: "Quête principale", when: "06/2026 → aujourd’hui", statusLabel: "En ligne", role: "Fondateur et seul développeur",
+      obj: "Un suivi nutritionnel pensé autour de la cuisine tunisienne : gratuit, en anglais, en français et en arabe, et utilisable hors ligne.",
+      results: [
+        "<b>587 commits</b> et la <b>v2.1.1</b> depuis le premier commit, le 3 juin 2026 ; lancement public le 28 septembre.",
+        "<b>~3 100 tests automatisés</b> derrière <b>8 contrôles CI obligatoires</b> ; des déploiements blue/green qui reviennent en arrière tout seuls.",
+        "Des suggestions de repas par LLM via une chaîne de fournisseurs, avec un garde-fou sur les réponses, une solution de repli et une <b>mesure du coût de chaque appel</b> ; un audit de confiance sur <b>648 situations</b>.",
+        "<b>106 plats tunisiens</b> calculés ingrédient par ingrédient, chacun avec sa page en 3 langues.",
+        "Découvrir : une carte des plats faits maison vendus près de chez vous, avec des avis.",
+        "<b>20+ utilisateurs</b> en test."
+      ],
+      proof: ["kalori-app.com", "Vidéo de démo"] },
+    platform: { kind: "Quête principale", title: "Plateforme data Kalori", when: "10/2026 → aujourd’hui", statusLabel: "En cours", role: "Data engineer",
+      obj: "Où Kalori doit-il ouvrir sa première boutique de plats préparés, et que doit contenir sa carte ? Une plateforme construite pour y répondre, d’abord sur des données synthétiques.",
+      results: [
+        "Des utilisateurs tunisiens synthétiques et un an d’entrées de journal alimentaire, générés à partir d’une graine (Python, uv).",
+        "Une source PostgreSQL sur AWS RDS, définie en Terraform.",
+        "Une extraction pseudonymisée, puis une capture des changements (Debezium → Kafka) vers un lakehouse en médaillon sur Microsoft Fabric, jusqu’à Power BI.",
+        "Mené comme un projet PMBOK : charte, WBS, planning CPM, registre des risques, demandes de changement, ADR. <b>2 jalons sur 8</b> atteints."
+      ],
+      proof: ["Journal du projet"] },
+    codelab: { kind: "Quête de guilde · HECFA", title: "Plateforme CodeLab 2.0", statusLabel: "Livré", role: "Responsable technique", team: "Département IT",
+      obj: "Les logiciels qui ont fait tourner le hackathon du club, de l’inscription aux notes du jury.",
+      results: [
+        "<b>220 participants</b> répartis en <b>12 équipes</b>.",
+        "<b>5 applications en production</b> : inscriptions et paiements, un tableau de bord participant, un support, la notation du jury et le suivi des ambassadeurs (développé seul).",
+        "Travail partagé sur le suivi RH, le site de sponsoring et les notifications EmailJS."
+      ],
+      proof: ["Vidéo de démo"] },
+    recruit: { kind: "Quête de guilde · HECFA", title: "Plateforme de recrutement", statusLabel: "Livré", role: "Responsable technique", team: "Département IT",
+      obj: "Un formulaire de candidature et un tableau de bord de filtrage pour le recrutement des nouveaux membres du club.",
+      results: ["<b>321 candidatures</b> traitées.", "Les deux ont été déployés et utilisés pour sélectionner les nouveaux membres."] },
+    connect: { kind: "Concours, puis produit", statusLabel: "1er prix", role: "Architecte solution et chef de projet", team: "Équipe",
+      obj: "Une plateforme de tutorat et d’échange de connaissances pour la communauté de l’IHEC.",
+      results: [
+        "Le MVP a remporté le <b>1er prix de la Global Entrepreneurship Week (IHEC)</b> et <b>1 500 TND</b> pour le club.",
+        "Puis développé en full stack sur <b>4 sprints Scrum</b> : rôles et connexion, séances de tutorat avec liens Meet, documents et avis de 1 à 5 étoiles, événements et offres de stage."
+      ],
+      proof: ["Vidéo de démo"] },
+    epistemia: { kind: "Projet client", when: "2025 → aujourd’hui", statusLabel: "En cours", role: "Chef de projet", team: "Équipe",
+      obj: "Une plateforme web qui numérise un jeu de société éducatif pour les étudiants.",
+      results: ["Client : l’administration de l’université.", "Animation des réunions et de la communication avec le client ; tenue de la date de livraison et d’un périmètre fidèle à la demande."],
+      proof: ["Site en ligne"] },
+    crypto: { kind: "Académique", title: "Tableau de bord cryptomonnaies", statusLabel: "Académique", role: "Analyse de données et développement", team: "Équipe de 5",
+      obj: "Un tableau de bord interactif où ce sont les données, et non l’emballement, qui expliquent les marchés crypto.",
+      results: [
+        "Relie l’inflation historique et les faillites bancaires de 2008 à l’essor du Bitcoin sur une carte animée.",
+        "Un moodboard du sentiment qui montre comment les tweets et les meme coins font bouger les prix.",
+        "Des prévisions par régression linéaire ; toute l’équipe a travaillé sur chaque partie."
+      ],
+      stack: ["Python", "Streamlit", "pandas", "Plotly", "Régression linéaire"],
+      proof: ["Présentation"] },
+    ihecbot: { kind: "Projet d’équipe", statusLabel: "Abandonné", role: "Responsable du chatbot", team: "Équipe",
+      obj: "Un assistant IA pour la bibliothèque de l’université.",
+      results: ["Responsable du chatbot : génération augmentée par récupération (RAG) avec ChromaDB et Llama, plus du fine-tuning.", "Nettoyage et structuration de <b>551 notices × 23 champs</b> avant l’indexation."] },
+    valorant: { kind: "Quête secondaire", statusLabel: "Perso", role: "Seul développeur",
+      obj: "Choisir la bonne arme selon sa façon de jouer, puis entraîner ses décisions.",
+      results: ["Un arbre de décision qui recommande <b>1 arme sur 19</b> selon le style de jeu, vérifié sur un jeu de test séparé.", "Un quiz tactique sur <b>180 scénarios</b>.", "Deux interfaces : Streamlit et Tkinter."] },
+    rideshare: { kind: "Quête de guilde · HECFA", statusLabel: "Abandonné", role: "Chef de projet", team: "Équipe",
+      obj: "Du covoiturage pour les étudiants de l’IHEC, porté par le département IT du club.",
+      results: ["Front end terminé ; le back end était partiel à l’abandon du projet."] },
+    site: { kind: "Quête de guilde · HECFA", statusLabel: "Maintenu", role: "Co-responsable IT", team: "Département IT",
+      obj: "Le site du club, repris lors de la passation du département IT.",
+      results: ["Maintenance, déploiements et configuration du domaine."],
+      stack: ["Next.js", "Déploiement", "DNS"] },
+    library: { kind: "Académique", statusLabel: "Abandonné", role: "Membre de l’équipe", team: "Équipe",
+      obj: "Numérisation de la nouvelle bibliothèque de l’université.",
+      results: ["Réservation de places et de livres, et recherche dans le catalogue importé."] },
+    learnhub: { kind: "Académique", statusLabel: "Local", role: "Membre de l’équipe", team: "Équipe",
+      obj: "Une plateforme d’apprentissage pour des cours rédigés par des enseignants de l’IHEC.",
+      results: ["Stocke les cours des enseignants avec des fonctions interactives ; fonctionne en local."] },
+    mic: { kind: "Quête secondaire", statusLabel: "Perso", role: "Seul développeur",
+      obj: "Un traitement du micro en temps réel, qui apparaît comme un micro normal dans Discord, Valorant et OBS.",
+      results: ["Un moteur DSP en Python qui alimente un câble audio virtuel, piloté depuis une page web locale."] },
+    first: { kind: "Première quête", title: "Premier jeu", statusLabel: "Jamais sorti", role: "Seul développeur", team: "Équipe de 3",
+      obj: "Un jeu de plateforme vertical sous Unity, réalisé à 13 ans.",
+      results: ["<b>9 mois</b> de développement en solo, avec un animateur et un graphiste.", "Jamais publié."] }
+  },
+  ranks: { P: ["Production", "tourne dans Kalori"], R: ["Projet", "utilisé dans un vrai projet"], B: ["En cours", "dans la plateforme data, en ce moment"], C: ["Cours", "travaux de cours"], F: ["Notions", "autodidacte, pas encore de projet"] },
+  skillGroups: ["Langages", "Web et applis", "Data", "IA et ML", "Cloud & DevOps", "Bases de données", "Méthode et outils"],
+  skillNames: {
+    "Data cleaning": "Nettoyage de données", "Change data capture": "Capture des changements (CDC)", "Star schema": "Schéma en étoile",
+    "LLMs in production": "LLM en production", "Blue/green deploys": "Déploiements blue/green", "ADRs": "ADR",
+    "Project management": "Gestion de projet", "Client support": "Support client"
+  },
+  log: [
+    { when: "06/2026 → aujourd’hui", dur: "Projet personnel", title: "Fondateur et seul développeur",
+      points: ["Conçu, développé et opéré seul : l’API, l’application, l’infrastructure et les mises en production.", "587 commits, v2.1.1, 20+ utilisateurs en test.", "Candidature à Y Combinator le 1er novembre 2026."] },
+    { dur: "16 mois · temps plein", title: "Agent de support technique", org: "Concentrix · compte marchands Uber · Tunis",
+      points: ["Traitement de cas techniques et non techniques pour les marchands Uber, en français et en anglais.", "Gestion des cas dans Salesforce et Jira.", "Rôle de conseil : comprendre le besoin du marchand et recommander la solution."] },
+    { dur: "Membre depuis 10/2024 · aujourd’hui alumni", title: "Responsable technique",
+      points: ["Codirection du département IT du club.", "7 applications livrées : 5 pour le hackathon CodeLab 2.0 (220 participants) et 2 pour le recrutement (321 candidatures).", "Maintenance du site du club, de ses déploiements et de son domaine."] },
+    { dur: "10 mois", title: "Membre",
+      points: ["Bootcamp machine learning (2025)."] }
+  ],
+  cal: {
+    "2019": [["Juil", "<b>Premier jeu</b>, un jeu de plateforme sous Unity, réalisé à 13 ans en 9 mois"]],
+    "2021": [["—", "<b>CodeCademy</b> : développement web, 6 modules"]],
+    "2023": [["Déc", "<b>Najahni</b>, une appli d’élèves en année du bac : documentation et collecte de données"]],
+    "2024": [["Juin", "<b>Baccalauréat</b> en sciences de l’informatique, mention Très bien"], ["Sep", "<b>IHEC Carthage</b>, Business Intelligence · IEEE CS INSAT"], ["Oct", "Rejoint <b>HEC Finance Academy</b>"], ["Nov", "<b>RideShare</b>, comme chef de projet"]],
+    "2025": [["Fév", "<b>IHEC BOT</b> : responsable du chatbot RAG"], ["Avr", "<b>IHEC Library</b>"], ["Mai", "<b>Tableau de bord crypto</b>"], ["Juin", "<b>Concentrix</b>, temps plein"], ["Juil", "<b>Responsable technique</b> à HECFA"], ["Oct", "<b>Plateforme de recrutement</b> : 321 candidatures"], ["Nov", "<b>IHEC Connect</b> remporte le 1er prix"], ["Déc", "<b>Valorant assistant</b> · début du développement de CodeLab 2.0"], ["—", "<b>Epistemia</b>, comme chef de projet"]],
+    "2026": [["Fév", "<b>CodeLab 2.0</b> : 220 participants, 12 équipes"], ["Avr", "<b>IHEC Connect</b>, développé en full stack"], ["Juin", "<b>Kalori</b> : premier commit"], ["Sep", "<b>Lancement de Kalori</b> le 28 sept. · fin de Concentrix"], ["Oct", "v2.0.0 · charte de la <b>plateforme data</b>"], ["Nov", "<b>Candidature YC</b> · Découvrir · DP-700"]]
+  }
+};
+
+/* French spacing: a no-break space before ":" and a narrow one before ";", "!" and "?".
+   Only a space typed before the mark is touched, so "https://", "18:30" and
+   "AWS Knowledge: Cloud Essentials" stay as they are. */
+const frTypo = (s) => s.replace(/ ([:;!?])/g, (_, p) => (p === ":" ? " " : " ") + p);
+function deepTypo(x) {
+  if (typeof x === "string") return frTypo(x);
+  if (Array.isArray(x)) return x.map(deepTypo);
+  if (x && typeof x === "object") return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, typeof v === "function" ? v : deepTypo(v)]));
+  return x;
+}
+UI.fr = deepTypo(UI.fr);
+Object.assign(FR, deepTypo(FR));
+
+/* ---------- language ---------- */
+const LANG_KEY = "portfolio-lang";
+let lang = (() => {
+  try { const s = localStorage.getItem(LANG_KEY); if (s === "en" || s === "fr") return s; } catch {}
+  return (navigator.language || "").toLowerCase().startsWith("fr") ? "fr" : "en";
+})();
+const t = (k) => UI[lang][k] ?? UI.en[k];
+const fr = () => lang === "fr";
+const menuText = (m) => (fr() ? FR.menu[m.id] : [m.label, m.sub]);
+const wmText = (id) => (fr() ? FR.watermark[id] : WATERMARK[id]);
+function quest(q) {
+  if (!fr()) return q;
+  const o = FR.quests[q.id] || {};
+  return { ...q, ...o, proof: q.proof.map((p, i) => ({ ...p, label: (o.proof && o.proof[i]) || p.label })) };
+}
+const rank = (r) => (fr() ? { ...RANKS[r], l: FR.ranks[r][0], d: FR.ranks[r][1] } : RANKS[r]);
+const logEntry = (e, i) => (fr() ? { ...e, ...FR.log[i] } : e);
+const calEvents = (y) => (fr() ? FR.cal[y.y] : y.ev);
+
+/* ---------- helpers ---------- */
+const $ = (s) => document.querySelector(s);
+const pips = (n) => Array.from({ length: 4 }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("");
+const calm = () => document.documentElement.classList.contains("calm") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- static text ---------- */
+function applyStatic() {
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll("[data-th]").forEach((el) => { el.innerHTML = t(el.dataset.th); });
+  document.querySelectorAll("[data-ta]").forEach((el) => {
+    const [attr, key] = el.dataset.ta.split(":"); el.setAttribute(attr, t(key));
+  });
+  ["quests", "stats", "log", "calendar", "profile", "system"].forEach((id, i) => {
+    const [label, sub] = menuText(MENU[i]);
+    const h = document.querySelector(`#${id} .head h2`); if (h) h.textContent = label;
+    const s = document.querySelector(`#${id} .head .sub`); if (s && id !== "calendar" && id !== "system") s.textContent = sub;
+  });
+  $("#about").innerHTML = t("about").map((p) => `<p>${p}</p>`).join("");
+  $("#facts").innerHTML = t("facts").map(([dt, ...dds]) =>
+    `<div><dt>${dt}</dt>${dds.map(([main, note]) => `<dd>${main}<span>${note}</span></dd>`).join("")}</div>`).join("");
+  document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+
+/* ---------- clock ---------- */
+function clock() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  $("#cDate").textContent = fr() ? `${pad(d.getDate())}/${pad(d.getMonth() + 1)}` : `${pad(d.getMonth() + 1)}/${pad(d.getDate())}`;
+  $("#cDow").textContent = d.toLocaleDateString(lang, { weekday: "short" }).replace(".", "").toUpperCase();
+  const h = d.getHours();
+  $("#cTod").textContent = t("tod")[h < 5 ? 0 : h < 11 ? 1 : h < 17 ? 2 : h < 21 ? 3 : 4];
+  const start = new Date(2026, 5, 3);
+  const today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = Math.round((today - start) / 86400000) + 1;
+  $("#cDay").textContent = day > 0 ? t("dayOf")(day) : "";
+}
+
+/* ---------- main menu ---------- */
+const menuList = $("#menuList");
+menuList.innerHTML = MENU.map((m, i) =>
+  `<li style="--i:${i}"><button type="button" data-i="${i}"><span class="label"></span><span class="sub"></span></button></li>`).join("");
+const items = [...menuList.children];
+const btns = items.map((li) => li.querySelector("button"));
+function renderMenu() {
+  btns.forEach((b, i) => {
+    const [label, sub] = menuText(MENU[i]);
+    b.querySelector(".label").textContent = label;
+    b.querySelector(".sub").textContent = sub;
+  });
+}
+let sel = 0;
+function select(i, focus) {
+  sel = (i + MENU.length) % MENU.length;
+  items.forEach((li, j) => li.classList.toggle("sel", j === sel));
+  if (focus) btns[sel].focus({ preventScroll: true });
+}
+btns.forEach((b, i) => {
+  b.addEventListener("mouseenter", () => select(i));
+  b.addEventListener("focus", () => select(i));
+  b.addEventListener("click", () => go(MENU[i].id));
+});
+select(0);
+
+function renderStatus() {
+  const list = fr() ? STATUS.map((s, i) => ({ ...s, ...FR.status[i] })) : STATUS;
+  $("#status").innerHTML = list.map((s) =>
+    `<div class="card"><span class="card-k">${s.k}</span><span class="card-v">${s.v}</span>` +
+    (s.segs ? `<span class="segs" aria-label="${s.segs[1]} ${t("of")} ${s.segs[0]}">${Array.from({ length: s.segs[0] }, (_, i) => `<i class="${i < s.segs[1] ? "on" : ""}"></i>`).join("")}</span>` : "") +
+    `<span class="card-meta">${s.meta}</span></div>`).join("");
+}
+
+/* ---------- quests ---------- */
+let tab = "all";
+let qsel = "kalori";
+const visible = () => QUESTS.filter((q) => tab === "all" || q.cats.includes(tab));
+function renderTabs() {
+  $("#qTabs").innerHTML = TABS.map(([id, l]) =>
+    `<button class="chipbtn" role="tab" type="button" aria-selected="${id === tab}" data-tab="${id}">${fr() ? FR.tabs[id] : l}</button>`).join("");
+}
+function renderList() {
+  const v = visible();
+  if (!v.some((q) => q.id === qsel)) qsel = v[0].id;
+  $("#qList").innerHTML = v.map((raw, i) => {
+    const q = quest(raw);
+    return `<li><button class="qrow" type="button" data-q="${q.id}" aria-current="${q.id === qsel}">` +
+      `<span class="qn">${String(i + 1).padStart(2, "0")}</span>` +
+      `<span class="qtitle"><span class="qt">${q.title}</span><span class="qd">${q.when} · ${q.role}</span></span>` +
+      `<span class="st ${q.status}">${q.statusLabel}</span></button></li>`;
+  }).join("");
+  $("#qCount").textContent = `${v.length} ${t("of")} ${QUESTS.length}`;
+}
+function renderDetail() {
+  const q = quest(QUESTS.find((x) => x.id === qsel));
+  // Only links that exist are shown; a card with none simply has no Proof row.
+  const links = q.proof.filter((p) => p.href);
+  const proof = links.length
+    ? `<p class="h">${t("proof")}</p><div class="proof">${links.map((p) => `<a href="${p.href}" target="_blank" rel="noopener">${p.label} ↗</a>`).join("")}</div>`
+    : "";
+  const el = $("#qDetail");
+  el.innerHTML =
+    `<p class="kind">${q.kind}</p><h3>${q.title}</h3>` +
+    `<dl class="meta"><div><dt>${t("role")}</dt><dd>${q.role}</dd></div><div><dt>${t("team")}</dt><dd>${q.team}</dd></div>` +
+    `<div><dt>${t("when")}</dt><dd>${q.when}</dd></div><div><dt>${t("status")}</dt><dd>${q.statusLabel}</dd></div></dl>` +
+    `<p class="obj">${q.obj}</p>` +
+    `<p class="h">${t("results")}</p><ul class="results">${q.results.map((r) => `<li>${r}</li>`).join("")}</ul>` +
+    `<p class="h">${t("stack")}</p><div class="tags">${q.stack.map((s) => `<span>${s}</span>`).join("")}</div>` +
+    proof;
+  el.style.animation = "none"; void el.offsetHeight; el.style.animation = "";
+  el.scrollTop = 0;
+}
+function pickQuest(id, focus) {
+  qsel = id;
+  document.querySelectorAll(".qrow").forEach((b) => b.setAttribute("aria-current", String(b.dataset.q === id)));
+  renderDetail();
+  if (focus) document.querySelector(`.qrow[data-q="${id}"]`).focus();
+}
+function setTab(id) {
+  tab = id; renderTabs(); renderList(); renderDetail();
+  const tb = document.querySelector(`[data-tab="${id}"]`); if (tb) tb.focus();
+}
+$("#qTabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); });
+$("#qList").addEventListener("click", (e) => {
+  const b = e.target.closest(".qrow"); if (!b) return;
+  pickQuest(b.dataset.q);
+  if (matchMedia("(max-width: 900px)").matches) $("#qDetail").scrollIntoView({ behavior: calm() ? "auto" : "smooth", block: "start" });
+});
+
+/* ---------- stats ---------- */
+function renderStats() {
+  $("#sLegend").innerHTML =
+    `<p>${t("legend")}</p>` +
+    Object.keys(RANKS).map((k) => { const r = rank(k); return `<span class="lg"><span class="pips">${pips(r.n)}</span>${r.l} <small>${r.d}</small></span>`; }).join("");
+  $("#sGrid").innerHTML = SKILLS.map((g, gi) =>
+    `<section class="sgroup" style="--i:${gi}"><h3><small>${String(gi + 1).padStart(2, "0")}</small>${fr() ? FR.skillGroups[gi] : g.g}</h3>` +
+    g.items.map(([name, r]) => `<div class="skill"><span>${(fr() && FR.skillNames[name]) || name}</span><span class="pips" aria-hidden="true">${pips(RANKS[r].n)}</span><span class="rk">${rank(r).l}</span></div>`).join("") +
+    `</section>`).join("");
+}
+
+/* ---------- log ---------- */
+function renderLog() {
+  $("#lList").innerHTML = LOG.map((raw, i) => {
+    const e = logEntry(raw, i);
+    return `<article class="entry" style="--i:${i}"><div class="when">${e.when}<small>${e.dur}</small></div>` +
+      `<div><h3>${e.title}</h3><p class="org">${e.org}</p><ul class="results">${e.points.map((p) => `<li>${p}</li>`).join("")}</ul></div></article>`;
+  }).join("");
+}
+
+/* ---------- calendar ---------- */
+function renderCal() {
+  $("#cYears").innerHTML = CAL.map((y, i) =>
+    `<section class="year${y.now ? " now" : ""}" style="--i:${i}"><h3>${y.y}</h3>` +
+    calEvents(y).map(([m, tx]) => `<div class="ev"><span class="m">${m}</span><span>${tx}</span></div>`).join("") + `</section>`).join("");
+}
+
+/* ---------- motion setting ---------- */
+function setMotion(isCalm) {
+  document.documentElement.classList.toggle("calm", isCalm);
+  $("#motionFull").setAttribute("aria-pressed", String(!isCalm));
+  $("#motionCalm").setAttribute("aria-pressed", String(isCalm));
+}
+$("#motionFull").addEventListener("click", () => setMotion(false));
+$("#motionCalm").addEventListener("click", () => setMotion(true));
+
+/* ---------- music ----------
+   Parked: MUSIC_FILE is null, so the toggle stays hidden and nothing is fetched.
+   To turn it on, put a track you have the rights to in audio/ and name it here.
+   Off until the visitor turns it on: browsers refuse sound before a click anyway.
+   START_ON = true shows the speaker as on and starts the track on the first
+   click or key press anywhere; the toggle still turns it off. */
+const MUSIC_FILE = null;
+const START_ON = false;
+const VOLUME = 0.04, FADE_MS = 1200;
+const bgm = $("#bgm"), sound = $("#sound");
+let musicOn = false, fadeId = 0;
+// A timer, not requestAnimationFrame: audio has to fade whether or not the page is painting.
+function fadeTo(target, done) {
+  clearInterval(fadeId);
+  const from = bgm.volume, t0 = performance.now();
+  fadeId = setInterval(() => {
+    const k = Math.min(1, (performance.now() - t0) / FADE_MS);
+    bgm.volume = from + (target - from) * k;
+    if (k === 1) { clearInterval(fadeId); if (done) done(); }
+  }, 40);
+}
+function paintSound(on) {
+  sound.setAttribute("aria-pressed", String(on));
+  sound.title = on ? t("musicOn") : t("musicOff");
+}
+async function setMusic(on) {
+  musicOn = on;
+  paintSound(on);
+  if (!on) { fadeTo(0, () => bgm.pause()); return; }
+  if (bgm.paused) bgm.volume = 0;
+  try { await bgm.play(); } catch { if (musicOn) { musicOn = false; paintSound(false); } return; }
+  if (musicOn) fadeTo(VOLUME); else bgm.pause();
+}
+if (MUSIC_FILE) {
+  bgm.src = MUSIC_FILE;
+  sound.hidden = false;
+  paintSound(false);
+  sound.addEventListener("click", () => setMusic(!musicOn));
+  bgm.addEventListener("error", () => { musicOn = false; paintSound(false); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) bgm.pause();
+    else if (musicOn) bgm.play().catch(() => {});
+  });
+  if (START_ON) {
+    musicOn = true; paintSound(true);
+    const first = (e) => {
+      removeEventListener("pointerdown", first); removeEventListener("keydown", first);
+      if (musicOn && !e.target.closest("#sound")) setMusic(true);
+    };
+    addEventListener("pointerdown", first); addEventListener("keydown", first);
+  }
+}
+
+/* ---------- render everything in the current language ---------- */
+function renderAll() {
+  document.documentElement.lang = lang;
+  applyStatic(); clock(); renderMenu(); renderStatus();
+  renderTabs(); renderList(); renderDetail();
+  renderStats(); renderLog(); renderCal();
+  $("#wm").textContent = wmText(current);
+  if (MUSIC_FILE) paintSound(musicOn);
+}
+function setLang(l) {
+  if (l === lang) return;
+  lang = l;
+  try { localStorage.setItem(LANG_KEY, l); } catch {}
+  renderAll();
+}
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (b) setLang(b.dataset.lang); });
+
+/* ---------- navigation ---------- */
+let current = "menu";
+let busy = false;
+const wipe = $("#wipe");
+function show(id) {
+  document.querySelectorAll(".screen").forEach((s) => { s.hidden = s.id !== id; });
+  current = id;
+  $("#wm").textContent = wmText(id);
+  history.replaceState(null, "", id === "menu" ? location.pathname : `#${id}`);
+  if (id === "menu") select(sel, true);
+  else if (id === "quests") { const r = document.querySelector('.qrow[aria-current="true"]'); if (r) r.focus({ preventScroll: true }); }
+  else { const b = document.querySelector(`#${id} .back`); if (b) b.focus({ preventScroll: true }); }
+}
+function go(id) {
+  if (busy || id === current || !WATERMARK[id]) return;
+  if (calm()) { show(id); return; }
+  busy = true;
+  wipe.className = "wipe in";
+  setTimeout(() => {
+    show(id);
+    wipe.className = "wipe out";
+    setTimeout(() => { wipe.className = "wipe"; busy = false; }, 380);
+  }, 330);
+}
+document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
+document.addEventListener("keydown", (e) => {
+  if (busy || e.altKey || e.ctrlKey || e.metaKey) return;
+  const k = e.key;
+  if (current === "menu") {
+    if (k === "ArrowDown") { e.preventDefault(); select(sel + 1, true); }
+    else if (k === "ArrowUp") { e.preventDefault(); select(sel - 1, true); }
+    else if (k === "Enter" && !e.target.closest("button, a")) { e.preventDefault(); go(MENU[sel].id); }
+    return;
+  }
+  if (k === "Escape" || k === "Backspace") { e.preventDefault(); go("menu"); return; }
+  if (current === "quests") {
+    const v = visible();
+    const idx = v.findIndex((q) => q.id === qsel);
+    if (k === "ArrowDown") { e.preventDefault(); pickQuest(v[Math.min(idx + 1, v.length - 1)].id, true); }
+    else if (k === "ArrowUp") { e.preventDefault(); pickQuest(v[Math.max(idx - 1, 0)].id, true); }
+    else if (k === "ArrowRight" || k === "ArrowLeft") {
+      e.preventDefault();
+      const ti = TABS.findIndex((x) => x[0] === tab);
+      setTab(TABS[(ti + (k === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length][0]);
+    }
+  }
+});
+renderAll();
+const start = location.hash.slice(1);
+if (WATERMARK[start] && start !== "menu") show(start); else show("menu");
+</script>
+</body>
+</html>
