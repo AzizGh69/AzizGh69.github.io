@@ -1050,22 +1050,47 @@ function show(id) {
   document.querySelectorAll(".screen").forEach((s) => { s.hidden = s.id !== id; });
   current = id;
   $("#wm").textContent = wmText(id);
-  history.replaceState(null, "", id === "menu" ? location.pathname : `#${id}`);
   if (id === "menu") select(sel, true);
   else if (id === "quests") { const r = document.querySelector('.qrow[aria-current="true"]'); if (r) r.focus({ preventScroll: true }); }
   else { const b = document.querySelector(`#${id} .back`); if (b) b.focus({ preventScroll: true }); }
 }
-function go(id) {
-  if (busy || id === current || !WATERMARK[id]) return;
+/* History: the menu is home. Opening a screen from the menu adds one history
+   step, so the browser's Back returns to the menu; moving between screens
+   replaces that step; going back to the menu (Esc, Back) steps history back,
+   so the next browser Back leaves the site instead of reopening the screen. */
+const PAGE = () => location.pathname + location.search;
+let pending = null;
+function transition(id) {
+  // Mid-wipe, "current" is still the old screen, so remember the request and settle it after.
+  if (busy) { pending = id; return; }
+  if (id === current) return;
   if (calm()) { show(id); return; }
   busy = true;
   wipe.className = "wipe in";
   setTimeout(() => {
     show(id);
     wipe.className = "wipe out";
-    setTimeout(() => { wipe.className = "wipe"; busy = false; }, 380);
+    setTimeout(() => {
+      wipe.className = "wipe"; busy = false;
+      const next = pending; pending = null;
+      if (next && next !== current) transition(next);
+    }, 380);
   }, 330);
 }
+function go(id) {
+  if (busy || id === current || !WATERMARK[id]) return;
+  if (id === "menu") {
+    if (history.state && history.state.screen) { history.back(); return; }   // popstate paints the menu
+    history.replaceState(null, "", PAGE());
+  } else if (current === "menu") {
+    history.pushState({ screen: id }, "", `#${id}`);
+  } else {
+    history.replaceState({ screen: id }, "", `#${id}`);
+  }
+  transition(id);
+}
+const screenFromUrl = () => { const h = location.hash.slice(1); return WATERMARK[h] && h !== "menu" ? h : "menu"; };
+addEventListener("popstate", () => transition(screenFromUrl()));
 document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
 document.addEventListener("keydown", (e) => {
   if (busy || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -1090,8 +1115,17 @@ document.addEventListener("keydown", (e) => {
   }
 });
 renderAll();
-const start = location.hash.slice(1);
-if (WATERMARK[start] && start !== "menu") show(start); else show("menu");
+{
+  // A link straight to a screen (…/#calendar) gets the menu slipped in underneath,
+  // so Back still lands on the menu. A reload keeps the steps it already has.
+  const start = screenFromUrl();
+  if (start === "menu") history.replaceState(null, "", PAGE());
+  else if (!(history.state && history.state.screen === start)) {
+    history.replaceState(null, "", PAGE());
+    history.pushState({ screen: start }, "", `#${start}`);
+  }
+  show(start);
+}
 </script>
 </body>
 </html>
