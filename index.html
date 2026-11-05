@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+// GitHub always publishes a <user>.github.io repository and refuses to switch it off, so that copy forwards here.
+if (location.hostname.endsWith(".github.io")) location.replace("https://aziz-ghazouani.pages.dev/" + location.search + location.hash);
+</script>
+<link rel="canonical" href="https://aziz-ghazouani.pages.dev/">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mohamed Aziz Ghazouani · Portfolio</title>
 <meta name="description" content="Mohamed Aziz Ghazouani: I build data products end to end. Founder of Kalori, Business Intelligence student at IHEC Carthage.">
@@ -81,6 +86,8 @@ a{color:inherit}
 /* ---------- screens ---------- */
 main{position:relative;z-index:5;height:100%}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+/* Vertical scrollbars stay native but thin and in the palette rather than white. */
+.screen,.qlist,.qdetail{scrollbar-width:thin;scrollbar-color:rgba(79,230,255,.5) transparent}
 .screen[hidden]{display:none!important}
 
 /* ---------- main menu ---------- */
@@ -214,7 +221,17 @@ main{position:relative;z-index:5;height:100%}
 .entry h3{margin:0;font:900 italic 32px/1 var(--display);text-transform:uppercase}
 .entry .org{font:700 italic 17px/1.25 var(--display);letter-spacing:.08em;color:var(--ice);margin:5px 0 10px;text-transform:uppercase}
 
-.years{display:flex;gap:16px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x proximity}
+/* The native scrollbar is a white Windows bar under a blue screen, so it is hidden and #cRail
+   draws one in the site's style. Snapping is for fingers only: on a desktop it pulled wheel and
+   rail scrolls back to the card they started from. */
+.years{display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.years::-webkit-scrollbar{display:none}
+@media (pointer:coarse){.years{scroll-snap-type:x proximity}}
+.rail{position:relative;height:22px;margin-top:10px;cursor:pointer;touch-action:none}
+.rail[hidden]{display:none}
+.rail::before{content:"";position:absolute;left:0;right:0;top:9px;height:4px;background:rgba(214,247,255,.14);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+.rail span{position:absolute;left:0;top:5px;height:12px;background:var(--cyan);clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%);transition:background .15s}
+.rail:hover span,.rail.drag span{background:#fff}
 .year{flex:0 0 290px;scroll-snap-align:start;background:rgba(4,10,28,.7);padding:16px 18px 18px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%);animation:fadein .4s ease-out both;animation-delay:calc(var(--i) * 50ms)}
 /* Year cards fade rather than slide: they sit in a snapping scroller, and a card that is still
    moving when the screen opens gets snapped to mid-slide, leaving the row 24px scrolled. */
@@ -388,6 +405,7 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
       <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
     </div>
     <div class="years" id="cYears"></div>
+    <div class="rail" id="cRail" aria-hidden="true" hidden><span></span></div>
   </section>
 
   <!-- PROFILE -->
@@ -961,6 +979,53 @@ function renderCal() {
   $("#cYears").innerHTML = CAL.map((y, i) =>
     `<section class="year${y.now ? " now" : ""}" style="--i:${i}"><h3>${y.y}</h3>` +
     calEvents(y).map(([m, tx]) => `<div class="ev"><span class="m">${m}</span><span>${tx}</span></div>`).join("") + `</section>`).join("");
+  paintRail();
+}
+
+/* ---------- calendar rail: the row's scrollbar, drawn by the page ---------- */
+const years = $("#cYears"), rail = $("#cRail"), thumb = rail.firstElementChild;
+const railMax = () => years.scrollWidth - years.clientWidth;
+function paintRail() {
+  const max = railMax();
+  rail.hidden = max <= 1;
+  if (rail.hidden) return;
+  const w = rail.clientWidth, tw = Math.max(years.clientWidth / years.scrollWidth, 0.08) * w;
+  thumb.style.width = `${tw}px`;
+  thumb.style.transform = `translateX(${(years.scrollLeft / max) * (w - tw)}px)`;
+}
+years.addEventListener("scroll", paintRail, { passive: true });
+new ResizeObserver(paintRail).observe(years);   // also fires when the screen goes from hidden to shown
+rail.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  const r = rail.getBoundingClientRect(), tw = thumb.offsetWidth, max = railMax();
+  // Grabbing the thumb keeps it under the finger; clicking the track centres it there.
+  const grab = e.target === thumb ? e.clientX - thumb.getBoundingClientRect().left : tw / 2;
+  const to = (x) => { years.scrollLeft = ((x - r.left - grab) / (r.width - tw)) * max; };
+  to(e.clientX);
+  rail.setPointerCapture(e.pointerId);
+  rail.classList.add("drag");
+  const move = (ev) => to(ev.clientX);
+  const up = () => {
+    rail.classList.remove("drag");
+    rail.removeEventListener("pointermove", move);
+    rail.removeEventListener("pointerup", up);
+    rail.removeEventListener("pointercancel", up);
+  };
+  rail.addEventListener("pointermove", move);
+  rail.addEventListener("pointerup", up);
+  rail.addEventListener("pointercancel", up);
+});
+// A mouse wheel scrolls the row sideways; at either end it hands back to the page.
+years.addEventListener("wheel", (e) => {
+  if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;   // trackpads already swipe sideways
+  const d = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY, max = railMax();
+  if (max <= 1 || (d < 0 && years.scrollLeft <= 0) || (d > 0 && years.scrollLeft >= max - 1)) return;
+  e.preventDefault();
+  years.scrollLeft += d;
+}, { passive: false });
+function stepYears(dir) {
+  const card = years.firstElementChild;
+  if (card) years.scrollBy({ left: dir * (card.offsetWidth + 16), behavior: calm() ? "auto" : "smooth" });
 }
 
 /* ---------- motion setting ---------- */
@@ -1102,6 +1167,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if (k === "Escape" || k === "Backspace") { e.preventDefault(); go("menu"); return; }
+  if (current === "calendar" && (k === "ArrowRight" || k === "ArrowLeft")) { e.preventDefault(); stepYears(k === "ArrowRight" ? 1 : -1); return; }
   if (current === "quests") {
     const v = visible();
     const idx = v.findIndex((q) => q.id === qsel);
