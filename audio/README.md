@@ -41,7 +41,7 @@ In `index.html`, search for `---------- music`. Just below are:
 
 | Setting | Now | What it does |
 |---|---|---|
-| `VOLUME` | `0.02` | Loudness, from 0 to 1. `0.04` is twice as loud. |
+| `VOLUME` | `0.1` | Loudness, from 0 to 1. `0.2` is twice as loud. |
 | `START_ON` | `false` | `true` shows the speaker as on, and the music starts at the visitor's first click anywhere on the page. Browsers never allow sound before a click. |
 | `FADE_MS` | `1200` | How long the fade in and out takes, in milliseconds. |
 | `MUSIC_FILE` | `"audio/bgm.mp3"` | Which file plays. `null` switches the music off entirely. |

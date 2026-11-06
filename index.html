@@ -1047,7 +1047,7 @@ $("#motionCalm").addEventListener("click", () => setMotion(true));
    VOLUME runs from 0 to 1; FADE_MS is the fade in and out. */
 const MUSIC_FILE = "audio/bgm.mp3";
 const START_ON = false;
-const VOLUME = 0.02, FADE_MS = 1200;
+const VOLUME = 0.1, FADE_MS = 1200;
 const bgm = $("#bgm"), sound = $("#sound");
 let musicOn = false, fadeId = 0;
 // A timer, not requestAnimationFrame: audio has to fade whether or not the page is painting.
