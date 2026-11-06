@@ -1038,12 +1038,14 @@ $("#motionFull").addEventListener("click", () => setMotion(false));
 $("#motionCalm").addEventListener("click", () => setMotion(true));
 
 /* ---------- music ----------
-   Parked: MUSIC_FILE is null, so the toggle stays hidden and nothing is fetched.
-   To turn it on, put a track you have the rights to in audio/ and name it here.
+   The track is audio/bgm.mp3; audio/README.md says how to add or change it.
+   The speaker only appears once that file is really there, so a site without
+   a track shows no button that plays nothing. MUSIC_FILE = null switches it off.
    Off until the visitor turns it on: browsers refuse sound before a click anyway.
    START_ON = true shows the speaker as on and starts the track on the first
-   click or key press anywhere; the toggle still turns it off. */
-const MUSIC_FILE = null;
+   click or key press anywhere; the toggle still turns it off.
+   VOLUME runs from 0 to 1; FADE_MS is the fade in and out. */
+const MUSIC_FILE = "audio/bgm.mp3";
 const START_ON = false;
 const VOLUME = 0.04, FADE_MS = 1200;
 const bgm = $("#bgm"), sound = $("#sound");
@@ -1071,8 +1073,16 @@ async function setMusic(on) {
   if (musicOn) fadeTo(VOLUME); else bgm.pause();
 }
 if (MUSIC_FILE) {
+  const showSound = () => { if (sound.hidden) { sound.hidden = false; paintSound(musicOn); } };
+  // Two ways to learn the track exists: a HEAD request on a real server (Cloudflare answers a
+  // missing file with the page itself, so the type has to say audio), and the audio element's
+  // own metadata for a page opened from disk, where fetch is not allowed.
+  fetch(MUSIC_FILE, { method: "HEAD", cache: "no-cache" })
+    .then((r) => { if (r.ok && /^audio\//.test(r.headers.get("content-type") || "")) showSound(); })
+    .catch(() => {});
+  bgm.addEventListener("loadedmetadata", showSound, { once: true });
+  bgm.preload = "metadata";
   bgm.src = MUSIC_FILE;
-  sound.hidden = false;
   paintSound(false);
   sound.addEventListener("click", () => setMusic(!musicOn));
   bgm.addEventListener("error", () => { musicOn = false; paintSound(false); });
