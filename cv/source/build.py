@@ -17,7 +17,7 @@ PRE = r"""\documentclass[10pt]{article}
 \setlist[itemize]{leftmargin=1.05em,itemsep=0.3pt,topsep=1pt,parsep=0pt,label={\color{accent}\textbullet}}
 \usepackage{titlesec}
 \titleformat{\section}{\color{accent}\bfseries\fontsize{10.5}{12}\selectfont}{}{0pt}{\MakeUppercase}[\vspace{-5pt}{\color{accent}\rule{\linewidth}{0.7pt}}]
-\titlespacing*{\section}{0pt}{4.5pt}{2.5pt}
+\titlespacing*{\section}{0pt}{4.5pt}{0.5pt}
 \usepackage[colorlinks=true,urlcolor=accent,linkcolor=accent,pdfauthor={Mohamed Aziz Ghazouani}]{hyperref}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
@@ -53,6 +53,7 @@ ABOUT = (
 
 K = {
     "ai": r"\textbf{Built the AI meal suggestions:} a rules-based recommender and an LLM provider chain (Anthropic, OpenAI-compatible) with an output guard, fallback and per-call cost metering, checked by a trust audit over 648 situations.",
+    "ai_all": r"\textbf{Built the AI meal suggestions:} a rules-based recommender and an LLM provider chain (Anthropic, OpenAI-compatible) with an output guard, fallback and per-call cost metering, over 106 Tunisian dishes, checked by a trust audit over 648 situations.",
     "ai_short": r"\textbf{Added LLM meal suggestions} with per-call cost tracking, over 106 Tunisian dishes with counted nutrition values.",
     "solo": r"\textbf{Developed the whole product alone} in 570+ commits: NestJS/TypeScript API, PostgreSQL, Redis, an offline React PWA, Firebase and Cloudflare.",
     "ci": r"\textbf{Industrialised delivery:} GitHub Actions CI with 8 required checks and ~3,100 automated tests, blue/green deployment with automatic rollback.",
@@ -70,6 +71,13 @@ SKILLS = {
         ("Cloud & DevOps", "Docker, n8n, AWS, Terraform (Infrastructure as Code), Podman, GitHub Actions (CI/CD), Cloudflare, Linux"),
         ("Databases", "PostgreSQL, Redis, MySQL, Oracle, Firebase"),
     ],
+    "all": [
+        ("AI & Data Science", "LLMs in production, Python, pandas, numpy, Streamlit, scikit-learn, RAG, embeddings, ChromaDB, Llama, fine-tuning, data cleaning"),
+        ("Data Engineering", "SQL, PySpark, ETL/ELT, CDC (Debezium, Kafka), medallion architecture, Microsoft Fabric, Power BI"),
+        ("Development", "TypeScript, NestJS, Firebase Auth / TOTP, JavaScript, Java, C#, PHP, React, Next.js, Postman, Git, Sentry, system design"),
+        ("Cloud & DevOps", "AWS, Terraform (Infrastructure as Code), Docker, Podman, GitHub Actions (CI/CD), Cloudflare, Linux, n8n"),
+        ("Databases", "PostgreSQL, Redis, MySQL, Oracle, Firebase"),
+    ],
     "de": [
         ("Data Engineering", "SQL, PySpark, ETL/ELT, CDC (Debezium, Kafka), medallion architecture, Microsoft Fabric, Power BI"),
         ("AI & Data Science", "Python, pandas, numpy, Streamlit, scikit-learn, RAG, LLMs in production, embeddings, ChromaDB, Llama, fine-tuning, data cleaning"),
@@ -78,16 +86,19 @@ SKILLS = {
         ("Development", "React, TypeScript, JavaScript, Java, C#, PHP, NestJS, Next.js, Postman, Git, Sentry, system design"),
     ],
 }
-NAMES = {"genai": "Mohamed-Aziz-Ghazouani-CV-GenAI-LLM", "de": "Mohamed-Aziz-Ghazouani-CV-Data-Engineering"}
+NAMES = {"all": "Mohamed-Aziz-Ghazouani-CV", "genai": "Mohamed-Aziz-Ghazouani-CV-GenAI-LLM", "de": "Mohamed-Aziz-Ghazouani-CV-Data-Engineering"}
 
 
 def build(kind):
-    title = {"genai": r"Generative AI \& LLM", "de": "Data Engineering"}[kind]
-    kalori = [K["ai"], K["solo"], K["ci"], K["dp"]] if kind == "genai" else [K["dp"], K["solo"], K["ci"], K["ai_short"]]
-    bot = [BOT["lead"], BOT["clean"]] if kind == "genai" else [BOT["clean"], BOT["lead"]]
+    # The all-in-one CV names no specialty: the breadth is the point.
+    title = {"all": "", "genai": r"Generative AI \& LLM \textbar{} ", "de": r"Data Engineering \textbar{} "}[kind]
+    kalori = {"all": [K["ai_all"], K["solo"], K["ci"], K["dp"]],
+              "genai": [K["ai"], K["solo"], K["ci"], K["dp"]],
+              "de": [K["dp"], K["solo"], K["ci"], K["ai_short"]]}[kind]
+    bot = [BOT["clean"], BOT["lead"]] if kind == "de" else [BOT["lead"], BOT["clean"]]
     s = PRE + "\\begin{document}\n"
     s += r"{\fontsize{21}{24}\selectfont\bfseries Mohamed Aziz GHAZOUANI\par}" + "\n\\vspace{2pt}\n"
-    s += r"{\color{accent}\bfseries\fontsize{11}{13}\selectfont " + title + r" \textbar{} Final-year internship (PFE) from 02/2027\par}" + "\n\\vspace{2pt}\n"
+    s += r"{\color{accent}\bfseries\fontsize{11}{13}\selectfont " + title + r"Final-year internship (PFE) from 02/2027\par}" + "\n\\vspace{2pt}\n"
     s += r"{\small Ben Arous, Tunisia\sep +216 25 004 537\sep " + link("mailto:aziz19ghazouani@gmail.com", "aziz19ghazouani@gmail.com") + r"\par" + "\n"
     s += r"\sep ".join([
         link("https://aziz-ghazouani.pages.dev", "Portfolio: aziz-ghazouani.pages.dev"),
@@ -118,14 +129,14 @@ def build(kind):
         r"\textbf{Delivered 5 production apps for the CodeLab 2.0 hackathon} (220 participants, 12 teams) in Next.js, React and Firebase: registration and payments, participant tracking, support, jury scoring, ambassadors.",
         r"\textbf{Built the club's recruitment platform:} application form and filtering dashboard, 321 applications processed.",
         r"\textbf{Maintained and deployed hecfa.tn} and its domain configuration as IT department co-lead.",
-        r"\textbf{Won 1st prize at Global Entrepreneurship Week} (IHEC, 11/2025) with the IHEC Connect prototype, 1,500 TND for the club.",
+        r"\textbf{Won 1st prize at Global Entrepreneurship Week} (IHEC, 11/2025): IHEC Connect prototype, 1,500 TND for the club.",
         r"\textbf{Received a recognition certificate} for the CodeLab 1.0 hackathon (2025), as a member.",
     ])
     s += "\\section{Skills}\n" + "".join("\\textbf{%s:} %s\\par\n" % (tex(a), tex(b)) for a, b in SKILLS[kind])
     s += r"\section{Certifications, languages \& involvement}" + "\n"
     s += r"\textbf{Certifications:} AWS Knowledge: Cloud Essentials (Amazon Web Services, 2026)\sep IBM Data Fundamentals (IBM, 2026)\par" + "\n"
     s += r"\textbf{Languages:} Arabic (native)\sep French (B2)\sep English (C1), levels assessed in the Concentrix recruitment test\par" + "\n"
-    s += r"\textbf{Involvement:} Photography Lab IHEC Carthage, member (10/2026 \textendash{} present)\sep IEEE Computer Society INSAT SBC, member (09/2024 \textendash{} 06/2025)\par" + "\n"
+    s += r"\textbf{Involvement:} Photography Lab, IHEC Carthage (10/2026 \textendash{} present)\sep IEEE Computer Society, INSAT SBC (09/2024 \textendash{} 06/2025)\par" + "\n"
     s += "\\end{document}\n"
     name = NAMES[kind]
     open(name + ".tex", "w", encoding="utf-8").write(s)
@@ -143,5 +154,5 @@ def build(kind):
     open(name + ".txt", "w", encoding="utf-8").write(text)
 
 
-for k in ("genai", "de"):
+for k in ("all", "genai", "de"):
     build(k)
