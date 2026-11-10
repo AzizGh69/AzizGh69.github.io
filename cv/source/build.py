@@ -123,12 +123,12 @@ def build(kind):
         r"\textbf{Diagnosed and resolved technical incidents} full time for French- and English-speaking clients.",
         r"\textbf{Analysed client needs} on consulting tasks and recommended suitable solutions.",
     ])
-    s += r"\entry{Technical Lead}{ \textendash{} HEC Finance Academy (HECFA), IHEC Carthage\sep " + link("https://hecfa.tn", "hecfa.tn") + r"}{07/2025 \textendash{} 10/2026}" + "\n"
+    s += r"\entry{Technical Lead}{ \textendash{} HEC Finance Academy (HECFA), IHEC Carthage\sep " + link("https://hecfa.com", "hecfa.com") + r"}{07/2025 \textendash{} 10/2026}" + "\n"
     s += r"\sub{Student club\sep executive board, elected co-head of the IT department\sep member since 10/2024, alumni since 10/2026}" + "\n"
     s += items([
         r"\textbf{Delivered 5 production apps for the CodeLab 2.0 hackathon} (220 participants, 12 teams) in Next.js, React and Firebase: registration and payments, participant tracking, support, jury scoring, ambassadors.",
         r"\textbf{Built the club's recruitment platform:} application form and filtering dashboard, 321 applications processed.",
-        r"\textbf{Maintained and deployed hecfa.tn} and its domain configuration as IT department co-lead.",
+        r"\textbf{Maintained and deployed hecfa.com} and its domain configuration as IT department co-lead.",
         r"\textbf{Won 1st prize at Global Entrepreneurship Week} (IHEC, 11/2025): IHEC Connect prototype, 1,500 TND for the club.",
         r"\textbf{Received a recognition certificate} for the CodeLab 1.0 hackathon (2025), as a member.",
     ])
