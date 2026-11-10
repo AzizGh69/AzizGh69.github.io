@@ -53,16 +53,21 @@ ABOUT = (
 
 K = {
     "ai": r"\textbf{Built the AI meal suggestions:} a rules-based recommender and an LLM provider chain (Anthropic, OpenAI-compatible) with an output guard, fallback and per-call cost metering, checked by a trust audit over 648 situations.",
-    "ai_all": r"\textbf{Built the AI meal suggestions:} a rules-based recommender and an LLM provider chain (Anthropic, OpenAI-compatible) with an output guard, fallback and per-call cost metering, over 106 Tunisian dishes, checked by a trust audit over 648 situations.",
+    "ai_all": r"\textbf{Built the AI meal suggestions:} a rules-based recommender and an LLM provider chain (Anthropic, OpenAI-compatible) with an output guard, fallback and per-call cost metering, over 106 Tunisian dishes, audited over 648 situations.",
     "ai_short": r"\textbf{Added LLM meal suggestions} with per-call cost tracking, over 106 Tunisian dishes with counted nutrition values.",
     "solo": r"\textbf{Developed the whole product alone} in 570+ commits: NestJS/TypeScript API, PostgreSQL, Redis, an offline React PWA, Firebase and Cloudflare.",
     "ci": r"\textbf{Industrialised delivery:} GitHub Actions CI with 8 required checks and ~3,100 automated tests, blue/green deployment with automatic rollback.",
-    "dp": r"\textbf{Designing a data platform} (in progress): synthetic data in Python, PostgreSQL on AWS RDS via Terraform, pseudonymised extraction, change data capture (Debezium, Kafka), a medallion lakehouse on Microsoft Fabric and Power BI, run with a project charter, risk register and ADRs.",
+    "dp": r"\textbf{Designing a data platform} (in progress): synthetic data, PostgreSQL on AWS RDS via Terraform, change data capture (Debezium, Kafka), a medallion lakehouse on Microsoft Fabric and Power BI, with a charter, risk register and ADRs.",
 }
 BOT = {
     "lead": r"\textbf{Led the chatbot:} Retrieval-Augmented Generation (RAG) with ChromaDB and Llama, and model fine-tuning.",
     "clean": r"\textbf{Cleaned and structured 550+ catalogue records} (23 fields: titles, authors, ISBN, call numbers) before indexing.",
 }
+BVMT = [
+    r"\textbf{Data, forecasting and risk:} 2016--2026 price history cleaned into PostgreSQL, live scraping every 60 s; 5-day forecasts (LSTM, XGBoost, EMA) checked with ADF, AIC/BIC and backtests; anomaly alerts (Isolation Forest, 3$\sigma$ volume spikes).",
+    r"\textbf{Portfolio and AI:} Markowitz optimisation with SHAP (Sharpe, VaR, stress tests), reinforcement learning, a 5-agent pipeline, LLM sentiment on French, Arabic and Tunizi news (GPT-4o, DeepSeek R1), RAG chatbot (ChromaDB, Llama 3.3).",
+    r"\textbf{Product and stack:} investor-profile sign-up, email alerts, scheduled reports, technical-indicator dashboard; FastAPI microservices, NestJS, Flask, TensorFlow, scikit-learn, Redis, Next.js, TypeScript, Recharts, Docker, n8n.",
+]
 SKILLS = {
     "genai": [
         ("AI & Data Science", "LLMs in production, Python, pandas, scikit-learn, RAG, embeddings, ChromaDB, Llama, fine-tuning, data cleaning"),
@@ -72,9 +77,9 @@ SKILLS = {
         ("Databases", "PostgreSQL, Redis, MySQL, Oracle, Firebase"),
     ],
     "all": [
-        ("AI & Data Science", "LLMs in production, Python, pandas, numpy, Streamlit, scikit-learn, RAG, embeddings, ChromaDB, Llama, fine-tuning, data cleaning"),
+        ("AI & Data Science", "LLMs in production, Python, pandas, numpy, Streamlit, scikit-learn, RAG, ChromaDB, Llama, fine-tuning"),
         ("Data Engineering", "SQL, PySpark, ETL/ELT, CDC (Debezium, Kafka), medallion architecture, Microsoft Fabric, Power BI"),
-        ("Development", "TypeScript, NestJS, Firebase Auth / TOTP, JavaScript, Java, C#, PHP, React, Next.js, Postman, Git, Sentry, system design"),
+        ("Development", "TypeScript, NestJS, Firebase Auth, JavaScript, Java, C#, PHP, React, Next.js, Git, Sentry, system design"),
         ("Cloud & DevOps", "AWS, Terraform (Infrastructure as Code), Docker, Podman, GitHub Actions (CI/CD), Cloudflare, Linux, n8n"),
         ("Databases", "PostgreSQL, Redis, MySQL, Oracle, Firebase"),
     ],
@@ -114,14 +119,14 @@ def build(kind):
     s += r"\entry{Kalori}{ \textendash{} Founder \& sole developer\sep " + link("https://kalori-app.com", "kalori-app.com") + r"}{06/2026 \textendash{} present}" + "\n"
     s += r"\sub{Nutrition tracker built around Tunisian food (EN/FR/AR), in testing with 20+ active users}" + "\n"
     s += items(kalori)
+    s += r"\entry{BVMT Trading Assistant}{ \textendash{} Project manager, entrepreneurship competition}{2026}" + "\n"
+    s += r"\sub{Intelligent trading assistant for the Tunis Stock Exchange (82 stocks), built on two validated prototypes}" + "\n"
+    s += items(BVMT)
     s += r"\entry{IHEC BOT}{ \textendash{} AI assistant for the university library (team project)}{02/2025}" + "\n" + items(bot)
-    s += r"\entry{Valorant Agent Assistant}{ \textendash{} Personal machine-learning project\sep " + link("https://github.com/AzizGh69/ValorantAgentAssistant", "GitHub") + "}{12/2025}\n"
-    s += items([r"\textbf{Trained a decision-tree classifier} (scikit-learn, pandas) recommending 1 of 19 weapons, evaluated on a held-out test set; built a 180-scenario quiz and Streamlit and Tkinter interfaces."])
     s += "\\section{Experience}\n"
     s += r"\entry{Technical Support Agent}{ \textendash{} Concentrix, Tunis (Lac 2)}{06/2025 \textendash{} 09/2026}" + "\n"
     s += items([
         r"\textbf{Diagnosed and resolved technical incidents} full time for French- and English-speaking clients.",
-        r"\textbf{Analysed client needs} on consulting tasks and recommended suitable solutions.",
     ])
     s += r"\entry{Technical Lead}{ \textendash{} HEC Finance Academy (HECFA), IHEC Carthage\sep " + link("https://hecfa.com", "hecfa.com") + r"}{07/2025 \textendash{} 10/2026}" + "\n"
     s += r"\sub{Student club\sep executive board, elected co-head of the IT department\sep member since 10/2024, alumni since 10/2026}" + "\n"
@@ -130,13 +135,12 @@ def build(kind):
         r"\textbf{Built the club's recruitment platform:} application form and filtering dashboard, 321 applications processed.",
         r"\textbf{Maintained and deployed hecfa.com} and its domain configuration as IT department co-lead.",
         r"\textbf{Won 1st prize at Global Entrepreneurship Week} (IHEC, 11/2025): IHEC Connect prototype, 1,500 TND for the club.",
-        r"\textbf{Received a recognition certificate} for the CodeLab 1.0 hackathon (2025), as a member.",
-    ])
+        r"\textbf{Received a recognition certificate} for the CodeLab 1.0 hackathon (2025), as a member.",    ])
     s += "\\section{Skills}\n" + "".join("\\textbf{%s:} %s\\par\n" % (tex(a), tex(b)) for a, b in SKILLS[kind])
     s += r"\section{Certifications, languages \& involvement}" + "\n"
     s += r"\textbf{Certifications:} AWS Knowledge: Cloud Essentials (Amazon Web Services, 2026)\sep IBM Data Fundamentals (IBM, 2026)\par" + "\n"
     s += r"\textbf{Languages:} Arabic (native)\sep French (B2)\sep English (C1), levels assessed in the Concentrix recruitment test\par" + "\n"
-    s += r"\textbf{Involvement:} Photography Lab, IHEC Carthage (10/2026 \textendash{} present)\sep IEEE Computer Society, INSAT SBC (09/2024 \textendash{} 06/2025)\par" + "\n"
+    s += r"\textbf{Involvement:} Photography Lab, IHEC Carthage (10/2026 \textendash{} present)\sep IEEE Computer Society, INSAT (2024\textendash{}2025)\par" + "\n"
     s += "\\end{document}\n"
     name = NAMES[kind]
     open(name + ".tex", "w", encoding="utf-8").write(s)
