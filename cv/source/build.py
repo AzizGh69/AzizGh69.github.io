@@ -154,5 +154,6 @@ def build(kind):
     open(name + ".txt", "w", encoding="utf-8").write(text)
 
 
-for k in ("all", "genai", "de"):
+# Only the complete CV is published; "genai" and "de" remain buildable here.
+for k in ("all",):
     build(k)

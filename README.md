@@ -10,7 +10,7 @@ and a script at the top of `index.html` forwards visitors from there to
 pages.dev.
 
 - `img/`: the hero photo
-- `cv/`: the two CVs linked from the System screen
+- `cv/`: the CV linked from the System screen
 - `audio/`: the background track, `bgm.mp3`. How to add, change or remove it
   is in [`audio/README.md`](audio/README.md). The speaker button only appears
   once the file is there.
