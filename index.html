@@ -92,7 +92,7 @@ main{position:relative;z-index:5;height:100%}
 
 /* ---------- main menu ---------- */
 #menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:minmax(0,1fr);padding:120px 4vw 80px;overflow:hidden}
-.hero{position:relative;min-height:0}
+.hero{position:relative;min-height:0;--pw:min(19vw,29vh,330px)}
 .nameplate{position:relative;z-index:3;animation:rise .6s var(--out) both}
 .np-plates{filter:drop-shadow(7px 7px 0 rgba(79,230,255,.6))}
 .np-first,.np-last{display:block;width:max-content;max-width:100%;text-transform:uppercase;clip-path:var(--slant);margin:0}
@@ -100,7 +100,7 @@ main{position:relative;z-index:5;height:100%}
 .np-last{background:var(--blue);color:#fff;font:800 italic clamp(28px,min(3.2vw,5vh),50px)/.95 var(--display);padding:7px 26px 3px 18px;margin:6px 0 0 46px;letter-spacing:.04em}
 .np-tag{margin:18px 0 0 92px;max-width:400px;font:600 16px/1.45 var(--body);color:var(--ice);text-shadow:0 2px 14px rgba(4,10,28,.9)}
 .np-tag b{color:var(--cyan);font-weight:700}
-.portrait{position:absolute;right:5vw;bottom:30px;width:min(19vw,29vh,330px);margin:0;z-index:2;rotate:-4deg;animation:rise .7s .08s var(--out) both}
+.portrait{position:absolute;right:-4vw;bottom:30px;width:var(--pw);margin:0;z-index:2;rotate:-4deg;animation:rise .7s .08s var(--out) both}
 .pframe{position:relative;aspect-ratio:4/5;--cut:polygon(12% 0,100% 0,88% 100%,0 100%);filter:drop-shadow(0 0 22px rgba(79,230,255,.28))}
 .pframe .plate{position:absolute;inset:0;clip-path:var(--cut);transition:transform .35s var(--snap)}
 .pframe .p1{background:var(--cyan);transform:translate(16px,12px)}
@@ -125,7 +125,7 @@ main{position:relative;z-index:5;height:100%}
 .menu button{all:unset;cursor:pointer;position:relative;display:flex;align-items:baseline;gap:14px;padding:4px 28px 0 20px;-webkit-tap-highlight-color:transparent}
 .menu button::before{content:"";position:absolute;left:-10px;right:-8px;top:10%;bottom:4%;background:var(--cyan);clip-path:polygon(3% 0,100% 0,97% 100%,0 100%);transform:scaleX(0);transform-origin:0 50%;transition:transform .2s var(--snap)}
 .menu button::after{content:"";position:absolute;left:-54px;top:50%;width:30px;height:32px;margin-top:-16px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);opacity:0;transform:translateX(-12px);transition:opacity .15s,transform .2s var(--snap)}
-.menu .label{position:relative;font:900 italic clamp(38px,min(5.3vw,8.4vh),84px)/.9 var(--display);text-transform:uppercase;text-shadow:4px 4px 0 rgba(4,10,28,.6);transition:transform .22s var(--snap),color .12s}
+.menu .label{position:relative;font:900 italic clamp(34px,min(5vw,7.4vh),78px)/.9 var(--display);text-transform:uppercase;text-shadow:4px 4px 0 rgba(4,10,28,.6);transition:transform .22s var(--snap),color .12s}
 .menu .sub{position:relative;font:800 italic 14px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color .12s,transform .22s var(--snap)}
 .menu li.sel button::before{transform:scaleX(1)}
 .menu li.sel button::after{opacity:1;transform:none;animation:nudge .7s ease-in-out .2s infinite alternate}
@@ -261,6 +261,75 @@ main{position:relative;z-index:5;height:100%}
 .setrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
 .setrow .lbl{flex-basis:100%;font:800 italic 13px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-top:6px}
 
+/* ---------- certification stream (main menu, lower left) ----------
+   One lane of cards drifting right to left, tilted like the menu. The list is drawn twice so
+   the loop has no seam; the copy is hidden from screen readers and from Tab. It tucks under
+   the portrait on the right so the cards look like they pass behind it. */
+.cstream{position:absolute;z-index:1;left:-4vw;bottom:6px;width:calc(100% - var(--pw) + 4vw + 2vw);animation:rise .7s .25s var(--out) both}
+.cstream-tag{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;margin:0 0 10px calc(4vw + 8px);padding:6px 16px 5px 12px;background:var(--cyan);color:var(--ink);clip-path:var(--slant);font:800 italic 14px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;transform:rotate(-4deg);transform-origin:0 100%;transition:background .12s}
+.cstream-tag b{background:var(--ink);color:var(--cyan);padding:3px 7px 2px;letter-spacing:.06em}
+.cstream-tag:hover,.cstream-tag:focus-visible{background:#fff}
+.lane{overflow:hidden;padding:10px 0 14px;transform:rotate(-4deg);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 84%,transparent 100%)}
+.track{display:flex;gap:14px;width:max-content;animation:marquee 46s linear infinite}
+.lane:hover .track,.lane:focus-within .track{animation-play-state:paused}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+html.calm .lane{overflow-x:auto;scrollbar-width:none}
+.ccard{all:unset;box-sizing:border-box;cursor:pointer;flex:0 0 auto;width:250px;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:12px;padding:10px 22px 10px 16px;background:rgba(4,10,28,.86);clip-path:var(--slant);box-shadow:inset 0 -3px 0 var(--ac);transition:transform .22s var(--snap),background .12s,color .12s}
+.ccard:hover,.ccard:focus-visible{background:var(--cyan);color:var(--ink);transform:translateY(-6px) rotate(-2deg) scale(1.05)}
+.ccard:hover .cc-meta,.ccard:focus-visible .cc-meta{color:var(--ink)}
+.cc-t{display:block;font:800 italic 19px/1 var(--display);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-meta{display:block;margin-top:5px;font:600 12px/1.2 var(--body);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* The issuer emblem: a hexagon in the issuer's colour. Used small on cards and rows, large in the detail. */
+.emb{--s:44px;position:relative;width:var(--s);height:var(--s);display:grid;place-items:center;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:linear-gradient(140deg,#fff -40%,var(--ac) 45%,#06123a 140%);color:#fff;font:900 italic calc(var(--s) * .3)/1 var(--display);letter-spacing:.02em;text-shadow:0 2px 0 rgba(4,10,28,.45)}
+.emb.prep{background:repeating-linear-gradient(135deg,rgba(214,247,255,.18) 0 6px,rgba(214,247,255,.06) 6px 12px);color:var(--ice)}
+
+/* ---------- certifications screen ---------- */
+.clist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 330px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(79,230,255,.5) transparent}
+.crow{all:unset;box-sizing:border-box;cursor:pointer;position:relative;width:calc(100% - 40px);margin-left:28px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:14px;padding:9px 22px 9px 16px;background:rgba(4,10,28,.62);clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);transition:transform .25s var(--snap),background .12s}
+.crow:hover{background:rgba(23,73,209,.6)}
+.crow .qd{margin-top:4px}
+.crow[aria-current="true"]{background:var(--cyan);color:var(--ink);transform:translateX(12px)}
+.crow[aria-current="true"] .qd{color:var(--ink)}
+.crow[aria-current="true"] .st{background:var(--ink);color:#fff}
+.crow:focus-visible .qt{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+/* A shine that runs across the row the moment it is picked. */
+.crow[aria-current="true"]::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 48%,transparent 66%);transform:translateX(-110%);animation:shine .6s .05s var(--out) forwards;pointer-events:none}
+@keyframes shine{to{transform:translateX(110%)}}
+.cpointer{position:absolute;left:0;width:22px;height:26px;margin-top:-13px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);transition:top .25s var(--snap);animation:nudge .7s ease-in-out infinite alternate;pointer-events:none}
+.cwrap{position:relative}
+
+.cdetail{position:relative;overflow:hidden;background:rgba(4,10,28,.86);padding:28px 34px 30px;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%);max-height:calc(100vh - 330px);overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(79,230,255,.5) transparent}
+.cdetail>*{position:relative;z-index:2}
+/* The pick animation: a cyan slash and a white one cut across the card, the emblem spins in
+   and lands with a ring, the title is revealed left to right, then the rest slides in. */
+.cdetail .slash{position:absolute;z-index:4;top:0;bottom:0;left:-70%;width:46%;background:var(--cyan);transform:skewX(-24deg);pointer-events:none}
+.cdetail .slash.s2{background:#fff;width:18%}
+.cdetail.go .slash{animation:slash .5s var(--out) both}
+.cdetail.go .slash.s2{animation-delay:.08s}
+@keyframes slash{from{left:-70%}to{left:150%}}
+.cdetail .ghost{position:absolute;z-index:1;right:10px;bottom:0;margin:0;font:900 italic 140px/1.2 var(--display);text-transform:uppercase;color:transparent;-webkit-text-stroke:2px rgba(79,230,255,.12);white-space:nowrap;pointer-events:none}
+.cdetail.go .ghost{animation:ghost .9s .1s var(--out) both}
+@keyframes ghost{from{opacity:0;translate:120px 0}to{opacity:1;translate:0 0}}
+.chead{display:flex;align-items:center;gap:24px}
+.chead .emb{--s:112px;flex:0 0 auto;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9))}
+.chead .ring{position:absolute;left:0;top:50%;width:112px;height:112px;margin-top:-56px;border:3px solid var(--ac);clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);opacity:0;pointer-events:none}
+.cdetail.go .chead .emb{animation:medal .75s .12s var(--snap) both}
+.cdetail.go .chead .ring{animation:ring .7s .55s ease-out both}
+@keyframes medal{0%{opacity:0;transform:perspective(500px) rotateY(540deg) rotate(-25deg) scale(.2)}70%{opacity:1;transform:perspective(500px) rotateY(-14deg) rotate(3deg) scale(1.12)}100%{opacity:1;transform:none}}
+@keyframes ring{0%{opacity:.9;transform:scale(.9)}100%{opacity:0;transform:scale(1.7)}}
+.cdetail h3{margin:6px 0 0;font:900 italic clamp(36px,3.8vw,58px)/.9 var(--display);text-transform:uppercase}
+.cdetail.go h3{animation:cut .45s .3s var(--out) both}
+@keyframes cut{from{clip-path:inset(0 100% 0 0);transform:skewX(-14deg)}to{clip-path:inset(0 0 0 0);transform:none}}
+.cdetail .in{opacity:1}
+.cdetail.go .in{animation:slideIn .45s var(--snap) both;animation-delay:calc(.42s + var(--d,0) * 70ms)}
+@keyframes slideIn{from{opacity:0;transform:translateX(44px) skewX(-8deg)}to{opacity:1;transform:none}}
+.cgroup{margin:10px 0 2px 28px;font:800 italic 13px/1 var(--display);letter-spacing:.24em;text-transform:uppercase;color:var(--cyan)}
+.cgroup:first-child{margin-top:0}
+.crow[aria-current="true"] .st.prize{background:var(--amber);color:var(--ink)}
+.st.earned{background:#fff;color:var(--ink)}
+.st.prep{background:transparent;color:var(--ice);box-shadow:inset 0 0 0 1px rgba(214,247,255,.6)}
+
 /* ---------- screen wipe ---------- */
 .wipe{position:fixed;inset:0;z-index:60;pointer-events:none;visibility:hidden}
 .wipe::before,.wipe::after{content:"";position:absolute;inset:0;clip-path:polygon(120% 0,140% 0,120% 100%,100% 100%)}
@@ -310,6 +379,13 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
   .entry{grid-template-columns:1fr;gap:8px}
   .head h2{font-size:clamp(52px,15vw,84px)}
   .watermark{font-size:60vw}
+  .cstream{order:4;position:relative;left:auto;bottom:auto;width:auto;margin:0 -18px}
+  .cstream-tag{margin-left:22px}
+  .status{order:5}
+  .clist,.cdetail{max-height:none}
+  .chead .emb,.chead .ring{--s:84px;width:84px;height:84px;margin-top:-42px}
+  .chead .emb{margin-top:0}
+  .cdetail .ghost{font-size:90px}
 }
 </style>
 </head>
@@ -361,6 +437,10 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
         </div>
         <div class="ripples" aria-hidden="true"><span></span><span></span><span></span></div>
       </figure>
+      <div class="cstream" id="cStream">
+        <button class="cstream-tag" type="button" data-go="certs"><span data-t="certsTag"></span><b id="cStreamN"></b></button>
+        <div class="lane"><div class="track" id="cTrack"></div></div>
+      </div>
     </div>
     <nav class="menu" data-ta="aria-label:sections"><ol id="menuList"></ol></nav>
     <aside class="status" id="status" data-ta="aria-label:statusNow"></aside>
@@ -387,6 +467,18 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
     </div>
     <div class="legend" id="sLegend"></div>
     <div class="sgrid" id="sGrid"></div>
+  </section>
+
+  <!-- BADGES (certifications) -->
+  <section class="screen inner" id="certs" aria-labelledby="bH" hidden>
+    <div class="head">
+      <h2 id="bH"></h2><p class="sub"></p><p class="count" id="bCount"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="qgrid">
+      <div class="cwrap"><span class="cpointer" id="bPointer" aria-hidden="true"></span><ul class="clist" id="bList"></ul></div>
+      <article class="cdetail" id="bDetail" aria-live="polite"></article>
+    </div>
   </section>
 
   <!-- LOG -->
@@ -463,12 +555,13 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
 const MENU = [
   { id: "quests",   label: "Quests",   sub: "Projects" },
   { id: "stats",    label: "Stats",    sub: "Skills" },
+  { id: "certs",    label: "Badges",   sub: "Certifications" },
   { id: "log",      label: "Log",      sub: "Experience" },
   { id: "calendar", label: "Calendar", sub: "Journey" },
   { id: "profile",  label: "Profile",  sub: "About me" },
   { id: "system",   label: "System",   sub: "Contact · CV" }
 ];
-const WATERMARK = { menu: "MENU", quests: "QUESTS", stats: "STATS", log: "LOG", calendar: "CALENDAR", profile: "PROFILE", system: "SYSTEM" };
+const WATERMARK = { menu: "MENU", quests: "QUESTS", stats: "STATS", certs: "BADGES", log: "LOG", calendar: "CALENDAR", profile: "PROFILE", system: "SYSTEM" };
 
 const STATUS = [
   { k: "Kalori", v: "Live · v2.1.1", meta: "20+ users in testing · 587 commits" },
@@ -603,6 +696,65 @@ const QUESTS = [
     stack: ["C#", "Unity"], proof: [] }
 ];
 
+/* Certifications, newest first. "ac" is the issuer's colour, "abbr" the text on its emblem.
+   Links follow the quests' rule: only links with an href are shown, so a credential's
+   verification link (Credly, 365 Data Science, IBM) goes in as soon as it exists. */
+const CERTS = [
+  { id: "cisco-eh", title: "Ethical Hacker", issuer: "Cisco Networking Academy", abbr: "CISCO", ac: "#1BA0D7",
+    date: "11/2026", type: "Badge", status: "earned",
+    blurb: "Cisco's offensive-security course: how an attacker works through a network, and how a tester reports it.",
+    covers: ["Penetration testing method", "Reconnaissance", "Vulnerability scanning", "Exploitation", "Social engineering", "Reporting"],
+    links: [{ label: "Verify", href: null }, { label: "Course", href: "https://www.netacad.com/courses/ethical-hacker" }] },
+  { id: "ai-agent", title: "AI Agent Engineer", issuer: "365 Data Science", abbr: "365", ac: "#7B61FF",
+    date: "11/2026", type: "Career track", status: "earned",
+    blurb: "The full career track, end to end: building LLM agents that plan, call tools and look things up.",
+    covers: ["LLM agents", "Agent architecture", "Tool calling", "Retrieval (RAG)", "Prompt design", "Evaluation"],
+    links: [{ label: "Verify", href: null }] },
+  { id: "adv-sql", title: "Advanced SQL for Data Engineering", issuer: "365 Data Science", abbr: "365", ac: "#7B61FF",
+    date: "11/2026", type: "Course", status: "earned",
+    blurb: "SQL past SELECT: the queries data pipelines are made of. All lessons and assessments passed; 3 CPE credits.",
+    covers: ["Window functions", "CTEs", "Query performance", "Data modelling", "Transformations"],
+    credId: "CC-D58DD5DCCD",
+    links: [{ label: "Verify", href: "https://learn.365datascience.com/certificates/CC-D58DD5DCCD/" }] },
+  { id: "aws-ce", title: "AWS Knowledge: Cloud Essentials", issuer: "Amazon Web Services", abbr: "AWS", ac: "#FF9900",
+    date: "10/2026", type: "Badge", status: "earned",
+    blurb: "The foundations of the AWS cloud, now in use for the data platform's RDS source.",
+    covers: ["Cloud concepts", "Core AWS services", "Security", "Pricing"],
+    links: [{ label: "Verify on Credly", href: "https://www.credly.com/badges/cd86026c-1405-491a-ac02-9a62cd683a0e/public_url" }] },
+  { id: "ibm-df", title: "Data Fundamentals", issuer: "IBM", abbr: "IBM", ac: "#0F62FE",
+    date: "10/2026", type: "Badge", status: "earned",
+    blurb: "IBM's grounding in how data is collected, cleaned, analysed and shown.",
+    covers: ["Data lifecycle", "Data cleaning", "Analysis", "Visualisation"],
+    links: [{ label: "Verify on Credly", href: "https://www.credly.com/badges/a0b510b5-274c-4e31-80a8-a7319f5d03b9/public_url" }] },
+  { id: "dp-700", title: "Fabric Data Engineer (DP-700)", issuer: "Microsoft", abbr: "MS", ac: "#00A4EF",
+    date: "Late 11/2026", type: "Exam", status: "prep",
+    blurb: "Microsoft's data engineering certification on Fabric, the platform the Kalori lakehouse runs on.",
+    covers: ["Lakehouse", "Ingestion", "Spark transformations", "Real-time data", "Monitoring"],
+    links: [{ label: "Exam page", href: "https://learn.microsoft.com/en-us/credentials/certifications/fabric-data-engineer-associate/" }] },
+  // Recognition: competitions and certificates from the club and the school (from LinkedIn).
+  { id: "cybercamp", group: "rec", title: "CyberCamp 7.0", issuer: "Securinets", abbr: "SEC", ac: "#E5484D",
+    date: "11/2026", type: "Competition", status: "prize", statusLabel: "2nd place",
+    blurb: "Securinets' cybersecurity camp, offensive cloud security track: finished 2nd.",
+    covers: ["Offensive cloud security", "AWS security", "Ethical hacking"],
+    links: [] },
+  { id: "hecfa-lead", group: "rec", title: "Tech Lead, Executive Board 2025–2026", issuer: "HEC Finance Academy", abbr: "HECFA", ac: "#C9A227",
+    date: "09/2026", type: "Certificate of appreciation", status: "earned",
+    blurb: "From the club's executive board, for leading its IT work: the CodeLab 2.0 apps and the recruitment platform.",
+    links: [] },
+  { id: "hecfa-it", group: "rec", title: "IT Department 2024–2025", issuer: "HEC Finance Academy", abbr: "HECFA", ac: "#C9A227",
+    date: "09/2025", type: "Certificate of recognition", status: "earned",
+    blurb: "For my work in the club's IT department in my first year.",
+    links: [] },
+  { id: "hecfa-com", group: "rec", title: "Communication Department 2024–2025", issuer: "HEC Finance Academy", abbr: "HECFA", ac: "#C9A227",
+    date: "09/2025", type: "Certificate of recognition", status: "earned",
+    blurb: "For my work with the club's communication department in my first year.",
+    links: [] },
+  { id: "epistemia", group: "rec", title: "Projet Epistemia", issuer: "IHEC Carthage", abbr: "IHEC", ac: "#B3123B",
+    date: "—", type: "Certificate of recognition", status: "earned",
+    blurb: "From IHEC Carthage, for running the Epistemia project for the university administration.",
+    links: [] }
+];
+
 const RANKS = {
   P: { n: 4, l: "Production", d: "runs in Kalori" },
   R: { n: 3, l: "Project", d: "used in a real project" },
@@ -652,6 +804,7 @@ const UI = {
     email: "Email", cvAll: "CV", cvMeta: "PDF · 1 page", settings: "Settings", language: "Language", motion: "Motion", full: "Full", calm: "Calm",
     of: "of", role: "Role", team: "Team", when: "When", status: "Status", results: "Results", stack: "Stack", proof: "Proof",
     legend: "Pips show the strongest evidence behind each skill, not a self-rating.",
+    certsTag: "Certifications", issuer: "Issuer", date: "Date", type: "Type", covers: "Covers", links: "Links", earned: "Earned", earnedN: "earned", prep: "Preparing", credId: "Credential ID", grpCert: "Certifications", grpRec: "Recognition", recN: "recognitions",
     tod: ["Late night", "Morning", "Afternoon", "Evening", "Late night"], dayOf: (n) => `Day ${n} of Kalori`,
     about: [
       "I started building at 13: nine months on a Unity platformer with an animator and a designer. It never shipped. Seven years later, Kalori did.",
@@ -663,7 +816,7 @@ const UI = {
     facts: [
       ["Education", ["Bachelor in Business Intelligence, IHEC Carthage", "09/2024 – 06/2027 · PFE from 02/2027"], ["Baccalaureate in Computer Science, mention Très bien", "06/2024"]],
       ["Languages", ["Arabic, native · English, C1 · French, B2", "English and French levels from the Concentrix recruitment test"]],
-      ["Certifications", ["AWS Knowledge: Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) in preparation"]],
+      ["Certifications", ["Cisco Ethical Hacker · AI Agent Engineer track · Advanced SQL for Data Engineering · AWS Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) in preparation"]],
       ["Awards", ["1st prize, Global Entrepreneurship Week, IHEC", "11/2025 · IHEC Connect · 1,500 TND for the club"]]
     ]
   },
@@ -677,6 +830,7 @@ const UI = {
     email: "E-mail", cvAll: "CV", cvMeta: "PDF · 1 page · en anglais", settings: "Réglages", language: "Langue", motion: "Animations", full: "Complètes", calm: "Réduites",
     of: "sur", role: "Rôle", team: "Équipe", when: "Période", status: "Statut", results: "Résultats", stack: "Stack", proof: "Liens",
     legend: "Les pastilles montrent la preuve la plus solide derrière chaque compétence, pas une auto-évaluation.",
+    certsTag: "Certifications", issuer: "Organisme", date: "Date", type: "Type", covers: "Contenu", links: "Liens", earned: "Obtenu", earnedN: "obtenues", prep: "En préparation", credId: "ID du certificat", grpCert: "Certifications", grpRec: "Distinctions", recN: "distinctions",
     tod: ["Nuit", "Matin", "Après-midi", "Soir", "Nuit"], dayOf: (n) => `Jour ${n} de Kalori`,
     about: [
       "J’ai commencé à construire à 13 ans : neuf mois sur un jeu de plateforme sous Unity, avec un animateur et un graphiste. Il n’est jamais sorti. Sept ans plus tard, Kalori, si.",
@@ -688,7 +842,7 @@ const UI = {
     facts: [
       ["Formation", ["Licence en Business Intelligence, IHEC Carthage", "09/2024 – 06/2027 · PFE à partir de 02/2027"], ["Baccalauréat en sciences de l’informatique, mention Très bien", "06/2024"]],
       ["Langues", ["Arabe, langue maternelle · anglais, C1 · français, B2", "Niveaux d’anglais et de français issus du test de recrutement de Concentrix"]],
-      ["Certifications", ["AWS Knowledge: Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) en préparation"]],
+      ["Certifications", ["Cisco Ethical Hacker · parcours AI Agent Engineer · Advanced SQL for Data Engineering · AWS Cloud Essentials · IBM Data Fundamentals", "2026 · DP-700 (Fabric Data Engineer) en préparation"]],
       ["Distinctions", ["1er prix, Global Entrepreneurship Week, IHEC", "11/2025 · IHEC Connect · 1 500 TND pour le club"]]
     ]
   }
@@ -696,8 +850,8 @@ const UI = {
 
 /* ---------- French content, keyed like the English ---------- */
 const FR = {
-  menu: { quests: ["Quêtes", "Projets"], stats: ["Stats", "Compétences"], log: ["Journal", "Expérience"], calendar: ["Calendrier", "Parcours"], profile: ["Profil", "À propos"], system: ["Système", "Contact · CV"] },
-  watermark: { menu: "MENU", quests: "QUÊTES", stats: "STATS", log: "JOURNAL", calendar: "CALENDRIER", profile: "PROFIL", system: "SYSTÈME" },
+  menu: { quests: ["Quêtes", "Projets"], stats: ["Stats", "Compétences"], certs: ["Badges", "Certifications"], log: ["Journal", "Expérience"], calendar: ["Calendrier", "Parcours"], profile: ["Profil", "À propos"], system: ["Système", "Contact · CV"] },
+  watermark: { menu: "MENU", quests: "QUÊTES", stats: "STATS", certs: "BADGES", log: "JOURNAL", calendar: "CALENDRIER", profile: "PROFIL", system: "SYSTÈME" },
   status: [
     { k: "Kalori", v: "En ligne · v2.1.1", meta: "20+ utilisateurs en test · 587 commits" },
     { k: "Plateforme data", v: "2 / 8", meta: "Jalons atteints · prochain : M2 le 10 nov." },
@@ -795,6 +949,43 @@ const FR = {
       obj: "Un jeu de plateforme vertical sous Unity, réalisé à 13 ans.",
       results: ["<b>9 mois</b> de développement en solo, avec un animateur et un graphiste.", "Jamais publié."] }
   },
+  certs: {
+    "cisco-eh": { title: "Ethical Hacker", type: "Badge",
+      blurb: "Le cours de sécurité offensive de Cisco : comment un attaquant progresse dans un réseau, et comment un testeur en rend compte.",
+      covers: ["Méthode de test d’intrusion", "Reconnaissance", "Scan de vulnérabilités", "Exploitation", "Ingénierie sociale", "Rapport"],
+      links: ["Vérifier", "Cours"] },
+    "ai-agent": { type: "Parcours complet",
+      blurb: "Le parcours complet, de bout en bout : construire des agents LLM qui planifient, appellent des outils et vont chercher l’information.",
+      covers: ["Agents LLM", "Architecture d’agents", "Appel d’outils", "Recherche augmentée (RAG)", "Conception de prompts", "Évaluation"],
+      links: ["Vérifier"] },
+    "adv-sql": { type: "Cours",
+      blurb: "Le SQL au-delà du SELECT : les requêtes dont sont faits les pipelines de données. Toutes les leçons et évaluations réussies ; 3 crédits CPE.",
+      covers: ["Fonctions de fenêtrage", "CTE", "Performance des requêtes", "Modélisation des données", "Transformations"],
+      links: ["Vérifier"] },
+    "aws-ce": { type: "Badge",
+      blurb: "Les bases du cloud AWS, utilisées aujourd’hui pour la source RDS de la plateforme data.",
+      covers: ["Concepts du cloud", "Services AWS essentiels", "Sécurité", "Tarification"],
+      links: ["Vérifier sur Credly"] },
+    "ibm-df": { type: "Badge",
+      blurb: "Les fondamentaux d’IBM sur la façon dont les données sont collectées, nettoyées, analysées et présentées.",
+      covers: ["Cycle de vie des données", "Nettoyage", "Analyse", "Visualisation"],
+      links: ["Vérifier sur Credly"] },
+    "dp-700": { date: "Fin 11/2026", type: "Examen",
+      blurb: "La certification data engineering de Microsoft sur Fabric, la plateforme où tourne le lakehouse de Kalori.",
+      covers: ["Lakehouse", "Ingestion", "Transformations Spark", "Données temps réel", "Supervision"],
+      links: ["Page de l’examen"] },
+    cybercamp: { type: "Compétition", statusLabel: "2e place",
+      blurb: "Le camp cybersécurité de Securinets, parcours sécurité offensive du cloud : 2e place.",
+      covers: ["Sécurité offensive du cloud", "Sécurité AWS", "Hacking éthique"] },
+    "hecfa-lead": { title: "Tech Lead, bureau exécutif 2025–2026", type: "Certificat d’appréciation",
+      blurb: "Du bureau exécutif du club, pour avoir dirigé son travail IT : les applications de CodeLab 2.0 et la plateforme de recrutement." },
+    "hecfa-it": { title: "Département IT 2024–2025", type: "Certificat de reconnaissance",
+      blurb: "Pour mon travail au département IT du club, pendant ma première année." },
+    "hecfa-com": { title: "Département communication 2024–2025", type: "Certificat de reconnaissance",
+      blurb: "Pour mon travail avec le département communication du club, pendant ma première année." },
+    epistemia: { type: "Certificat de reconnaissance",
+      blurb: "De l’IHEC Carthage, pour avoir mené le projet Epistemia pour l’administration de l’université." }
+  },
   ranks: { P: ["Production", "tourne dans Kalori"], R: ["Projet", "utilisé dans un vrai projet"], B: ["En cours", "dans la plateforme data, en ce moment"], C: ["Cours", "travaux de cours"], F: ["Notions", "autodidacte, pas encore de projet"] },
   skillGroups: ["Langages", "Web et applis", "Data", "IA et ML", "Cloud & DevOps", "Bases de données", "Méthode et outils"],
   skillNames: {
@@ -850,6 +1041,11 @@ function quest(q) {
   const o = FR.quests[q.id] || {};
   return { ...q, ...o, proof: q.proof.map((p, i) => ({ ...p, label: (o.proof && o.proof[i]) || p.label })) };
 }
+function cert(c) {
+  if (!fr()) return c;
+  const o = FR.certs[c.id] || {};
+  return { ...c, ...o, links: c.links.map((l, i) => ({ ...l, label: (o.links && o.links[i]) || l.label })) };
+}
 const rank = (r) => (fr() ? { ...RANKS[r], l: FR.ranks[r][0], d: FR.ranks[r][1] } : RANKS[r]);
 const logEntry = (e, i) => (fr() ? { ...e, ...FR.log[i] } : e);
 const calEvents = (y) => (fr() ? FR.cal[y.y] : y.ev);
@@ -866,8 +1062,8 @@ function applyStatic() {
   document.querySelectorAll("[data-ta]").forEach((el) => {
     const [attr, key] = el.dataset.ta.split(":"); el.setAttribute(attr, t(key));
   });
-  ["quests", "stats", "log", "calendar", "profile", "system"].forEach((id, i) => {
-    const [label, sub] = menuText(MENU[i]);
+  MENU.forEach((m) => {
+    const id = m.id, [label, sub] = menuText(m);
     const h = document.querySelector(`#${id} .head h2`); if (h) h.textContent = label;
     const s = document.querySelector(`#${id} .head .sub`); if (s && id !== "calendar" && id !== "system") s.textContent = sub;
   });
@@ -980,6 +1176,88 @@ $("#qList").addEventListener("click", (e) => {
   pickQuest(b.dataset.q);
   if (matchMedia("(max-width: 900px)").matches) $("#qDetail").scrollIntoView({ behavior: calm() ? "auto" : "smooth", block: "start" });
 });
+
+/* ---------- certifications: the menu stream and the Badges screen ---------- */
+let csel = CERTS[0].id;
+const emblem = (c) => `<span class="emb${c.status === "prep" ? " prep" : ""}" style="--ac:${c.ac}" aria-hidden="true">${c.abbr}</span>`;
+function renderStream() {
+  const card = (raw, copy) => {
+    const c = cert(raw);
+    return `<button class="ccard" type="button" data-cert="${c.id}" style="--ac:${c.ac}"${copy ? ' tabindex="-1" aria-hidden="true"' : ""}>` +
+      `${emblem(c)}<span><span class="cc-t">${c.title}</span><span class="cc-meta">${c.issuer} · ${c.status === "prep" ? t("prep") : c.statusLabel || c.date}</span></span></button>`;
+  };
+  // Drawn twice: the track slides by exactly half its width, so the copy takes the original's place.
+  $("#cTrack").innerHTML = CERTS.map((c) => card(c, false)).join("") + CERTS.map((c) => card(c, true)).join("");
+  $("#cStreamN").textContent = CERTS.length;
+}
+$("#cTrack").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-cert]"); if (!b) return;
+  csel = b.dataset.cert; renderCertList(); renderCertDetail(false);
+  go("certs");
+});
+// The short label on a row's chip, and the word in the detail's Status field.
+const chipLabel = (c) => (c.status === "prep" ? t("prep") : c.statusLabel || (c.group === "rec" ? t("grpRec") : c.type));
+const statusWord = (c) => (c.status === "prep" ? t("prep") : c.statusLabel || t("earned"));
+function renderCertList() {
+  let lastGroup = null;
+  $("#bList").innerHTML = CERTS.map((raw) => {
+    const c = cert(raw), g = c.group || "cert";
+    const head = g !== lastGroup ? `<li class="cgroup">${t(g === "rec" ? "grpRec" : "grpCert")}</li>` : "";
+    lastGroup = g;
+    return head + `<li><button class="crow" type="button" data-c="${c.id}" aria-current="${c.id === csel}">${emblem(c)}` +
+      `<span class="qtitle"><span class="qt">${c.title}</span><span class="qd">${c.issuer} · ${c.date}</span></span>` +
+      `<span class="st ${c.status}">${chipLabel(c)}</span></button></li>`;
+  }).join("");
+  const certs = CERTS.filter((c) => (c.group || "cert") === "cert"), prep = certs.filter((c) => c.status === "prep").length;
+  const rec = CERTS.length - certs.length;
+  $("#bCount").textContent = `${certs.length - prep} ${t("earnedN")}` + (prep ? ` · ${prep} ${t("prep").toLowerCase()}` : "") + (rec ? ` · ${rec} ${t("recN")}` : "");
+  placePointer();
+}
+function placePointer() {
+  const row = document.querySelector(`.crow[data-c="${csel}"]`), p = $("#bPointer");
+  if (!row || !row.offsetParent) return;
+  const list = $("#bList");
+  p.style.top = `${row.offsetTop - list.scrollTop + row.offsetHeight / 2}px`;
+}
+function renderCertDetail(play) {
+  const c = cert(CERTS.find((x) => x.id === csel));
+  const links = c.links.filter((l) => l.href);
+  let d = 0;
+  const el = $("#bDetail");
+  el.innerHTML =
+    `<span class="slash" aria-hidden="true"></span><span class="slash s2" aria-hidden="true"></span>` +
+    `<p class="ghost" aria-hidden="true">${c.abbr}</p>` +
+    `<div class="chead" style="--ac:${c.ac}">${emblem(c)}<span class="ring" aria-hidden="true"></span>` +
+    `<div><p class="kind">${c.type} · ${c.issuer}</p><h3>${c.title}</h3></div></div>` +
+    `<dl class="meta in" style="--d:${d++};margin-top:20px"><div><dt>${t("issuer")}</dt><dd>${c.issuer}</dd></div><div><dt>${t("date")}</dt><dd>${c.date}</dd></div>` +
+    `<div><dt>${t("type")}</dt><dd>${c.type}</dd></div><div><dt>${t("status")}</dt><dd>${statusWord(c)}</dd></div>` +
+    (c.credId ? `<div><dt>${t("credId")}</dt><dd>${c.credId}</dd></div>` : "") + `</dl>` +
+    `<p class="obj in" style="--d:${d++}">${c.blurb}</p>` +
+    (c.covers ? `<p class="h in" style="--d:${d++}">${t("covers")}</p><div class="tags in" style="--d:${d++}">${c.covers.map((s) => `<span>${s}</span>`).join("")}</div>` : "") +
+    (links.length ? `<p class="h in" style="--d:${d++}">${t("links")}</p><div class="proof in" style="--d:${d++}">${links.map((l) => `<a href="${l.href}" target="_blank" rel="noopener">${l.label} ↗</a>`).join("")}</div>` : "");
+  el.scrollTop = 0;
+  // Re-adding the class restarts every keyframe in the card, so each pick plays the whole entrance.
+  el.classList.remove("go");
+  if (play !== false) { void el.offsetWidth; el.classList.add("go"); }
+}
+function pickCert(id, focus) {
+  if (id === csel) { if (focus) document.querySelector(`.crow[data-c="${id}"]`)?.focus(); return; }
+  csel = id;
+  document.querySelectorAll(".crow").forEach((b) => b.setAttribute("aria-current", String(b.dataset.c === id)));
+  // The shine runs on aria-current; toggling it off and on restarts it on the row just picked.
+  const row = document.querySelector(`.crow[data-c="${id}"]`);
+  if (row) { row.setAttribute("aria-current", "false"); void row.offsetWidth; row.setAttribute("aria-current", "true"); }
+  renderCertDetail();
+  placePointer();
+  if (focus && row) row.focus();
+}
+$("#bList").addEventListener("click", (e) => {
+  const b = e.target.closest(".crow"); if (!b) return;
+  pickCert(b.dataset.c);
+  if (matchMedia("(max-width: 900px)").matches) $("#bDetail").scrollIntoView({ behavior: calm() ? "auto" : "smooth", block: "start" });
+});
+$("#bList").addEventListener("scroll", placePointer, { passive: true });
+addEventListener("resize", placePointer);
 
 /* ---------- stats ---------- */
 function renderStats() {
@@ -1132,6 +1410,7 @@ function renderAll() {
   document.documentElement.lang = lang;
   applyStatic(); clock(); renderMenu(); renderStatus();
   renderTabs(); renderList(); renderDetail();
+  renderStream(); renderCertList(); renderCertDetail(current === "certs");
   renderStats(); renderLog(); renderCal();
   $("#wm").textContent = wmText(current);
   if (MUSIC_FILE) paintSound(musicOn);
@@ -1154,6 +1433,12 @@ function show(id) {
   $("#wm").textContent = wmText(id);
   if (id === "menu") select(sel, true);
   else if (id === "quests") { const r = document.querySelector('.qrow[aria-current="true"]'); if (r) r.focus({ preventScroll: true }); }
+  else if (id === "certs") {
+    const r = document.querySelector('.crow[aria-current="true"]'); if (r) r.focus({ preventScroll: true });
+    placePointer();
+    // The screen was hidden while it was drawn, so the entrance plays now that it can be seen.
+    const el = $("#bDetail"); el.classList.remove("go"); void el.offsetWidth; el.classList.add("go");
+  }
   else { const b = document.querySelector(`#${id} .back`); if (b) b.focus({ preventScroll: true }); }
 }
 /* History: the menu is home. Opening a screen from the menu adds one history
@@ -1205,6 +1490,13 @@ document.addEventListener("keydown", (e) => {
   }
   if (k === "Escape" || k === "Backspace") { e.preventDefault(); go("menu"); return; }
   if (current === "calendar" && (k === "ArrowRight" || k === "ArrowLeft")) { e.preventDefault(); stepYears(k === "ArrowRight" ? 1 : -1); return; }
+  if (current === "certs" && (k === "ArrowDown" || k === "ArrowUp")) {
+    e.preventDefault();
+    const i = CERTS.findIndex((c) => c.id === csel);
+    const j = Math.max(0, Math.min(CERTS.length - 1, i + (k === "ArrowDown" ? 1 : -1)));
+    pickCert(CERTS[j].id, true);
+    return;
+  }
   if (current === "quests") {
     const v = visible();
     const idx = v.findIndex((q) => q.id === qsel);
