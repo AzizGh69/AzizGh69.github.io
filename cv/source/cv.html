@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mohamed Aziz GHAZOUANI — CV</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    :root {
+      --navy: #0a2350;
+      --blue: #1d4ed8;
+      --sky: #dbe6ff;
+      --tint: #f1f5ff;
+      --rule: #c9d7fb;
+      --ink: #1e293b;
+      --muted: #52607a;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body {
+      color: var(--ink);
+      font-family: Calibri, "Segoe UI", Arial, sans-serif;
+      font-size: 9.9pt;
+      line-height: 1.17;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    a { color: inherit; text-decoration: none; }
+    p { margin: 0; }
+
+    /* Header band */
+    header {
+      background: linear-gradient(115deg, var(--navy) 0%, #13388a 55%, var(--blue) 100%);
+      color: #fff;
+      padding: 6mm 11mm 5mm;
+      border-bottom: 1.2mm solid;
+      border-image: linear-gradient(90deg, #60a5fa, #93c5fd 40%, #ffffff) 1;
+    }
+    h1 {
+      margin: 0 0 1.6mm;
+      font-size: 24pt;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: .6pt;
+    }
+    h1 .last { color: #bcd2ff; }
+    .contact, .links { color: var(--sky); font-size: 9.8pt; }
+    .contact { margin-bottom: .6mm; }
+    .sep { color: #7ea6f5; padding: 0 1.4mm; }
+    .links a { color: #fff; }
+
+    main { padding: 3.4mm 11mm 0; }
+
+    section { margin: 0 0 2.1mm; }
+    h2 {
+      display: flex; align-items: center; gap: 2.5mm;
+      margin: 0 0 1.1mm;
+      color: var(--blue);
+      font-size: 9.8pt;
+      font-weight: 700;
+      letter-spacing: .5pt;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    h2::before {
+      content: ""; width: 2.2mm; height: 2.2mm; border-radius: .5mm;
+      background: var(--blue); flex: 0 0 auto;
+    }
+    h2::after { content: ""; flex: 1; height: .7pt; background: var(--rule); order: 2; }
+
+    .about {
+      background: var(--tint);
+      border-left: 2.4pt solid var(--blue);
+      padding: 1.2mm 3mm;
+      border-radius: 0 1.2mm 1.2mm 0;
+    }
+
+    .entry { margin: 0 0 1.3mm; }
+    .entry:last-child { margin-bottom: 0; }
+    .entry-head {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 5mm;
+    }
+    .entry-title { min-width: 0; color: var(--navy); font-weight: 700; }
+    .entry-title .role { color: var(--ink); font-weight: 400; }
+    .entry-title a { color: var(--blue); font-weight: 600; }
+    main a.lk { color: var(--blue); text-decoration: underline; text-decoration-color: #9db8f3; text-decoration-thickness: .6pt; text-underline-offset: 1.4pt; }
+    h2 a.lk { margin-left: auto; order: 3; font-size: 8.4pt; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .date {
+      flex: 0 0 auto; white-space: nowrap;
+      color: var(--blue); font-weight: 600; font-size: 9.6pt;
+    }
+    .subtitle { margin: .2mm 0 .5mm; font-style: italic; color: var(--muted); }
+
+    ul { margin: .2mm 0 0; padding-left: 4.4mm; }
+    li { margin: 0 0 .2mm; padding-left: .6mm; }
+    li:last-child { margin-bottom: 0; }
+    li::marker { color: var(--blue); content: "▸ "; font-size: 8pt; }
+    strong { font-weight: 700; color: var(--navy); }
+
+    .award { margin: 0 0 .2mm; }
+    .award .entry-title { font-weight: 400; color: var(--ink); }
+    .place {
+      display: inline-block; min-width: 17mm;
+      color: var(--blue); font-weight: 700;
+    }
+
+    .grid { display: grid; grid-template-columns: 29mm 1fr; column-gap: 2.5mm; row-gap: .3mm; }
+    .label { color: var(--navy); font-weight: 700; }
+
+    @media print {
+      html, body { width: 210mm; height: 297mm; }
+      section, .entry { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mohamed Aziz <span class="last">GHAZOUANI</span></h1>
+    <p class="contact">Tunis, Tunisia<span class="sep">|</span>+216 25 004 537<span class="sep">|</span>aziz19ghazouani@gmail.com</p>
+    <p class="links"><a href="https://aziz-ghazouani.pages.dev">aziz-ghazouani.pages.dev</a><span class="sep">|</span><a href="https://linkedin.com/in/aziz-ghazouani">linkedin.com/in/aziz-ghazouani</a><span class="sep">|</span><a href="https://github.com/AzizGh69">github.com/AzizGh69</a></p>
+  </header>
+
+  <main>
+    <section>
+      <h2>About</h2>
+      <p class="about">Business Intelligence student who builds and runs production data and agentic AI systems end to end, from LLM pipelines to CI/CD, with 16 months of client-facing support and three competition awards. Available for a 4–6 month PFE from 02/2027.</p>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">Bachelor in Business Intelligence <span class="role">– IHEC Carthage, Tunis</span></span><span class="date">09/2024 – 06/2027</span></div>
+        <p class="subtitle">3rd year · average 14.5/20</p>
+        <div class="entry-head"><span class="entry-title">Baccalaureate in Computer Science <span class="role">– Mention Très bien</span></span><span class="date">06/2024</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">Kalori <span class="role">– Founder &amp; sole developer ·</span> <a href="https://kalori-app.com">kalori-app.com</a></span><span class="date">06/2026 – present</span></div>
+        <p class="subtitle">Nutrition tracker built around Tunisian food (EN/FR/AR), in testing with 20+ users</p>
+        <ul>
+          <li><strong>Built the AI meal suggestions:</strong> a rules-based recommender and a multi-provider LLM chain with an output guard, fallback and per-call cost metering, covering 106 Tunisian dishes.</li>
+          <li><strong>Developed the whole product alone</strong> in 570+ commits, from the API, database and caching layer to an offline-first web app, authentication and edge hosting.</li>
+          <li><strong>Industrialised delivery:</strong> CI with 8 required checks and ~3,100 automated tests; blue/green deployment with automatic rollback.</li>
+          <li><strong>Designing a data platform</strong> (planning stage): change data capture into a medallion lakehouse feeding BI dashboards, on cloud infrastructure provisioned as code.</li>
+        </ul>
+      </div>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">BVMT Trading Assistant <span class="role">– Project manager &amp; developer (one of 2 developers in a team of 7) ·</span> <a href="https://github.com/AzizGh69/bvmt-trading-assistant">GitHub</a></span><span class="date">04/2026</span></div>
+        <p class="subtitle">Entrepreneurship competition project: intelligent trading assistant for the Tunis Stock Exchange (82 stocks)</p>
+        <ul>
+          <li><strong>Data pipeline:</strong> cleaned 2016–2026 price history into a relational database, with live market scraping every 60 s.</li>
+          <li><strong>Forecasting and alerts:</strong> 5-day price forecasts with XGBoost and LSTM validated by backtesting; volume anomaly alerts with Isolation Forest.</li>
+          <li><strong>Agentic AI layer:</strong> a 5-agent LLM pipeline for sentiment analysis on French, Arabic and Tunizi news, and a RAG chatbot, served through FastAPI microservices and a web dashboard.</li>
+        </ul>
+      </div>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">IHEC BOT <span class="role">– AI assistant for the university library (team project) ·</span> <a href="https://github.com/AzizGh69/ihec-bot">GitHub</a></span><span class="date">02/2025</span></div>
+        <ul>
+          <li><strong>Led the chatbot:</strong> built the retrieval-augmented generation pipeline and fine-tuned the model.</li>
+          <li><strong>Cleaned and structured 550+ catalogue records</strong> (titles, authors, ISBN, call numbers) before indexing.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">Consultant, Uber Merchant Support <span class="role">– <a class="lk" href="https://www.linkedin.com/company/concentrix/posts/">Concentrix</a>, Tunis</span></span><span class="date">06/2025 – 09/2026</span></div>
+        <ul>
+          <li><strong>Supported Uber merchants full time</strong> in French and English, resolving technical incidents and advising on Uber marketing tools.</li>
+          <li><strong>Averaged 4.3/5 CSAT</strong> and won Best Monthly Performer 4 times.</li>
+          <li><strong>Managed cases in Salesforce</strong> and escalated issues through Jira.</li>
+        </ul>
+      </div>
+      <div class="entry">
+        <div class="entry-head"><span class="entry-title">Technical Lead <span class="role">– <a class="lk" href="https://www.linkedin.com/company/hec-finance-academy/posts/">HEC Finance Academy (HECFA)</a>, IHEC Carthage ·</span> <a href="https://hecfa.com">hecfa.com</a></span><span class="date">10/2025 – 10/2026</span></div>
+        <p class="subtitle">Student club · executive board</p>
+        <ul>
+          <li><strong>Delivered 5 production apps for the CodeLab 2.0 hackathon</strong> (220 participants, 12 teams): registration and payments, participant tracking, support, jury scoring, ambassadors.</li>
+          <li><strong>Built the club's recruitment platform:</strong> application form and filtering dashboard, 321 applications processed.</li>
+          <li><strong>Maintained and deployed hecfa.com</strong> and its domain configuration.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Awards</h2>
+      <div class="entry-head award"><span class="entry-title"><span class="place">2nd place</span> <a class="lk" href="https://aziz-ghazouani.pages.dev/#certs/cybercamp">CyberCamp 7.0, Offensive Cloud Security</a></span><span class="date">11/2026</span></div>
+      <div class="entry-head award"><span class="entry-title"><span class="place">1st prize</span> Global Entrepreneurship Week, IHEC Carthage: <a class="lk" href="https://aziz-ghazouani.pages.dev/#quests/connect">IHEC Connect prototype</a>, 1,500 TND for the club</span><span class="date">11/2025</span></div>
+      <div class="entry-head award"><span class="entry-title"><span class="place">3rd prize</span> <a class="lk" href="https://aziz-ghazouani.pages.dev/#certs/injaz">Entrepreneurship Bootcamp, JCI INSAT</a>: won a fully funded incubation for our project</span><span class="date">10/2025</span></div>
+    </section>
+
+    <section>
+      <h2>Skills <a class="lk" href="https://aziz-ghazouani.pages.dev/#stats">Full skill tree ↗</a></h2>
+      <div class="grid">
+        <span class="label">AI &amp; Data Science</span><span>LLMs in production, Python, pandas, NumPy, Streamlit, scikit-learn, RAG, ChromaDB, Llama, fine-tuning</span>
+        <span class="label">Data Engineering</span><span>SQL, PySpark, ETL/ELT, CDC (Debezium, Kafka), medallion architecture, Microsoft Fabric, Power BI</span>
+        <span class="label">Development</span><span>TypeScript, NestJS, FastAPI, Firebase Auth, JavaScript, Java, C#, PHP, React, Next.js, Git, Sentry, system design</span>
+        <span class="label">Cloud &amp; DevOps</span><span>AWS, Terraform (Infrastructure as Code), Docker, Podman, GitHub Actions (CI/CD), Cloudflare, Linux, n8n</span>
+        <span class="label">Databases</span><span>PostgreSQL, Redis, MySQL, Oracle, Firebase</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Certifications, Languages &amp; Involvement</h2>
+      <div class="grid">
+        <span class="label">Certifications</span><span><a class="lk" href="https://aziz-ghazouani.pages.dev/#certs/cisco-eh">Ethical Hacker</a> (Cisco Networking Academy, 11/2026) · <a class="lk" href="https://aziz-ghazouani.pages.dev/#certs/ai-agent">AI Agent Engineer career track</a> (365 Data Science, 11/2026) · <a class="lk" href="https://aziz-ghazouani.pages.dev/#certs/adv-sql">Advanced SQL for Data Engineering</a> (365 Data Science, 11/2026) · <a class="lk" href="https://www.credly.com/badges/cd86026c-1405-491a-ac02-9a62cd683a0e/public_url">AWS Knowledge: Cloud Essentials</a> (Amazon Web Services, 10/2026) · <a class="lk" href="https://www.credly.com/badges/a0b510b5-274c-4e31-80a8-a7319f5d03b9/public_url">IBM Data Fundamentals</a> (IBM, 10/2026)</span>
+        <span class="label">Languages</span><span>Arabic (native) · French (B2) · English (C1)</span>
+        <span class="label">Involvement</span><span>Photography Lab (10/2026 – present) · HEC Finance Academy, member (10/2024 – 10/2026) · IEEE Computer Society Chapter (10/2024 – 10/2025)</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
