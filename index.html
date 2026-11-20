@@ -646,7 +646,7 @@ const QUESTS = [
       "<b>Product:</b> investor-profile sign-up, email alerts, scheduled reports, RSI / MACD / Bollinger dashboard, light and dark themes."
     ],
     stack: ["Python", "FastAPI (12 microservices)", "NestJS", "Flask", "scikit-learn", "TensorFlow", "XGBoost", "statsmodels", "SHAP", "cvxpy", "ChromaDB", "Llama 3.3", "PostgreSQL", "Redis", "Next.js", "TypeScript", "Tailwind", "Recharts", "Docker", "n8n"],
-    proof: [] },
+    proof: [{ label: "GitHub", href: "https://github.com/AzizGh69/bvmt-trading-assistant" }] },
   { id: "epistemia", cats: ["lead"], kind: "Client project", title: "Epistemia", when: "2025 → now", status: "progress", statusLabel: "Ongoing",
     role: "Project manager", team: "Team",
     obj: "A web platform that digitises an educational board game for students.",
@@ -666,7 +666,7 @@ const QUESTS = [
     role: "Chatbot lead", team: "Team",
     obj: "An AI assistant for the university library.",
     results: ["Owned the chatbot: retrieval-augmented generation with ChromaDB and Llama, plus fine-tuning.", "Cleaned and structured <b>551 catalogue records × 23 fields</b> before indexing."],
-    stack: ["Python", "RAG", "ChromaDB", "Llama"], proof: [] },
+    stack: ["Python", "RAG", "ChromaDB", "Llama"], proof: [{ label: "GitHub", href: "https://github.com/AzizGh69/ihec-bot" }] },
   { id: "valorant", cats: ["data", "side"], kind: "Side quest", title: "Valorant Agent Assistant", when: "12/2025", status: "done", statusLabel: "Personal",
     role: "Sole developer", team: "Solo",
     obj: "Pick the right weapon for how you play, then train your decisions.",
@@ -1537,7 +1537,13 @@ function go(id) {
   }
   transition(id);
 }
-const screenFromUrl = () => { const h = location.hash.slice(1); return WATERMARK[h] && h !== "menu" ? h : "menu"; };
+// A hash can name an item too (#certs/aws-ce, #quests/kalori): the CV links straight to them.
+const screenFromUrl = () => { const h = location.hash.slice(1).split("/")[0]; return WATERMARK[h] && h !== "menu" ? h : "menu"; };
+{
+  const [scr, item] = location.hash.slice(1).split("/");
+  if (scr === "certs" && CERTS.some((c) => c.id === item)) csel = item;
+  if (scr === "quests" && QUESTS.some((q) => q.id === item)) { tab = "all"; qsel = item; }
+}
 addEventListener("popstate", () => transition(screenFromUrl()));
 document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
 document.addEventListener("keydown", (e) => {
@@ -1574,11 +1580,11 @@ renderAll();
 {
   // A link straight to a screen (…/#calendar) gets the menu slipped in underneath,
   // so Back still lands on the menu. A reload keeps the steps it already has.
-  const start = screenFromUrl();
+  const start = screenFromUrl(), hash = location.hash;
   if (start === "menu") history.replaceState(null, "", PAGE());
   else if (!(history.state && history.state.screen === start)) {
     history.replaceState(null, "", PAGE());
-    history.pushState({ screen: start }, "", `#${start}`);
+    history.pushState({ screen: start }, "", hash);
   }
   show(start);
 }
