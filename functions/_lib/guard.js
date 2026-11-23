@@ -62,6 +62,9 @@ export function scoreMatch(raw) {
     const evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
     let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
     if (status !== "gap" && evidence.length === 0) status = "gap"; // a claim without real evidence does not count
+    // The model sometimes under-rates: a requirement that names the very skill it cites is a direct match.
+    const key = String(r.req || "").toLowerCase().replace(/#/g, "sharp").replace(/[+]/g, "plus").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (status === "adjacent" && key && evidence.some((id) => id.startsWith("skill:") && (id.slice(6) === key || key.endsWith("-" + id.slice(6)) || id.slice(6).endsWith("-" + key)))) status = "direct";
     return {
       req: clean(r.req, 120), priority: r.priority === "must" ? "must" : "nice", status,
       evidence: status === "gap" ? [] : evidence, note: sanitizeReply(clean(r.note, 300)) ?? ""
