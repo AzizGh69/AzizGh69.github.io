@@ -21,8 +21,12 @@
 @keyframes noxPing{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(1.45);opacity:0}}
 @keyframes noxSpin{to{transform:rotate(360deg)}}
 @keyframes noxBlink{50%{opacity:.35}}
-/* The menu's status cards sit bottom-right too: slide them left of the bubble. */
-@media (min-width:901px){#menu .status{right:calc(3vw + 110px);width:min(360px,28vw)}}
+/* On the main menu the status cards keep the corner and the bubble sits just left of them. */
+.nox-bubble,.nox-tag{transition:right .45s var(--out),transform .25s var(--snap)}
+@media (min-width:901px){
+  body[data-screen="menu"] .nox-bubble{right:calc(3vw + min(380px,32vw) + 34px)}
+  body[data-screen="menu"] .nox-tag{right:calc(3vw + min(380px,32vw) + 10px)}
+}
 
 /* ---------- first-visit teaser ---------- */
 .nox-tag{position:fixed;right:24px;bottom:138px;z-index:45;display:flex;align-items:stretch;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9));animation:noxTag .5s var(--snap) both}

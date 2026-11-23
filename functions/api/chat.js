@@ -117,7 +117,7 @@ async function groq(env, system, turns, asJson) {
 
 async function ask(env, system, turns, asJson) {
   const providers = [env.GEMINI_API_KEY && gemini, env.GROQ_API_KEY && groq].filter(Boolean);
-  if (!providers.length) throw Object.assign(new Error("no provider configured"), { status: 503 });
+  if (!providers.length) throw Object.assign(new Error("no provider configured"), { status: 503, config: true });
   let last;
   for (const p of providers) {
     try { return await p(env, system, turns, asJson); } catch (e) { last = e; }
@@ -172,8 +172,10 @@ async function handlePost(request, env) {
     const reply = sanitizeReply(raw);
     return json({ reply: reply || REFUSAL[lang] });
   } catch (e) {
-    const status = e?.status === 429 ? 429 : e?.status === 503 ? 503 : 502;
-    return json({ error: status === 429 ? "busy" : status === 503 ? "not_configured" : "model_error" }, status);
+    if (e?.config) return json({ error: "not_configured" }, 503);
+    // Provider overloaded (503) or rate limited (429/413): tell the visitor to try again shortly.
+    const busy = [429, 413, 503].includes(e?.status);
+    return json({ error: busy ? "busy" : "model_error" }, busy ? 429 : 502);
   }
 }
 

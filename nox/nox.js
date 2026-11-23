@@ -417,6 +417,7 @@
 
   // On #recruiter the same agent (and conversation) moves into the screen.
   function place() {
+    document.body.dataset.screen = current;
     const full = current === "recruiter";
     agent.classList.toggle("full", full);
     if (full) { $("#noxDock").appendChild(agent); float.hidden = true; bubble.hidden = true; hideTag(); greet(); }
