@@ -67,7 +67,7 @@ export function sanitizeReply(text) {
     const bare = u.replace(/[.,;:!?]+$/, "");
     return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";
   });
-  t = fixKnownSlips(t);
+  t = fixKnownSlips(t).replace(/\s?\[team result\]/gi, "");
   if (PROMPT_FINGERPRINTS.some((f) => t.includes(f))) return null;
   return t.slice(0, LIMITS.reply).trim();
 }

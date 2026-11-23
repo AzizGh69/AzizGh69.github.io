@@ -52,6 +52,18 @@ out.push("");
 out.push("## AVAILABILITY");
 out.push(`${add("fact:availability")} Looking for a 4–6 month final-year internship (PFE) from 02/2027 in data engineering, AI or product (data, AI and product roles). Graduation expected 06/2027. NOT stated anywhere in the portfolio: remote vs on-site preference, relocation, salary, visa or work permit. Never say any of these is fine, possible or acceptable; say Aziz will answer that by email.`);
 out.push("");
+// Soft skills, written by hand, each backed by items elsewhere in this dossier (portfolio and CV). Keep it that way:
+// a claim goes here only with its evidence. No team sizes are stated anywhere, so none are claimed.
+out.push("## SOFT SKILLS (each backed by the items cited)");
+out.push(`${add("fact:soft-skills")} Summary of evidence for soft skills:`);
+[
+  "Leadership: elected co-head of the IT department and member of the executive board at HEC Finance Academy, recognised as Tech Lead [log:hec-finance-academy] [cert:hecfa-lead]; project manager on Epistemia, IHEC Connect (also solution architect), the BVMT Trading Assistant and RideShare [quest:epistemia] [quest:connect] [quest:bvmt] [quest:rideshare]; chatbot lead on IHEC BOT [quest:ihecbot]. Team sizes are not stated.",
+  "Communication: 16 months of full-time bilingual support (French, English) for Uber merchants at Concentrix, which taught him to listen to users before writing code [log:concentrix]; on Epistemia he ran the meetings and the client communication [quest:epistemia]; worked in the club's communication department [cert:hecfa-com]; Arabic native, English C1, French B2 [fact:languages].",
+  "Public speaking and pitching: pitched IHEC Connect to 1st prize at Global Entrepreneurship Week [quest:connect] [fact:awards]; 3rd prize at the INJAZ × JCI entrepreneurship bootcamp, which covered pitching [cert:injaz]; the portfolio photo shows him speaking at a podium.",
+  "Under pressure: 3 competition podiums: 1st (Global Entrepreneurship Week), 2nd (CyberCamp 7.0, offensive cloud security) and 3rd (INJAZ bootcamp) [fact:awards] [cert:cybercamp] [cert:injaz]; his department's software ran the 220-participant CodeLab 2.0 hackathon live, delivered on a deadline [quest:codelab]; worked full time at Concentrix for 16 months while studying [log:concentrix].",
+  "Teamwork and student life (vie associative): HEC Finance Academy (communication department, then IT department and executive board) [log:hec-finance-academy]; organising teams of DevFest and CodeLab 1.0 [cert:devfest] [cert:hecfa-it]; IEEE Computer Society member [log:ieee-computer-society]; Photography Lab at IHEC [cv]; most projects are team projects, e.g. IHEC Connect over 4 Scrum sprints [quest:connect] and the cryptocurrency dashboard, where the whole team worked on every part [quest:crypto]."
+].forEach((l) => out.push("- " + l));
+out.push("");
 out.push("## CURRENT STATUS");
 data.STATUS.forEach((s) => full(`- ${s.k}: ${s.v} — ${s.meta}`));
 out.push("");
@@ -67,10 +79,12 @@ out.push("");
 out.push("## PROJECTS (portfolio 'quests')");
 data.QUESTS.forEach((q) => {
   const id = add("quest:" + q.id);
-  out.push(`${id} ${q.title} — ${q.kind} — ${q.when} — ${q.statusLabel || q.status} — role: ${q.role} — stack: ${(q.stack || []).join(", ")}`);
+  // Team projects say so up front: their results are the team's, and Aziz is credited with his role only.
+  const who = q.team === "Solo" ? `solo, role: ${q.role}` : `TEAM project (${q.team}); Aziz's role: ${q.role}; results below are the team's`;
+  out.push(`${id} ${q.title} — ${q.kind} — ${q.when} — ${q.statusLabel || q.status} — ${who} — stack: ${(q.stack || []).join(", ")}`);
   const proof = (q.proof || []).filter((p) => p.href);
   proof.forEach((p) => links.add(p.href));
-  detail("quest:" + q.id, [`  Team: ${q.team}`, `  Objective: ${plain(q.obj)}`, ...(q.results || []).map((r) => "  - " + plain(r)),
+  detail("quest:" + q.id, [`  Team: ${q.team}`, `  Objective: ${plain(q.obj)}`, ...(q.results || []).map((r) => (q.team === "Solo" ? "  - " : "  - [team result] ") + plain(r)),
     proof.length && `  Proof: ${proof.map((p) => `${p.label} (${p.href})`).join(", ")}`]);
 });
 out.push("");
