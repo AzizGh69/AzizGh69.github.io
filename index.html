@@ -20,6 +20,7 @@ if (location.hostname.endsWith(".github.io")) location.replace("https://aziz-gha
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M12 6h50l-10 52H2z' fill='%231749D1'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='28' text-anchor='middle' fill='%23fff'%3EAG%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="nox/nox.css">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,600;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -427,6 +428,7 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
     <audio id="bgm" preload="none" loop></audio>
     <button class="chipbtn lang" type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
     <button class="chipbtn lang" type="button" data-lang="fr" lang="fr" aria-label="Français" aria-pressed="false">FR</button>
+    <button class="chipbtn nox-chip" type="button" data-nox-open data-ta="aria-label:noxOpen"><i aria-hidden="true"></i>NOX</button>
     <button class="chipbtn solid" type="button" data-go="system">CV ↓</button>
   </div>
 </header>
@@ -555,6 +557,15 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
       </div>
     </div>
   </section>
+
+  <!-- RECRUITER (NOX, full view: nox/nox.js moves the agent in here) -->
+  <section class="screen inner" id="recruiter" aria-labelledby="rH" hidden>
+    <div class="head">
+      <h2 id="rH">NOX</h2><p class="sub" data-t="noxSub"></p>
+      <button class="chipbtn back" type="button" data-go="menu"><kbd data-t="kEsc"></kbd><span data-t="back"></span></button>
+    </div>
+    <div class="nox-dock" id="noxDock"></div>
+  </section>
 </main>
 
 <p class="keys" aria-hidden="true"><span><kbd>↑↓</kbd><span data-t="kSelect"></span></span><span><kbd data-t="kEnter"></kbd><span data-t="kOpen"></span></span><span><kbd data-t="kEsc"></kbd><span data-t="back"></span></span></p>
@@ -573,7 +584,7 @@ const MENU = [
   { id: "profile",  label: "Profile",  sub: "About me" },
   { id: "system",   label: "System",   sub: "Contact · CV" }
 ];
-const WATERMARK = { menu: "MENU", quests: "QUESTS", stats: "STATS", certs: "BADGES", log: "LOG", calendar: "CALENDAR", profile: "PROFILE", system: "SYSTEM" };
+const WATERMARK = { menu: "MENU", quests: "QUESTS", stats: "STATS", certs: "BADGES", log: "LOG", calendar: "CALENDAR", profile: "PROFILE", system: "SYSTEM", recruiter: "NOX" };
 
 const STATUS = [
   { k: "Kalori", v: "Live · v2.1.1", meta: "20+ users in testing · 587 commits" },
@@ -847,6 +858,7 @@ const UI = {
     of: "of", role: "Role", team: "Team", when: "When", status: "Status", results: "Results", stack: "Stack", proof: "Proof",
     legend: "Pips show the strongest evidence behind each skill, not a self-rating.",
     certsTag: "Certifications", issuer: "Issuer", date: "Date", type: "Type", covers: "Covers", links: "Links", earned: "Earned", earnedN: "earned", prep: "Preparing", credId: "Credential ID", grpCert: "Certifications", grpRec: "Recognition", recN: "recognitions", courses: "Courses in the track",
+    noxOpen: "Ask NOX, the recruiter assistant", noxSub: "Recruiter assistant · Job match",
     tod: ["Late night", "Morning", "Afternoon", "Evening", "Late night"], dayOf: (n) => `Day ${n} of Kalori`,
     about: [
       "I started building at 13: nine months on a Unity platformer with an animator and a designer. It never shipped. Seven years later, Kalori did.",
@@ -873,6 +885,7 @@ const UI = {
     of: "sur", role: "Rôle", team: "Équipe", when: "Période", status: "Statut", results: "Résultats", stack: "Stack", proof: "Liens",
     legend: "Les pastilles montrent la preuve la plus solide derrière chaque compétence, pas une auto-évaluation.",
     certsTag: "Certifications", issuer: "Organisme", date: "Date", type: "Type", covers: "Contenu", links: "Liens", earned: "Obtenu", earnedN: "obtenues", prep: "En préparation", credId: "ID du certificat", grpCert: "Certifications", grpRec: "Distinctions", recN: "distinctions", courses: "Cours du parcours",
+    noxOpen: "Demander à NOX, l’assistant recruteur", noxSub: "Assistant recruteur · Adéquation au poste",
     tod: ["Nuit", "Matin", "Après-midi", "Soir", "Nuit"], dayOf: (n) => `Jour ${n} de Kalori`,
     about: [
       "J’ai commencé à construire à 13 ans : neuf mois sur un jeu de plateforme sous Unity, avec un animateur et un graphiste. Il n’est jamais sorti. Sept ans plus tard, Kalori, si.",
@@ -893,7 +906,7 @@ const UI = {
 /* ---------- French content, keyed like the English ---------- */
 const FR = {
   menu: { quests: ["Quêtes", "Projets"], stats: ["Stats", "Compétences"], certs: ["Badges", "Certifications"], log: ["Journal", "Expérience"], calendar: ["Calendrier", "Parcours"], profile: ["Profil", "À propos"], system: ["Système", "Contact · CV"] },
-  watermark: { menu: "MENU", quests: "QUÊTES", stats: "STATS", certs: "BADGES", log: "JOURNAL", calendar: "CALENDRIER", profile: "PROFIL", system: "SYSTÈME" },
+  watermark: { menu: "MENU", quests: "QUÊTES", stats: "STATS", certs: "BADGES", log: "JOURNAL", calendar: "CALENDRIER", profile: "PROFIL", system: "SYSTÈME", recruiter: "NOX" },
   status: [
     { k: "Kalori", v: "En ligne · v2.1.1", meta: "20+ utilisateurs en test · 587 commits" },
     { k: "Plateforme data", v: "2 / 8", meta: "Jalons atteints · prochain : M2 le 10 nov." },
@@ -1589,5 +1602,6 @@ renderAll();
   show(start);
 }
 </script>
+<script src="nox/nox.js"></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+import { IDS, LINKS, SKILL_RANK, CERT_STATUS } from "./knowledge.js";
+import { PROMPT_FINGERPRINTS } from "./prompt.js";
+
+const ID_SET = new Set(IDS);
+export const LIMITS = { turns: 16, message: 1000, jd: 8000, reply: 2500 };
+
+// Strip control, zero-width and bidi characters that hide or reorder text; normalise width tricks.
+export function clean(s, max) {
+  return String(s ?? "")
+    .normalize("NFKC")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .replace(/[​-‏‪-‮⁠-⁤⁦-⁩﻿]/g, "")
+    .slice(0, max)
+    .trim();
+}
+
+// Text that tries to re-instruct the model. Not trusted, not blocked: flagged so the model treats it as data.
+const INJECTION = [
+  /ignore (all |any |the )?(previous|prior|above|earlier|your)/i,
+  /disregard (all |the )?(previous|prior|above|instructions|rules)/i,
+  /(system|developer) (prompt|message|instructions?)/i,
+  /(reveal|repeat|print|show|output) (me )?(your|the) (hidden |initial |system )?(prompt|instructions|rules)/i,
+  /you are (now|no longer)|act as|pretend (to be|you)|role-?play|jailbreak|\bDAN\b|developer mode/i,
+  /new (instructions|rules|persona)/i,
+  /<\/?(system|assistant|user_message|job_description|knowledge)>/i,
+  /\[(INST|SYS)\]|<\|im_start\|>|###\s*(system|instruction)/i,
+  /(oublie|ignore)[sz]? (toutes? )?(les |tes |vos )?(instructions|consignes|règles)/i,
+  /(score|match)[^.\n]{0,30}(100|cent) ?%/i
+];
+export const looksLikeInjection = (s) => INJECTION.some((r) => r.test(s));
+
+// Our own tags inside visitor text could close the fence early, so neutralise them.
+export const fence = (s) => s.replace(/<\s*\/?\s*(user_message|job_description|knowledge|system)\s*>/gi, "[tag removed]");
+
+// Keep only [ids] that exist and URLs we published; drop HTML; cap length; catch prompt leaks.
+export function sanitizeReply(text) {
+  let t = String(text ?? "").replace(/<[^>]*>/g, "");
+  t = t.replace(/\[([a-z]+:[a-z0-9-]+)\]/gi, (m, id) => (ID_SET.has(id.toLowerCase()) ? `[${id.toLowerCase()}]` : ""));
+  t = t.replace(/\b(?:https?:\/\/|mailto:)[^\s)\]]+/gi, (u) => {
+    const bare = u.replace(/[.,;:!?]+$/, "");
+    return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";
+  });
+  if (PROMPT_FINGERPRINTS.some((f) => t.includes(f))) return null;
+  return t.slice(0, LIMITS.reply).trim();
+}
+
+// The score is computed here from validated evidence, never taken from the model.
+const SKILL_STRENGTH = { P: 1, R: 1, B: 0.95, C: 0.85, F: 0.75 };
+function strength(ids) {
+  let best = 0;
+  for (const id of ids) {
+    if (id.startsWith("skill:")) best = Math.max(best, SKILL_STRENGTH[SKILL_RANK[id]] ?? 0.75);
+    else if (id.startsWith("cert:")) best = Math.max(best, CERT_STATUS[id] === "prep" ? 0.8 : 1);
+    else best = Math.max(best, 1);
+  }
+  return best;
+}
+export function scoreMatch(raw) {
+  const reqs = (Array.isArray(raw?.requirements) ? raw.requirements : []).slice(0, 14).map((r) => {
+    const evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
+    let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
+    if (status !== "gap" && evidence.length === 0) status = "gap"; // a claim without real evidence does not count
+    return {
+      req: clean(r.req, 120), priority: r.priority === "must" ? "must" : "nice", status,
+      evidence: status === "gap" ? [] : evidence, note: sanitizeReply(clean(r.note, 300)) ?? ""
+    };
+  }).filter((r) => r.req);
+  let got = 0, total = 0;
+  for (const r of reqs) {
+    const w = r.priority === "must" ? 2 : 1;
+    total += w;
+    if (r.status === "direct") got += w * strength(r.evidence);
+    else if (r.status === "adjacent") got += w * 0.7 * strength(r.evidence); // generous, still below a direct match
+  }
+  let score = total ? Math.round((got / total) * 100) : 0;
+  if (score >= 100 && reqs.some((r) => r.status !== "direct")) score = 99;
+  return {
+    score, verdict: clean(raw?.verdict, 60), requirements: reqs,
+    pitch: sanitizeReply(clean(raw?.pitch, 1200)) ?? ""
+  };
+}

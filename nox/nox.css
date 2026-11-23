@@ -1,0 +1,184 @@
+/* NOX, the recruiter agent: bubble, floating dialogue and the #recruiter full view. Uses the page's tokens. */
+
+/* ---------- topbar chip ---------- */
+.chipbtn.nox-chip{background:linear-gradient(100deg,#1749D1,#0B1E57);color:#fff;box-shadow:inset 0 0 0 2px var(--cyan)}
+.chipbtn.nox-chip i{display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);vertical-align:1px;animation:noxBlink 1.6s ease-in-out infinite}
+.chipbtn.nox-chip:hover{background:var(--cyan);color:var(--ink)}
+
+/* ---------- the moon bubble ---------- */
+.nox-bubble{all:unset;position:fixed;right:28px;bottom:26px;z-index:45;width:88px;height:88px;cursor:pointer;border-radius:50%;
+  -webkit-tap-highlight-color:transparent;transition:transform .25s var(--snap)}
+.nox-bubble[hidden]{display:none}
+.nox-moon{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 40% 36%,#fff 0%,#D6F7FF 40%,#7FCFF5 78%,#1749D1 100%);
+  box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 28px 6px rgba(79,230,255,.55),8px 8px 0 4px rgba(23,73,209,.9)}
+.nox-moon .nox-svg{position:absolute;left:0;top:4px;width:100%;height:100%}
+.nox-moon .nox-moonbg{display:none}
+.nox-ping{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--cyan);animation:noxPing 2.4s cubic-bezier(.2,.6,.3,1) infinite;pointer-events:none}
+.nox-ringtext{position:absolute;inset:-22px;width:calc(100% + 44px);height:calc(100% + 44px);animation:noxSpin 18s linear infinite;pointer-events:none;overflow:visible}
+.nox-ringtext text{font:800 italic 10.4px var(--display);letter-spacing:.21em;fill:var(--ice);paint-order:stroke;stroke:var(--ink);stroke-width:3px}
+.nox-bubble:hover,.nox-bubble:focus-visible{transform:scale(1.08) rotate(-4deg)}
+.nox-bubble:focus-visible .nox-moon{box-shadow:0 0 0 3px var(--ink),0 0 0 6px #fff,0 0 28px 6px rgba(79,230,255,.7)}
+@keyframes noxPing{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(1.45);opacity:0}}
+@keyframes noxSpin{to{transform:rotate(360deg)}}
+@keyframes noxBlink{50%{opacity:.35}}
+/* The menu's status cards sit bottom-right too: slide them left of the bubble. */
+@media (min-width:901px){#menu .status{right:calc(3vw + 110px);width:min(360px,28vw)}}
+
+/* ---------- first-visit teaser ---------- */
+.nox-tag{position:fixed;right:24px;bottom:138px;z-index:45;display:flex;align-items:stretch;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9));animation:noxTag .5s var(--snap) both}
+.nox-tag[hidden]{display:none}
+.nox-tag button{all:unset;cursor:pointer;font:800 italic 17px/1.15 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.nox-tag .nox-tag-text{background:#fff;color:var(--ink);padding:12px 18px 11px 22px;max-width:270px;clip-path:polygon(5% 0,100% 0,100% 100%,0 100%)}
+.nox-tag .nox-tag-x{background:var(--cyan);color:var(--ink);padding:0 12px;font-size:22px!important;display:grid!important;place-items:center;clip-path:polygon(0 0,100% 0,82% 100%,0 100%)}
+.nox-tag-text:focus-visible,.nox-tag-x:focus-visible{text-decoration:underline}
+@keyframes noxTag{from{opacity:0;transform:translateX(30px) skewX(-10deg)}}
+
+/* ---------- floating panel ---------- */
+.nox-float{position:fixed;right:22px;bottom:22px;z-index:45;width:min(860px,calc(100vw - 44px));height:min(640px,calc(100vh - 110px))}
+.nox-float[hidden]{display:none}
+.nox-float.in .nox{animation:noxIn .45s var(--out) both}
+.nox-float.in .nox-figure{animation:noxCut .6s var(--snap) .08s both}
+@keyframes noxIn{from{clip-path:polygon(100% 0,100% 0,100% 100%,100% 100%)}to{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}}
+@keyframes noxCut{from{transform:translateX(-60%) skewX(8deg);opacity:0}}
+
+/* ---------- the agent (shared by both views) ---------- */
+.nox{position:relative;display:grid;grid-template-columns:minmax(220px,34%) 1fr;height:100%;background:linear-gradient(160deg,#0A1640 0%,#040A1C 60%);color:#fff;
+  box-shadow:inset 0 0 0 2px rgba(79,230,255,.55);clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%)}
+.nox-stage{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 30% 20%,#1C5CF0 0%,#0B1E57 55%,#040A1C 100%)}
+.nox-slash{position:absolute;left:-30%;top:52%;width:160%;height:26%;background:var(--blue);transform:rotate(-18deg);box-shadow:0 0 0 3px var(--cyan)}
+.nox-slash.s2{top:30%;height:5%;background:var(--cyan);opacity:.6;box-shadow:none}
+.nox-figure{position:absolute;inset:auto -22% 0 -22%;height:100%}
+.nox-figure .nox-svg{width:100%;height:100%;display:block;filter:drop-shadow(8px 0 0 rgba(4,10,28,.6))}
+.nox-main{display:flex;flex-direction:column;min-height:0;min-width:0;padding:16px 20px 12px 20px}
+.nox-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.nox-plate{display:flex;flex-direction:column;filter:drop-shadow(5px 5px 0 var(--blue))}
+.nox-plate b{font:900 italic 46px/.85 var(--display);letter-spacing:.02em;background:#fff;color:var(--ink);padding:4px 26px 2px 14px;clip-path:var(--slant);align-self:flex-start;transform:rotate(-3deg);transform-origin:0 100%}
+.nox-plate span{font:800 italic 14px/1 var(--display);letter-spacing:.22em;text-transform:uppercase;background:var(--cyan);color:var(--ink);padding:5px 16px 4px;margin:4px 0 0 18px;clip-path:var(--slant);align-self:flex-start}
+.nox-tools{display:flex;gap:6px}
+.nox-tool,.nox-send{all:unset;cursor:pointer;display:grid;place-items:center;width:38px;height:34px;background:rgba(214,247,255,.1);color:var(--ice);clip-path:var(--slant);transition:background .12s,color .12s}
+.nox-tool svg,.nox-send svg{width:20px;height:20px}
+.nox-tool:hover,.nox-send:hover{background:var(--blue);color:#fff}
+.nox-tool:focus-visible,.nox-send:focus-visible{background:#fff;color:var(--ink)}
+.nox-tool[aria-pressed="true"]{background:var(--cyan);color:var(--ink)}
+.nox-tool[aria-pressed="false"] .w,.nox-tool[aria-pressed="true"] .x{display:none}
+.nox-tool[aria-disabled="true"]{opacity:.35;cursor:not-allowed}
+.nox-tool[hidden]{display:none}
+.nox-mic.on{background:#E5484D;color:#fff;animation:noxBlink 1s infinite}
+.nox.full #noxFull,.nox.full #noxClose{display:none}
+
+.nox-tabs{display:flex;gap:6px;margin:14px 0 10px}
+.nox-tab{all:unset;cursor:pointer;font:800 italic 16px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;padding:9px 22px 8px;background:rgba(214,247,255,.08);color:var(--muted);clip-path:var(--slant)}
+.nox-tab[aria-selected="true"]{background:#fff;color:var(--ink)}
+.nox-tab:hover{color:#fff}
+.nox-tab:focus-visible{text-decoration:underline}
+.nox-view{flex:1;min-height:0;display:flex;flex-direction:column}
+.nox-view[hidden]{display:none}
+
+/* dialogue */
+.nox-log{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 4px 8px 0;scrollbar-width:thin;scrollbar-color:rgba(79,230,255,.5) transparent}
+.nox-msg{max-width:92%;font:500 15.5px/1.45 var(--body);animation:noxMsg .3s var(--out) both}
+.nox-msg p{margin:0 0 6px}.nox-msg p:last-child{margin:0}
+.nox-msg ul{margin:4px 0 6px;padding-left:18px}.nox-msg li{margin:2px 0}
+.nox-msg b{color:var(--cyan);font-weight:700}
+.nox-msg a{color:var(--cyan)}
+.nox-says{align-self:flex-start;position:relative;background:linear-gradient(90deg,rgba(11,30,87,.95),rgba(11,30,87,.75));padding:11px 16px 12px 18px;border-left:4px solid var(--cyan);clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%)}
+.nox-you{align-self:flex-end}
+.nox-msg.you{align-self:flex-end;background:#fff;color:var(--ink);font-weight:600;padding:9px 22px 9px 16px;clip-path:polygon(12px 0,100% 0,100% 100%,0 100%);white-space:pre-wrap}
+@keyframes noxMsg{from{opacity:0;transform:translateY(8px)}}
+.nox-dots{display:flex;align-items:center;gap:5px}
+.nox-dots span{width:8px;height:8px;background:var(--cyan);transform:skewX(-20deg);animation:noxDot 1s ease-in-out infinite}
+.nox-dots span:nth-child(2){animation-delay:.15s}.nox-dots span:nth-child(3){animation-delay:.3s}
+.nox-dots em{margin-left:8px;font:700 italic 14px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+@keyframes noxDot{50%{opacity:.2;transform:skewX(-20deg) translateY(-3px)}}
+.nox-ev{all:unset;cursor:pointer;display:inline-block;margin:1px 2px;padding:2px 10px 1px 8px;font:800 italic 13px/1.3 var(--display);letter-spacing:.08em;text-transform:uppercase;background:var(--cyan);color:var(--ink);clip-path:var(--slant);vertical-align:1px}
+.nox-ev::before{content:"◆ ";font-size:9px}
+.nox-ev:hover,.nox-ev:focus-visible{background:#fff}
+
+.nox-choices{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 10px}
+.nox-choices[hidden]{display:none}
+.nox-choice{all:unset;cursor:pointer;font:800 italic 15px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:9px 20px 8px 14px;background:rgba(23,73,209,.45);color:#fff;clip-path:var(--slant);animation:noxChoice .4s var(--snap) both;animation-delay:calc(var(--i) * 60ms + .2s);transition:background .12s,transform .12s}
+.nox-choice:hover,.nox-choice:focus-visible{background:#fff;color:var(--ink);transform:translateX(4px)}
+.nox-choice.alt{background:var(--cyan);color:var(--ink)}
+@keyframes noxChoice{from{opacity:0;transform:translateX(-14px)}}
+
+.nox-input{display:flex;align-items:flex-end;gap:6px;padding-top:6px;border-top:1px solid rgba(79,230,255,.25)}
+.nox-input textarea,.nox-jd textarea{flex:1;resize:none;font:500 15.5px/1.4 var(--body);color:#fff;background:rgba(214,247,255,.07);border:0;outline:0;padding:9px 12px;box-shadow:inset 0 -2px 0 rgba(79,230,255,.4)}
+.nox-input textarea{max-height:140px}
+.nox-input textarea:focus,.nox-jd textarea:focus{box-shadow:inset 0 -2px 0 var(--cyan);background:rgba(214,247,255,.11)}
+.nox-input textarea::placeholder,.nox-jd textarea::placeholder{color:var(--muted);opacity:.8}
+.nox-send{background:var(--cyan);color:var(--ink);width:46px}
+.nox-send:disabled{opacity:.5;cursor:wait}
+.nox-disc{margin:8px 0 0;font:500 11.5px/1.3 var(--body);color:var(--muted);opacity:.85}
+
+/* job match */
+.nox-view[data-v="match"]{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(79,230,255,.5) transparent;padding-right:4px}
+.nox-jd{display:flex;flex-direction:column;gap:8px}
+.nox-jd label{font:800 italic 15px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.nox-jd textarea{min-height:120px;height:22vh}
+.nox-go{all:unset;cursor:pointer;align-self:flex-start;font:900 italic 18px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;padding:11px 28px 10px;background:var(--cyan);color:var(--ink);clip-path:var(--slant)}
+.nox-go:hover,.nox-go:focus-visible{background:#fff}
+.nox-go:disabled{opacity:.5;cursor:wait}
+.nox-result{margin-top:14px}
+.nox-err{color:var(--amber);font-weight:600}
+.nox-score{--p:0;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:14px;background:rgba(11,30,87,.6);border-left:4px solid var(--cyan)}
+.nox-ring{width:112px;height:112px;border-radius:50%;display:grid;place-content:center;text-align:center;
+  background:radial-gradient(closest-side,#040A1C 78%,transparent 80% 100%),conic-gradient(var(--cyan) calc(var(--p) * 1%),rgba(214,247,255,.12) 0)}
+.nox-ring b{font:900 italic 36px/1 var(--display)}
+.nox-ring small{font:800 italic 12px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.nox-score h4{margin:0 0 6px;font:900 italic 26px/1 var(--display);text-transform:uppercase;color:#fff;text-shadow:3px 3px 0 var(--blue)}
+.nox-pitch{font:500 14.5px/1.45 var(--body)}.nox-pitch p{margin:0 0 4px}
+.nox-result h5{margin:16px 0 8px;font:800 italic 16px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.nox-reqs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.nox-reqs li{padding:9px 12px;background:rgba(214,247,255,.05);border-left:3px solid var(--muted)}
+.nox-reqs li.direct{border-color:var(--cyan)}.nox-reqs li.adjacent{border-color:var(--amber)}.nox-reqs li.gap{border-color:#6B7BA6;opacity:.9}
+.nox-reqs strong{font:700 15px/1.3 var(--body)}
+.nox-reqs p{margin:4px 0 0;font:500 13.5px/1.4 var(--body);color:var(--ice)}
+.nox-st,.nox-pr{display:inline-block;margin-right:6px;padding:2px 9px 1px;font:800 italic 12px/1.3 var(--display);letter-spacing:.12em;text-transform:uppercase;clip-path:var(--slant);vertical-align:2px}
+.nox-st.direct{background:var(--cyan);color:var(--ink)}.nox-st.adjacent{background:var(--amber);color:var(--ink)}.nox-st.gap{background:#3A4670;color:#fff}
+.nox-pr{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px rgba(169,190,234,.5)}
+.nox-pr.must{color:#fff}
+.nox-evs{margin-top:5px}
+
+/* ---------- character states ---------- */
+.nox-eye{transform-box:fill-box;transform-origin:center;animation:noxLid 5.5s infinite}
+@keyframes noxLid{0%,46%,50%,100%{transform:scaleY(1)}48%{transform:scaleY(.1)}}
+.nox-mouth .m1,.nox-mouth .m2{opacity:0}
+[data-state="talking"] .nox-mouth .m0{opacity:0}
+[data-state="talking"] .nox-mouth .m1{animation:noxM1 .36s steps(1) infinite}
+[data-state="talking"] .nox-mouth .m2{animation:noxM2 .36s steps(1) infinite}
+@keyframes noxM1{0%{opacity:1}33%{opacity:0}66%{opacity:1}}
+@keyframes noxM2{0%{opacity:0}33%{opacity:1}66%{opacity:0}}
+[data-state="thinking"] .nox-eye{animation:none;transform:scaleY(.35) translateX(2px)}
+[data-state="thinking"] .nox-led{animation:noxBlink .4s infinite}
+[data-state="talking"] .nox-led{fill:#fff}
+.nox-card{animation:noxFloat 4s ease-in-out infinite}
+@keyframes noxFloat{50%{translate:0 -4px}}
+[data-state="talking"] .nox-figure{animation:noxBob .5s ease-in-out infinite alternate}
+@keyframes noxBob{to{transform:translateY(-3px)}}
+.nox-bubble[data-state="talking"] .nox-moon{animation:noxGlow .5s ease-in-out infinite alternate}
+@keyframes noxGlow{to{box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 40px 12px rgba(79,230,255,.8),8px 8px 0 4px rgba(23,73,209,.9)}}
+
+/* ---------- #recruiter full view ---------- */
+.nox-dock{flex:1}
+.nox.full{height:max(560px,calc(100vh - 290px));animation:pop .4s var(--snap) both}
+.nox.full .nox-figure{animation:noxCut .6s var(--snap) .1s both}
+
+/* ---------- small screens ---------- */
+@media (max-width:900px){
+  .nox-bubble{right:16px;bottom:16px;width:72px;height:72px}
+  .nox-tag{right:12px;bottom:110px}
+  .nox-tag .nox-tag-text{font-size:15px!important;max-width:200px}
+}
+@media (max-width:700px){
+  .nox-float{inset:0;width:auto;height:auto}
+  .nox{grid-template-columns:1fr;grid-template-rows:150px 1fr;clip-path:none}
+  .nox-figure{inset:-6% -2% auto auto;width:56%;height:auto;aspect-ratio:200/230}
+  .nox-main{padding:10px 12px 10px}
+  .nox-plate b{font-size:36px}
+  .nox-top{position:absolute;top:10px;left:12px;right:12px;display:block}
+  .nox-tools{position:absolute;top:92px;left:0}
+  .nox-stage + .nox-main{padding-top:12px}
+  .nox.full{height:calc(100vh - 210px)}
+}
+html.calm .nox-ringtext,html.calm .nox-ping{animation:none}
+html.calm .nox-ping{display:none}
