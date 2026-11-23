@@ -53,6 +53,22 @@ Groq's free tier allows about 8,000 tokens per minute per model, and each NOX
 request uses 5–7k, so roughly one question per minute; past that, visitors get
 a polite "busy, try again in a minute".
 
+- Binding `AI` (Settings → Bindings → Workers AI): the last reserve, used when
+  Gemini and Groq are both busy. Models: `@cf/google/gemma-4-26b-a4b-it`, then
+  `@cf/zai-org/glm-4.7-flash` (`CF_AI_MODEL` forces one). About 190–230
+  questions a day fit in the free 10,000 neurons.
+
+NOX tries Gemini, then Groq, then Workers AI, rotating models and resting the
+busy ones. The logs show `answered by <provider> <model>` for each reply.
+
+**$0 cost policy.** Every provider stays on its free tier, and none can bill:
+- Cloudflare account on the **Workers Free** plan: Workers AI stops at the
+  daily free allowance instead of charging. Never upgrade to Workers Paid
+  (usage past the allowance would then be billed) without revisiting this.
+- Gemini: AI Studio key with **no billing account** linked to its project.
+- Groq: free plan, no card on file.
+When a free limit is reached, visitors see "busy, try again" — never a bill.
+
 Then redeploy. Without a key NOX still opens and tells visitors to email Aziz.
 
 ### Deploying

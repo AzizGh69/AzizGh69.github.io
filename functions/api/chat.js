@@ -143,10 +143,38 @@ async function groq(env, model, system, turns, asJson) {
   return (data?.choices?.[0]?.message?.content ?? "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
 }
 
+/* Cloudflare Workers AI, through the project's "AI" binding: the last reserve.
+   $0 policy: the account is on the Workers Free plan, where Workers AI stops at the free daily
+   allowance (10,000 neurons) instead of billing. These models are the cheapest good ones per
+   question (~190–230 questions a day free). Never move the account to Workers Paid without
+   revisiting this: on Paid, usage past the allowance is billed. */
+const CF_MODELS = ["@cf/google/gemma-4-26b-a4b-it", "@cf/zai-org/glm-4.7-flash"];
+const listCf = async (env) => (env.CF_AI_MODEL ? [env.CF_AI_MODEL] : CF_MODELS);
+async function workersAi(env, model, system, turns, asJson) {
+  let out;
+  try {
+    out = await env.AI.run(model, {
+      messages: [{ role: "system", content: system + (asJson ? "\nReturn ONLY a JSON object matching this schema: " + JSON.stringify(MATCH_SCHEMA) : "") }, ...turns],
+      max_tokens: asJson ? 2200 : 900, temperature: asJson ? 0.2 : 0.6
+    });
+  } catch (e) {
+    const msg = String(e?.message || e);
+    // 4006 / "daily free allocation": today's free neurons are spent. Rest it until things reset.
+    const status = /4006|free allocation|neurons|quota|limit/i.test(msg) ? 429 : /capacity|overload|unavailable/i.test(msg) ? 503 : 502;
+    throw fail("workers-ai", model, status, msg);
+  }
+  const text = typeof out?.response === "string" ? out.response
+    : out?.response && typeof out.response === "object" ? JSON.stringify(out.response)
+    : out?.choices?.[0]?.message?.content ?? "";
+  if (!text) throw fail("workers-ai", model, 502, JSON.stringify(out).slice(0, 200));
+  return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+}
+
 async function ask(env, system, turns, asJson) {
   const pools = [];
   if (env.GEMINI_API_KEY) pools.push(["gemini", gemini, listGemini]);
   if (env.GROQ_API_KEY) pools.push(["groq", groq, listGroq]);
+  if (env.AI) pools.push(["workers-ai", workersAi, listCf]);
   if (!pools.length) throw Object.assign(new Error("no provider configured"), { status: 503, config: true });
   // A provider that is overloaded as a whole (every model 503) rests and goes to the back.
   pools.sort((a, b) => resting(`${a[0]}:*`) - resting(`${b[0]}:*`));
@@ -160,14 +188,14 @@ async function ask(env, system, turns, asJson) {
   }
   let last = Object.assign(new Error("no model available"), { status: 503 });
   const overloaded = {};
-  for (const [name, call, model] of tries.slice(0, 6)) {
+  for (const [name, call, model] of tries.slice(0, 8)) {
     if (overloaded[name] >= 2) continue; // two overloaded models in a row: the provider is down, move on
-    try { return await call(env, model, system, turns, asJson); }
+    try { const text = await call(env, model, system, turns, asJson); console.log("answered by", name, model); return text; }
     catch (e) {
       last = e;
       if (e.status === 503) { overloaded[name] = (overloaded[name] || 0) + 1; if (overloaded[name] >= 2) restFor(`${name}:*`, 120); }
       else overloaded[name] = 0;
-      if (e.status === 429 || e.status === 503) restFor(`${name}:${model}`, e.status === 429 ? 60 : 45);
+      if (e.status === 429 || e.status === 503) restFor(`${name}:${model}`, e.status === 503 ? 45 : name === "workers-ai" ? 3600 : 60);
       else if (e.status === 404) restFor(`${name}:${model}`, 3600);
     }
   }
