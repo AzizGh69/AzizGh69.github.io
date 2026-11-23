@@ -42,7 +42,10 @@ const SLIPS = [
   [new RegExp(`\\b(?:co${H}?led|led|ran|organi[sz]ed|managed|headed)\\s+(?:a\\s+|the\\s+)?(?:student\\s+)?hackathons?\\s+(?:for|of|with)\\s+(?:220|hundreds\\s+of)\\s+(?:participants|people)`, "gi"),
     "co-led the IT department that ran a 220-participant hackathon"],
   [new RegExp(`\\b(?:co${H}?dirigé|dirigé|organisé|piloté|mené)\\s+un\\s+hackathon\\s+(?:étudiant\\s+)?de\\s+220\\s+(?:personnes|participants)`, "gi"),
-    "co-dirigé le pôle IT qui a organisé un hackathon de 220 participants"]
+    "co-dirigé le pôle IT qui a organisé un hackathon de 220 participants"],
+  // Puffery the prompt bans but models still write.
+  [/\bproving\b/g, "showing"], [/\bProving\b/g, "Showing"],
+  [/\b(production|commercial|enterprise)[-‐‑ ]grade\b/gi, "production"]
 ];
 // "the IT department that ran a 220-person hackathon" is already right: leave it alone.
 const ALREADY_RIGHT = /\b(?:that|which|who|qui(?: a)?),?\s$/i;
