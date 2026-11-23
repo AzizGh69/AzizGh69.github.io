@@ -153,9 +153,12 @@ const listCf = async (env) => (env.CF_AI_MODEL ? [env.CF_AI_MODEL] : CF_MODELS);
 async function workersAi(env, model, system, turns, asJson) {
   let out;
   try {
+    // Both models think before answering, and the thinking counts against max_tokens: with it on, a job match
+    // used all 2,200 tokens thinking and returned an empty answer. Turn it off; keep a margin in case it is ignored.
     out = await env.AI.run(model, {
       messages: [{ role: "system", content: system + (asJson ? "\nReturn ONLY a JSON object matching this schema: " + JSON.stringify(MATCH_SCHEMA) : "") }, ...turns],
-      max_tokens: asJson ? 2200 : 900, temperature: asJson ? 0 : 0.6
+      max_tokens: asJson ? 4000 : 1500, temperature: asJson ? 0 : 0.6,
+      chat_template_kwargs: { enable_thinking: false, thinking: false }, reasoning_effort: "low"
     });
   } catch (e) {
     const msg = String(e?.message || e);
@@ -166,8 +169,22 @@ async function workersAi(env, model, system, turns, asJson) {
   const text = typeof out?.response === "string" ? out.response
     : out?.response && typeof out.response === "object" ? JSON.stringify(out.response)
     : out?.choices?.[0]?.message?.content ?? "";
-  if (!text) throw fail("workers-ai", model, 502, JSON.stringify(out).slice(0, 200));
+  if (!text) {
+    const c = out?.choices?.[0];
+    console.error("workers-ai shape", model, JSON.stringify({ keys: Object.keys(out || {}), finish: c?.finish_reason, msgKeys: Object.keys(c?.message || {}),
+      contentType: typeof c?.message?.content, content: JSON.stringify(c?.message?.content)?.slice(0, 300), reasoningLen: String(c?.message?.reasoning_content || c?.message?.reasoning || "").length, usage: out?.usage }));
+    throw fail("workers-ai", model, 502, "no text");
+  }
   return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+}
+
+// A job match must come back as JSON with requirements; anything else moves on to the next model.
+function parseMatch(raw) {
+  const s = String(raw || "").replace(/^\s*```(?:json)?\s*|\s*```\s*$/g, "");
+  const from = s.indexOf("{"), to = s.lastIndexOf("}");
+  if (from < 0 || to <= from) return null;
+  try { const p = JSON.parse(s.slice(from, to + 1)); return Array.isArray(p?.requirements) && p.requirements.length ? p : null; }
+  catch { return null; }
 }
 
 async function ask(env, system, turns, asJson) {
@@ -190,13 +207,19 @@ async function ask(env, system, turns, asJson) {
   const overloaded = {};
   for (const [name, call, model] of tries.slice(0, 8)) {
     if (overloaded[name] >= 2) continue; // two overloaded models in a row: the provider is down, move on
-    try { const text = await call(env, model, system, turns, asJson); console.log("answered by", name, model); return text; }
+    try {
+      const text = await call(env, model, system, turns, asJson);
+      if (asJson && !parseMatch(text)) throw fail(name, model, 502, "not valid match JSON: " + String(text).slice(0, 200));
+      console.log("answered by", name, model);
+      return text;
+    }
     catch (e) {
       last = e;
       if (e.status === 503) { overloaded[name] = (overloaded[name] || 0) + 1; if (overloaded[name] >= 2) restFor(`${name}:*`, 120); }
       else overloaded[name] = 0;
       if (e.status === 429 || e.status === 503) restFor(`${name}:${model}`, e.status === 503 ? 45 : name === "workers-ai" ? 3600 : 60);
       else if (e.status === 404) restFor(`${name}:${model}`, 3600);
+      else if (e.status === 413) restFor(`${name}:${model}`, 600); // this prompt is too large for its per-minute limit
     }
   }
   throw last;
@@ -228,8 +251,8 @@ async function handlePost(request, env) {
       const turn = (cut || looksLikeInjection(jd) ? FLAG : "") +
         `Analyse this job description against Aziz's profile.\n<job_description>\n${fence(jd)}\n</job_description>`;
       const raw = await ask(env, systemPrompt("match", lang, jd), [{ role: "user", content: turn }], true);
-      let parsed;
-      try { parsed = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, "")); } catch { return json({ error: "model_error" }, 502); }
+      const parsed = parseMatch(raw);
+      if (!parsed) return json({ error: "model_error" }, 502);
       return json({ match: scoreMatch(parsed, lang, jd) });
     }
 

@@ -35,7 +35,7 @@ STYLE:
 const MATCH_RULES = `
 JOB MATCH TASK:
 The visitor pasted a job description. Extract its real requirements (skills, tools, experience, education, languages, soft skills), at most 14, merging duplicates. For each:
-- "req": the requirement in the job description's own words. Keep any duration exactly as written ("2+ years of professional experience", "1 year of experience with Python"); never drop it, and never apply it to other items listed next to it.
+- "req": the requirement in the job description's own words. Keep any duration exactly as written ("2+ years of professional experience"); never drop it. When one duration covers a list ("1 year of experience with Python, Kafka, SQL"), it applies to each item: write "1 year of experience with Kafka", and so on.
 - "priority": "must" if required/mandatory/core, else "nice".
 - "status": "direct" if KNOWLEDGE shows this exact skill/tool/qualification; "adjacent" if KNOWLEDGE shows a closely transferable skill (be generous but honest: same family of tool, same concept, same domain); "gap" if nothing relevant.
 - "evidence": the KNOWLEDGE ids that support it (required for direct and adjacent, empty for gap).

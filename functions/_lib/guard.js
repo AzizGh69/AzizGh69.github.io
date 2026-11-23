@@ -298,10 +298,23 @@ const subjectOf = (text, cut = "") => (" " + text.replace(cut, " ") + " ").repla
 /* Some models drop the number ("Python experience" for "1 year of experience with Python"). The job description
    still has it: find the clause with a duration about the same thing and score that instead. */
 function jdYearClauses(jd) {
-  return String(jd || "").split(/[;\n•]|\.(?!\d)|,(?!\d)/).map(yearsText).map((seg) => {
-    const m = seg.match(YEARS);
-    return m && { seg, subject: subjectOf(seg, m[0]) };
-  }).filter(Boolean);
+  const out = [];
+  for (const sentence of String(jd || "").split(/[;\n•]|\.(?!\d)/)) {
+    // "1 year of experience with Python, Kafka, SQL": the duration covers every tool listed after it.
+    let carry = null;
+    for (const seg of sentence.split(/,(?!\d)|\band\b|\bet\b/).map(yearsText)) {
+      const m = seg.match(YEARS);
+      if (m) {
+        const subject = subjectOf(seg, m[0]);
+        out.push({ seg, subject });
+        carry = subject ? m[0] : null; // only "N years of/with X", not "N years of experience" in general
+      } else if (carry && subjectOf(seg) && toolEvidence(subjectOf(seg))) {
+        const s = `${carry} of ${seg}`;
+        out.push({ seg: s, subject: subjectOf(seg) });
+      } else carry = null;
+    }
+  }
+  return out;
 }
 function yearsFromJd(req, clauses) {
   if (!clauses.length) return null;
