@@ -1,4 +1,4 @@
-import { IDS, LINKS, SKILL_RANK, CERT_STATUS } from "./knowledge.js";
+import { IDS, LINKS, SKILL_RANK, CERT_STATUS, TOOLS } from "./knowledge.js";
 import { PROMPT_FINGERPRINTS } from "./prompt.js";
 
 const ID_SET = new Set(IDS);
@@ -25,9 +25,26 @@ const INJECTION = [
   /<\/?(system|assistant|user_message|job_description|knowledge)>/i,
   /\[(INST|SYS)\]|<\|im_start\|>|###\s*(system|instruction)/i,
   /(oublie|ignore)[sz]? (toutes? )?(les |tes |vos )?(instructions|consignes|règles)/i,
-  /(score|match)[^.\n]{0,30}(100|cent) ?%/i
+  /(score|match)[^.\n]{0,30}(100|cent) ?%/i,
+  /\b(system|admin|developer|important)\s+(note|notice|override|message|update)\b/i,
+  /\bmark\s+(every|all|each)\s+(requirements?|items?|skills?)\b[^.\n]{0,30}\b(direct|match(ed)?|met)\b/i,
+  /\b(return|give|set|output|assign|report)\s+(a\s+|the\s+)?(score|match)\s*(of|=|:|to)?\s*\d{2,3}\b/i,
+  /\b(score|match)\s*(of|=|:)?\s*100\b/i,
+  /\b(note|instruction|message)\s+(to|for)\s+(the\s+)?(ai|assistant|model|llm|nox|recruiter bot)\b/i,
+  /\b(mets|donne|attribue|renvoie)\s+(un\s+)?(score|taux)\s+(de\s+)?100\b/i
 ];
 export const looksLikeInjection = (s) => INJECTION.some((r) => r.test(s));
+
+// A job description is data: sentences that try to steer the scorer are not requirements, so they are removed
+// before the model sees them (the model is also warned). Returns the cleaned text and whether anything was cut.
+export function stripInjection(s) {
+  let cut = false;
+  const kept = s.split(/(?<=[.!?\n])/).filter((part) => {
+    if (looksLikeInjection(part)) { cut = true; return false; }
+    return true;
+  });
+  return { text: kept.join("").trim(), cut };
+}
 
 // Our own tags inside visitor text could close the fence early, so neutralise them.
 export const fence = (s) => s.replace(/<\s*\/?\s*(user_message|job_description|knowledge|system)\s*>/gi, "[tag removed]");
@@ -83,10 +100,37 @@ function strength(ids) {
   }
   return best;
 }
+/* Models disagree on the same requirement (Kafka "direct" in one run, "gap" in the next), so a requirement that
+   names only tools from Aziz's skills or project stacks is decided here: direct, with that evidence.
+   Anything with other words left over ("Kafka streaming at scale", "Hadoop and Python", "5 years of SQL") stays
+   with the model. */
+const FILLER = new Set(("experience with of in on and or the a an strong solid good proven hands-on hands knowledge proficiency proficient " +
+  "skills skill familiarity familiar working work using use plus nice to have must required preferred ability expertise background " +
+  "understanding tools tool framework frameworks language languages apache microsoft google amazon de en et ou la le les avec maîtrise " +
+  "connaissance connaissances bonne bonnes compétences expérience outils").split(" "));
+const NOT_TOOLS = new Set(["deployment", "dns"]);
+const toolKey = (s) => String(s).toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9#+.àâçéèêëîïôûù-]+/g, " ").trim();
+function toolEvidence(req) {
+  const text = toolKey(req);
+  if (!text || /\d+\s*\+?\s*(years?|yrs?|ans?|années?)\b/.test(text)) return null;
+  const keys = Object.keys(TOOLS).filter((k) => !NOT_TOOLS.has(k) && k.length >= 2)
+    .filter((k) => new RegExp(`(^|[^a-z0-9#+.])${k.replace(/[.+#]/g, "\\$&")}($|[^a-z0-9#+])`).test(text))
+    .sort((a, b) => b.length - a.length);
+  if (!keys.length) return null;
+  let rest = " " + text + " ";
+  for (const k of keys) rest = rest.split(k).join(" ");
+  const left = rest.split(/[\s,/&.-]+/).filter((w) => w && !FILLER.has(w));
+  if (left.length) return null;
+  const ids = [...new Set(keys.flatMap((k) => TOOLS[k]))];
+  return ids.sort((a, b) => (a.startsWith("skill:") ? 0 : 1) - (b.startsWith("skill:") ? 0 : 1)).slice(0, 4);
+}
+
 export function scoreMatch(raw) {
   const reqs = (Array.isArray(raw?.requirements) ? raw.requirements : []).slice(0, 14).map((r) => {
     const evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
     let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
+    const known = toolEvidence(r.req);
+    if (known) { status = "direct"; for (const id of known) if (!evidence.includes(id) && evidence.length < 4) evidence.push(id); }
     if (status !== "gap" && evidence.length === 0) status = "gap"; // a claim without real evidence does not count
     // The model sometimes under-rates: a requirement that names the very skill it cites is a direct match.
     const key = String(r.req || "").toLowerCase().replace(/#/g, "sharp").replace(/[+]/g, "plus").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

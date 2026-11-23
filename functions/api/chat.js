@@ -2,7 +2,7 @@
 // Secrets (Pages → Settings → Variables): GEMINI_API_KEY (free tier), optional GROQ_API_KEY as fallback.
 // Optional: GEMINI_MODEL / GROQ_MODEL to pin one model; by default NOX rotates through the models each key can use.
 import { systemPrompt } from "../_lib/prompt.js";
-import { clean, fence, looksLikeInjection, sanitizeReply, scoreMatch, LIMITS } from "../_lib/guard.js";
+import { clean, fence, looksLikeInjection, stripInjection, sanitizeReply, scoreMatch, LIMITS } from "../_lib/guard.js";
 
 const ALLOWED_HOSTS = ["aziz-ghazouani.pages.dev", "localhost", "127.0.0.1"];
 const WINDOW_MS = 10 * 60 * 1000, MAX_REQ = 20;
@@ -93,7 +93,7 @@ async function gemini(env, model, system, turns, asJson) {
       system_instruction: { parts: [{ text: system }] },
       contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
       generationConfig: {
-        temperature: asJson ? 0.2 : 0.6, maxOutputTokens: asJson ? 6000 : 3000,
+        temperature: asJson ? 0 : 0.6, maxOutputTokens: asJson ? 6000 : 3000,
         ...(asJson ? { responseMimeType: "application/json", responseSchema: MATCH_SCHEMA } : {})
       },
       safetySettings: ["HARASSMENT", "HATE_SPEECH", "SEXUALLY_EXPLICIT", "DANGEROUS_CONTENT"]
@@ -129,7 +129,7 @@ async function groq(env, model, system, turns, asJson) {
     body: JSON.stringify({
       model,
       // max_tokens counts against the free tier's tokens-per-minute budget, so keep it tight.
-      temperature: asJson ? 0.2 : 0.6, max_tokens: asJson ? 2200 : 900,
+      temperature: asJson ? 0 : 0.6, max_tokens: asJson ? 2200 : 900,
       // Reasoning models spend output tokens thinking: keep that short and out of the answer.
       ...(/gpt-oss/.test(model) ? { reasoning_effort: "low", include_reasoning: false } : {}),
       ...(/qwen/.test(model) ? { reasoning_format: "hidden" } : {}),
@@ -155,7 +155,7 @@ async function workersAi(env, model, system, turns, asJson) {
   try {
     out = await env.AI.run(model, {
       messages: [{ role: "system", content: system + (asJson ? "\nReturn ONLY a JSON object matching this schema: " + JSON.stringify(MATCH_SCHEMA) : "") }, ...turns],
-      max_tokens: asJson ? 2200 : 900, temperature: asJson ? 0.2 : 0.6
+      max_tokens: asJson ? 2200 : 900, temperature: asJson ? 0 : 0.6
     });
   } catch (e) {
     const msg = String(e?.message || e);
@@ -223,9 +223,9 @@ async function handlePost(request, env) {
 
   try {
     if (mode === "match") {
-      const jd = clean(body.jd, LIMITS.jd);
+      const { text: jd, cut } = stripInjection(clean(body.jd, LIMITS.jd));
       if (jd.length < 40) return json({ error: "jd_too_short" }, 400);
-      const turn = (looksLikeInjection(jd) ? FLAG : "") +
+      const turn = (cut || looksLikeInjection(jd) ? FLAG : "") +
         `Analyse this job description against Aziz's profile.\n<job_description>\n${fence(jd)}\n</job_description>`;
       const raw = await ask(env, systemPrompt("match", lang, jd), [{ role: "user", content: turn }], true);
       let parsed;

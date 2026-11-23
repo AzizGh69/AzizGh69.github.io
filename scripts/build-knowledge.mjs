@@ -127,6 +127,14 @@ out.push(add("cv") + " Education: " + section("EDUCATION").join(" · "));
 out.push("CV skills list: " + section("SKILLS").join(" | "));
 out.push("CV languages & involvement: " + section("CERTIFICATIONS, LANGUAGES & INVOLVEMENT").join(" | "));
 
+// Tool name → evidence ids, so the job-match score treats a named tool the same way whatever model answers.
+const toolKey = (s) => String(s).toLowerCase().replace(/\(.*?\)/g, "").replace(/^(apache|microsoft|google|amazon)\s+/, "").replace(/[^a-z0-9#+.]+/g, " ").trim();
+const tools = {};
+const addTool = (name, id) => { const k = toolKey(name); if (k.length < 2) return; (tools[k] ||= []).includes(id) || tools[k].push(id); };
+data.SKILLS.forEach((g) => g.items.forEach(([name]) => name.split(/\s*[,/]\s*/).forEach((n) => addTool(n, "skill:" + slug(name)))));
+data.QUESTS.forEach((q) => (q.stack || []).forEach((s) => { addTool(s, "quest:" + q.id); addTool(s.split(" ")[0], "quest:" + q.id); }));
+addTool("Kafka", "quest:platform"); addTool("Debezium", "quest:platform"); // CDC pipeline, also in the CV skills list
+
 const template = out.map((l) => (typeof l === "string" ? l : l.full)).join("\n");
 const text = template.replace(/@@([^@]+)@@\n?/g, (m, id) => (details[id] ? details[id] + "\n" : ""));
 const core = template.replace(/@@[^@]+@@\n?/g, "");
@@ -140,5 +148,6 @@ writeFileSync(file,
   `export const IDS = ${JSON.stringify(ids)};\n` +
   `export const SKILL_RANK = ${JSON.stringify(rankOf)};\n` +
   `export const CERT_STATUS = ${JSON.stringify(certStatus)};\n` +
-  `export const LINKS = ${JSON.stringify([...links])};\n`);
+  `export const LINKS = ${JSON.stringify([...links])};\n` +
+  `export const TOOLS = ${JSON.stringify(tools)};\n`);
 console.log(`knowledge.js: ${text.length} chars in full, core ${core.length}, ${ids.length} ids, ${links.size} links`);
