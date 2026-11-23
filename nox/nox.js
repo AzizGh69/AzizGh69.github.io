@@ -290,13 +290,20 @@
     if (on && !el) { el = document.createElement("div"); el.className = "nox-msg nox-says nox-dots"; el.innerHTML = `<span></span><span></span><span></span><em>${esc(tx("thinking"))}</em>`; log.appendChild(el); scrollLog(); }
     if (!on && el) el.remove();
   }
-  async function call(payload) {
+  async function callOnce(payload) {
     try {
       const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, lang: L() }) });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) return { error: data.error || "default" };
       return data;
     } catch { return { error: "default" }; }
+  }
+  // Free AI tiers refill within seconds: when every model is busy, wait a moment and try once more.
+  async function call(payload) {
+    const first = await callOnce(payload);
+    if (first.error !== "busy" && first.error !== "model_error") return first;
+    await new Promise((r) => setTimeout(r, 8000));
+    return callOnce(payload);
   }
   const errText = (e) => T[L()].err[e] || T[L()].err.default;
 

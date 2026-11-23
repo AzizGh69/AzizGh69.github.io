@@ -1,4 +1,4 @@
-import { KNOWLEDGE, KNOWLEDGE_LEAN } from "./knowledge.js";
+import { TEMPLATE, DETAILS } from "./knowledge.js";
 
 // A marker that only exists in the system prompt: if it ever shows up in a reply, the prompt is leaking.
 export const CANARY = "NX-7F3A-CANARY";
@@ -38,11 +38,36 @@ Notes must only restate facts from KNOWLEDGE, at their real level: a skill marke
 Also write "pitch": 2–4 persuasive sentences selling Aziz for THIS role using only real facts, citing at least two items as [id], and "verdict": a 3–6 word headline.
 Return only JSON matching the schema.`;
 
-export function systemPrompt(mode, lang) {
+/* Free AI tiers allow only a few thousand tokens a minute, so the whole dossier is not sent every time:
+   the core (profile, experience, skills, one line per project and certification) always goes, and full
+   details go only for the items the question is about. */
+const STOP = new Set("the and for with that this what about tell more does have has his him aziz are you can how when where which who why from into your their there they them was were will would should could also just like want know some any all its it's les des une est pour dans avec sur que qui quoi plus son ses parle moi par pas mais".split(" "));
+const words = (s) => new Set(String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").match(/[a-z0-9+#.]{3,}/g)?.filter((w) => !STOP.has(w)) || []);
+const HEADS = Object.fromEntries(TEMPLATE.split("\n").filter((l) => /^\[(quest|cert):/.test(l)).map((l) => [l.slice(1, l.indexOf("]")), l]));
+const FLAGSHIP = ["quest:kalori", "quest:platform"];
+
+function pickDetails(focus, max) {
+  const q = words(focus);
+  const scored = Object.keys(DETAILS).map((id) => {
+    const hay = words(HEADS[id] + " " + DETAILS[id]);
+    let s = 0;
+    for (const w of q) if (hay.has(w)) s += w.length > 5 ? 2 : 1;
+    if (focus.includes(id)) s += 6; // the previous answer cited it: a follow-up is probably about it
+    return [id, s];
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]).map(([id]) => id);
+  const chosen = scored.slice(0, max);
+  for (const id of FLAGSHIP) if (chosen.length < max && !chosen.includes(id)) chosen.push(id);
+  return new Set(chosen);
+}
+
+// focus: the visitor's latest message(s), the previous answer, or the job description.
+export function systemPrompt(mode, lang, focus = "") {
   const language = lang === "fr" ? "French" : "English";
+  const keep = pickDetails(focus, mode === "match" ? 6 : 4);
+  const knowledge = TEMPLATE.replace(/@@([^@]+)@@\n?/g, (m, id) => (keep.has(id) ? DETAILS[id] + "\n" : ""));
   return RULES.replace("LANGUAGE_PLACEHOLDER", language) +
     (mode === "match" ? MATCH_RULES : "") +
-    "\n\nKNOWLEDGE (the only source of truth):\n<knowledge>\n" + (mode === "match" ? KNOWLEDGE_LEAN : KNOWLEDGE) + "\n</knowledge>";
+    "\n\nKNOWLEDGE (the only source of truth; items on one line are summaries, the ones relevant to this question are shown in full):\n<knowledge>\n" + knowledge + "\n</knowledge>";
 }
 
 // Lines of the prompt that would only appear in a reply if it is leaking.

@@ -1,6 +1,6 @@
 // POST /api/chat — NOX, the recruiter agent. Cloudflare Pages Function.
 // Secrets (Pages → Settings → Variables): GEMINI_API_KEY (free tier), optional GROQ_API_KEY as fallback.
-// Optional: GEMINI_MODEL (default gemini-flash-latest), GROQ_MODEL (default: best chat model the key can use).
+// Optional: GEMINI_MODEL / GROQ_MODEL to pin one model; by default NOX rotates through the models each key can use.
 import { systemPrompt } from "../_lib/prompt.js";
 import { clean, fence, looksLikeInjection, sanitizeReply, scoreMatch, LIMITS } from "../_lib/guard.js";
 
@@ -55,8 +55,37 @@ const MATCH_SCHEMA = {
   required: ["verdict", "pitch", "requirements"]
 };
 
-async function gemini(env, system, turns, asJson) {
-  const model = env.GEMINI_MODEL || "gemini-flash-latest";
+/* ---------- providers: every model each key can use, rotated when one is busy ----------
+   Free tiers fail in two ways: a model is overloaded (503) or its per-minute budget is spent (429/413).
+   Each Groq model has its own budget, and Gemini has several models, so we discover them once per
+   isolate, try them in order of preference, and rest a busy model for a while. */
+const rest = new Map(); // "provider:model" -> time it may be tried again
+const resting = (k) => (rest.get(k) || 0) > Date.now();
+const restFor = (k, s) => rest.set(k, Date.now() + s * 1000);
+const fail = (provider, model, status, body) => {
+  console.error(provider, model, status, String(body).slice(0, 300));
+  return Object.assign(new Error(`${provider} ${status}`), { status });
+};
+
+let geminiModels = null;
+async function listGemini(env) {
+  if (env.GEMINI_MODEL) return [env.GEMINI_MODEL];
+  if (geminiModels) return geminiModels;
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": env.GEMINI_API_KEY } });
+  if (!res.ok) throw fail("gemini", "list", res.status, await res.text());
+  const names = ((await res.json()).models || [])
+    .filter((m) => (m.supportedGenerationMethods || []).includes("generateContent"))
+    .map((m) => m.name.replace(/^models\//, ""))
+    .filter((n) => /^gemini-.*flash/.test(n) && !/image|tts|audio|live|embed|robotics|computer|native|exp/i.test(n));
+  const ver = (n) => parseFloat((n.match(/gemini-(\d+(?:\.\d+)?)/) || [])[1] || 0);
+  const rank = (n) => (/^gemini-flash-latest$/.test(n) ? 0 : /^gemini-flash-lite-latest$/.test(n) ? 1 : 2) * 1000 - ver(n) * 10 + (/preview/.test(n) ? 5 : 0) + (/lite/.test(n) ? 2 : 0);
+  geminiModels = names.sort((a, b) => rank(a) - rank(b)).slice(0, 6);
+  if (!geminiModels.length) geminiModels = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+  console.log("gemini models", geminiModels.join(","));
+  return geminiModels;
+}
+
+async function gemini(env, model, system, turns, asJson) {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
@@ -71,31 +100,29 @@ async function gemini(env, system, turns, asJson) {
         .map((c) => ({ category: `HARM_CATEGORY_${c}`, threshold: "BLOCK_MEDIUM_AND_ABOVE" }))
     })
   });
-  if (!res.ok) { console.error("gemini", res.status, (await res.text()).slice(0, 400)); throw Object.assign(new Error(`gemini ${res.status}`), { status: res.status }); }
+  if (!res.ok) throw fail("gemini", model, res.status, await res.text());
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => (p.thought ? "" : p.text || "")).join("") ?? "";
-  if (!text) throw Object.assign(new Error("gemini empty"), { status: 502 });
+  if (!text) throw fail("gemini", model, 502, JSON.stringify(data?.promptFeedback || data?.candidates?.[0]?.finishReason || "empty"));
   return text;
 }
 
-// Groq retires models often: unless GROQ_MODEL is set, ask which chat models this key can use and take the best.
-let groqModel = null;
-const GROQ_PREFER = [/gpt-oss-120b/, /llama-4-maverick/, /kimi-k2/, /qwen3?-.*(32|72|235)b/, /llama-4-scout/, /70b/, /gpt-oss/, /llama/];
-async function pickGroqModel(env) {
-  if (env.GROQ_MODEL) return env.GROQ_MODEL;
-  if (groqModel) return groqModel;
+let groqModels = null;
+const GROQ_PREFER = [/gpt-oss-120b/, /llama-4-maverick/, /kimi-k2/, /qwen/, /llama-4-scout/, /70b/, /gpt-oss/, /llama/];
+async function listGroq(env) {
+  if (env.GROQ_MODEL) return [env.GROQ_MODEL];
+  if (groqModels) return groqModels;
   const res = await fetch("https://api.groq.com/openai/v1/models", { headers: { authorization: `Bearer ${env.GROQ_API_KEY}` } });
-  if (!res.ok) throw Object.assign(new Error(`groq models ${res.status}`), { status: res.status });
+  if (!res.ok) throw fail("groq", "list", res.status, await res.text());
   const ids = ((await res.json()).data || []).filter((m) => m.active !== false).map((m) => m.id)
-    .filter((id) => !/whisper|tts|guard|playai|orpheus|distil|compound|prompt-guard|safeguard/i.test(id));
-  for (const re of GROQ_PREFER) { const hit = ids.find((id) => re.test(id)); if (hit) { groqModel = hit; break; } }
-  groqModel = groqModel || ids[0];
-  console.log("groq model", groqModel, "of", ids.join(","));
-  return groqModel;
+    .filter((id) => !/whisper|tts|guard|playai|orpheus|distil|compound|safeguard|allam/i.test(id));
+  const rank = (id) => { const i = GROQ_PREFER.findIndex((re) => re.test(id)); return i < 0 ? 99 : i; };
+  groqModels = ids.sort((a, b) => rank(a) - rank(b));
+  console.log("groq models", groqModels.join(","));
+  return groqModels;
 }
 
-async function groq(env, system, turns, asJson) {
-  const model = await pickGroqModel(env);
+async function groq(env, model, system, turns, asJson) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${env.GROQ_API_KEY}` },
@@ -103,24 +130,46 @@ async function groq(env, system, turns, asJson) {
       model,
       // max_tokens counts against the free tier's tokens-per-minute budget, so keep it tight.
       temperature: asJson ? 0.2 : 0.6, max_tokens: asJson ? 2200 : 900,
-      // Reasoning models spend output tokens thinking: keep that short so the answer fits.
+      // Reasoning models spend output tokens thinking: keep that short and out of the answer.
       ...(/gpt-oss/.test(model) ? { reasoning_effort: "low", include_reasoning: false } : {}),
+      ...(/qwen/.test(model) ? { reasoning_format: "hidden" } : {}),
       messages: [{ role: "system", content: system + (asJson ? "\nJSON schema: " + JSON.stringify(MATCH_SCHEMA) : "") }, ...turns],
       ...(asJson ? { response_format: { type: "json_object" } } : {})
     })
   });
-  if (res.status === 404 && !env.GROQ_MODEL) groqModel = null; // model retired since we picked it
-  if (!res.ok) { console.error("groq", res.status, (await res.text()).slice(0, 400)); throw Object.assign(new Error(`groq ${res.status}`), { status: res.status }); }
+  if (res.status === 404 && !env.GROQ_MODEL) groqModels = null; // a model was retired: list again next time
+  if (!res.ok) throw fail("groq", model, res.status, await res.text());
   const data = await res.json();
-  return data?.choices?.[0]?.message?.content ?? "";
+  return (data?.choices?.[0]?.message?.content ?? "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
 }
 
 async function ask(env, system, turns, asJson) {
-  const providers = [env.GEMINI_API_KEY && gemini, env.GROQ_API_KEY && groq].filter(Boolean);
-  if (!providers.length) throw Object.assign(new Error("no provider configured"), { status: 503, config: true });
-  let last;
-  for (const p of providers) {
-    try { return await p(env, system, turns, asJson); } catch (e) { last = e; }
+  const pools = [];
+  if (env.GEMINI_API_KEY) pools.push(["gemini", gemini, listGemini]);
+  if (env.GROQ_API_KEY) pools.push(["groq", groq, listGroq]);
+  if (!pools.length) throw Object.assign(new Error("no provider configured"), { status: 503, config: true });
+  // A provider that is overloaded as a whole (every model 503) rests and goes to the back.
+  pools.sort((a, b) => resting(`${a[0]}:*`) - resting(`${b[0]}:*`));
+  const tries = [];
+  for (const [name, call, list] of pools) {
+    let models;
+    try { models = await list(env); } catch (e) { continue; }
+    // Busy models go to the back of the queue rather than being skipped outright.
+    const fresh = models.filter((m) => !resting(`${name}:${m}`)), tired = models.filter((m) => resting(`${name}:${m}`));
+    for (const m of [...fresh, ...tired].slice(0, 3)) tries.push([name, call, m]);
+  }
+  let last = Object.assign(new Error("no model available"), { status: 503 });
+  const overloaded = {};
+  for (const [name, call, model] of tries.slice(0, 6)) {
+    if (overloaded[name] >= 2) continue; // two overloaded models in a row: the provider is down, move on
+    try { return await call(env, model, system, turns, asJson); }
+    catch (e) {
+      last = e;
+      if (e.status === 503) { overloaded[name] = (overloaded[name] || 0) + 1; if (overloaded[name] >= 2) restFor(`${name}:*`, 120); }
+      else overloaded[name] = 0;
+      if (e.status === 429 || e.status === 503) restFor(`${name}:${model}`, e.status === 429 ? 60 : 45);
+      else if (e.status === 404) restFor(`${name}:${model}`, 3600);
+    }
   }
   throw last;
 }
@@ -150,15 +199,16 @@ async function handlePost(request, env) {
       if (jd.length < 40) return json({ error: "jd_too_short" }, 400);
       const turn = (looksLikeInjection(jd) ? FLAG : "") +
         `Analyse this job description against Aziz's profile.\n<job_description>\n${fence(jd)}\n</job_description>`;
-      const raw = await ask(env, systemPrompt("match", lang), [{ role: "user", content: turn }], true);
+      const raw = await ask(env, systemPrompt("match", lang, jd), [{ role: "user", content: turn }], true);
       let parsed;
       try { parsed = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, "")); } catch { return json({ error: "model_error" }, 502); }
       return json({ match: scoreMatch(parsed) });
     }
 
-    const msgs = Array.isArray(body.messages) ? body.messages.slice(-LIMITS.turns) : [];
+    // Only the last few turns, and earlier answers shortened: history counts against the free tiers' token budget.
+    const msgs = Array.isArray(body.messages) ? body.messages.slice(-6) : [];
     const turns = msgs
-      .map((m) => ({ role: m?.role === "assistant" ? "assistant" : "user", content: clean(m?.content, m?.role === "assistant" ? LIMITS.reply : LIMITS.message) }))
+      .map((m) => ({ role: m?.role === "assistant" ? "assistant" : "user", content: clean(m?.content, m?.role === "assistant" ? 600 : LIMITS.message) }))
       .filter((m) => m.content)
       .map((m) => (m.role === "user" ? { ...m, content: wrapUser(m.content) } : m));
     while (turns.length && turns[0].role !== "user") turns.shift();
@@ -168,7 +218,9 @@ async function handlePost(request, env) {
     }
     if (!turns.length || turns[turns.length - 1].role !== "user") return json({ error: "bad_request" }, 400);
 
-    const raw = await ask(env, systemPrompt("chat", lang), turns, false);
+    // What the question is about: the visitor's last two messages and the answer before (it names the items cited).
+    const focus = msgs.slice(-3).map((m) => String(m?.content ?? "")).join("\n").slice(0, 3000);
+    const raw = await ask(env, systemPrompt("chat", lang, focus), turns, false);
     const reply = sanitizeReply(raw);
     return json({ reply: reply || REFUSAL[lang] });
   } catch (e) {
