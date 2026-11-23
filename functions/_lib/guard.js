@@ -84,7 +84,7 @@ export function sanitizeReply(text) {
     const bare = u.replace(/[.,;:!?]+$/, "");
     return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";
   });
-  t = fixKnownSlips(t).replace(/\s?\[team result\]/gi, "");
+  t = fixKnownSlips(t).replace(/\s?\[(?:team result|knowledge|source|sources|citation)\]/gi, "");
   if (PROMPT_FINGERPRINTS.some((f) => t.includes(f))) return null;
   return t.slice(0, LIMITS.reply).trim();
 }
@@ -257,12 +257,91 @@ function softEvidence(req) {
   return { status, ids, text: { en: notes.map((h) => h.en).join(" "), fr: notes.map((h) => h.fr).join(" ") } };
 }
 
-export function scoreMatch(raw, lang = "en") {
+/* "N years of …" requirements, decided here. The only stated work duration is 16 months full time at Concentrix
+   (technical support); durations are never added together. So:
+   - 0 years / "0–2 years" / "less than N years": direct (an entry-level ask fits a final-year student).
+   - general professional or client-support experience: 1 year direct (16 months), 2 years adjacent, 3+ a gap.
+   - a skill or field he has (from projects): 1–2 years adjacent (skill shown, duration not), 3+ a gap.
+   - a tool he has not used (Hadoop, Scala) or anything unknown: a gap. */
+const YEARS = /\b(?:(less than|under|up to|fewer than|moins de|jusqu a)\s+)?(\d+(?:[.,]\d+)?)\s*(?:\+|plus)?\s*(?:(?:-|to|a|ou|or)\s*(\d+)\s*\+?\s*)?(years?|yrs?|ans?|annees?|months?|mois)\b/;
+const GENERIC = new Set(("of in with as on for at a an the and or minimum min least at plus over more than au moins de d du des en dans un une " +
+  "experience experiences experienced professional professionnelle professionnel work working industry relevant related hands on proven " +
+  "commercial practical prior previous similar role roles position positions field track record including using solid strong good " +
+  "development developer developing programming coding engineering engineer post graduate graduation diplome required requis minimum " +
+  "level senior junior years year yrs ans an annees annee months month mois equivalent comparable demonstrated " +
+  "must nice to have bonus plus requirements requirement qualifications skills required preferred desired ideally atout souhaite souhaitee " +
+  "exigences profil recherche obligatoire").split(" "));
+const DOMAINS = [
+  [/\b(customer service|customer support|client support|technical support|support|service client|relation client|call center|centre d appels)\b/, "support"],
+  [/\b(data engineering|data engineer|data pipelines?|etl|elt|big data|data|analytics|business intelligence|bi|donnees)\b/, ["quest:platform", "skill:etl-elt"]],
+  [/\b(software|web|backend|back end|frontend|front end|full stack|fullstack|application|applications|mobile|logiciel)\b/, ["log:kalori", "quest:kalori"]],
+  [/\b(machine learning|ml|ai|artificial intelligence|ia|intelligence artificielle|llms?|deep learning|data science)\b/, ["skill:llms-in-production", "skill:scikit-learn"]],
+  [/\b(cloud|devops|infrastructure|ci cd)\b/, ["skill:docker", "skill:github-actions", "skill:aws"]],
+  [/\b(project management|gestion de projets?|agile|scrum)\b/, ["skill:project-management", "quest:epistemia"]]
+];
+const YEAR_NOTES = {
+  entry: { en: "An entry-level ask fits: he is a final-year student looking for a 4–6 month PFE internship from 02/2027.",
+    fr: "Un poste junior lui correspond : il est étudiant en dernière année et cherche un stage PFE de 4 à 6 mois à partir de 02/2027." },
+  pro: { en: "16 months of full-time work as a technical support agent at Concentrix.",
+    fr: "16 mois à temps plein comme agent de support technique chez Concentrix." },
+  proShort: { en: "16 months of full-time work at Concentrix (technical support), short of the years asked.",
+    fr: "16 mois à temps plein chez Concentrix (support technique), en dessous des années demandées." },
+  skill: { en: "He has this skill from his projects, but the portfolio states no years of professional experience with it; he is a final-year student.",
+    fr: "Il a cette compétence grâce à ses projets, mais le portfolio n'indique pas d'années d'expérience professionnelle ; il est étudiant en dernière année." },
+  gap: { en: "The portfolio does not support this many years of experience; he is a final-year student, graduating 06/2027.",
+    fr: "Le portfolio ne justifie pas autant d'années d'expérience ; il est étudiant en dernière année, diplômé en 06/2027." }
+};
+const yearsText = (s) => deaccent(s).replace(/[‐-―−]/g, "-").replace(/[^a-z0-9.,+ -]+/g, " ").replace(/\s+/g, " ");
+// What the years are of: the text without the number and generic words ("3 years of Python experience" -> "python").
+const subjectOf = (text, cut = "") => (" " + text.replace(cut, " ") + " ").replace(/[.,+-]/g, " ")
+  .split(/\s+/).filter((w) => w && !GENERIC.has(w) && !/^\d+$/.test(w)).sort().join(" ");
+/* Some models drop the number ("Python experience" for "1 year of experience with Python"). The job description
+   still has it: find the clause with a duration about the same thing and score that instead. */
+function jdYearClauses(jd) {
+  return String(jd || "").split(/[;\n•]|\.(?!\d)|,(?!\d)/).map(yearsText).map((seg) => {
+    const m = seg.match(YEARS);
+    return m && { seg, subject: subjectOf(seg, m[0]) };
+  }).filter(Boolean);
+}
+function yearsFromJd(req, clauses) {
+  if (!clauses.length) return null;
+  const text = yearsText(req);
+  const subject = subjectOf(text);
+  if (!subject && !/\bexperience\b/.test(text)) return null;
+  const hit = clauses.find((c) => c.subject === subject);
+  return hit ? yearsEvidence(hit.seg) : null;
+}
+function yearsEvidence(req) {
+  const text = yearsText(req);
+  const m = text.match(YEARS);
+  if (!m) return null;
+  const months = /^(months?|mois)$/.test(m[4]);
+  let n = parseFloat(m[2].replace(",", ".")) / (months ? 12 : 1);
+  if (m[1] || (m[3] && n === 0)) n = 0;
+  const out = (status, ids, key) => ({ status, ids, text: YEAR_NOTES[key] });
+  if (n === 0) return out("direct", ["fact:availability"], "entry");
+  const need = Math.max(1, Math.ceil(n - 0.001));
+  const subject = subjectOf(text, m[0]);
+  const proLike = (ids) => (need <= 1 ? out("direct", ids, "pro") : need === 2 ? out("adjacent", ids, "proShort") : out("gap", [], "gap"));
+  if (!subject) return proLike(["log:concentrix"]);
+  const tool = toolEvidence(subject.replace(/\d+/g, " "));
+  const soft = softEvidence(subject);
+  const domain = DOMAINS.find(([re]) => re.test(" " + subject + " "));
+  if (domain?.[1] === "support" || (soft && soft.ids.includes("log:concentrix") && /communicat|client|customer|stakeholder/.test(subject)))
+    return proLike(["log:concentrix", "skill:client-support"]);
+  if (tool?.status === "adjacent" || (tool && tool.status === "gap")) return out("gap", [], "gap");
+  const ids = tool?.status === "direct" ? tool.ids : soft?.status === "direct" ? soft.ids : domain ? domain[1] : null;
+  if (!ids) return out("gap", [], "gap");
+  return need <= 2 ? out("adjacent", ids, "skill") : out("gap", [], "gap");
+}
+
+export function scoreMatch(raw, lang = "en", jd = "") {
+  const clauses = jdYearClauses(jd);
   const reqs = (Array.isArray(raw?.requirements) ? raw.requirements : []).slice(0, 14).map((r) => {
     let evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
     let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
     let note = r.note;
-    const known = softEvidence(r.req) || toolEvidence(r.req);
+    const known = yearsEvidence(r.req) || yearsFromJd(r.req, clauses) || softEvidence(r.req) || toolEvidence(r.req);
     if (known) {
       // Fixed evidence, so the strength (and the score) does not depend on what the model cited.
       evidence = known.ids.filter((id) => ID_SET.has(id));
