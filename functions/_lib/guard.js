@@ -34,10 +34,15 @@ export const fence = (s) => s.replace(/<\s*\/?\s*(user_message|job_description|k
 
 // Keep only [ids] that exist and URLs we published; drop HTML; cap length; catch prompt leaks.
 export function sanitizeReply(text) {
-  let t = String(text ?? "").replace(/<[^>]*>/g, "");
+  let t = String(text ?? "").replace(/<[^>]*>/g, "")
+    // Markdown links show as raw text in the chat: keep the visible text (the URL check below still applies).
+    .replace(/\[([^\]\n]{1,200})\]\(((?:https?:\/\/|mailto:)[^)\s]+)\)/g, (m, label, url) =>
+      /^mailto:/i.test(url) ? url.slice(7) : label.trim() === url ? url : `${label} (${url})`);
   // Normalise citations ("[ quest:kalori ]", "[skill:sql, skill:python]") to "[id]" and drop ids that do not exist.
   t = t.replace(/\[\s*((?:[a-z]+:[a-z0-9-]+|cv)(?:\s*[,;]\s*(?:[a-z]+:[a-z0-9-]+|cv))*)\s*\]/gi, (m, list) =>
     list.split(/\s*[,;]\s*/).map((id) => id.toLowerCase()).filter((id) => ID_SET.has(id)).map((id) => `[${id}]`).join(" "));
+  // Anything else shaped like a citation ("[skill:*]", "[quest:unknown]") would show as raw text: drop it.
+  t = t.replace(/\s?\[\s*(?:quest|cert|skill|log|fact)\s*:[^\]\n]{0,60}\]/gi, (m) => (ID_SET.has(m.trim().slice(1, -1).trim().toLowerCase()) ? m : ""));
   t = t.replace(/\b(?:https?:\/\/|mailto:)[^\s)\]]+/gi, (u) => {
     const bare = u.replace(/[.,;:!?]+$/, "");
     return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";
