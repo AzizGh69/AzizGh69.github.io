@@ -109,35 +109,82 @@ const FILLER = new Set(("experience with of in on and or the a an strong solid g
   "understanding tools tool framework frameworks language languages apache microsoft google amazon de en et ou la le les avec maîtrise " +
   "connaissance connaissances bonne bonnes compétences expérience outils").split(" "));
 const NOT_TOOLS = new Set(["deployment", "dns"]);
-const toolKey = (s) => String(s).toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9#+.àâçéèêëîïôûù-]+/g, " ").trim();
+/* Tools Aziz has not used but has a real transferable skill for. Decided here, not by the model, so the same
+   requirement always scores the same: adjacent, with this evidence and this note (never direct, never gap).
+   Spark itself is direct: PySpark is Spark's Python API. */
+const SPARK = ["skill:pyspark", "quest:platform"];
+const ADJ_NOTE = {
+  hadoop: { en: "Hadoop is not on the portfolio; his PySpark work in the data platform is the transferable Spark-ecosystem skill.",
+    fr: "Hadoop n'apparaît pas sur le portfolio ; son travail PySpark dans la plateforme de données est la compétence transférable de l'écosystème Spark." },
+  scala: { en: "Scala is not on the portfolio; Java (used in projects) and PySpark (Spark's Python API) are the transferable skills.",
+    fr: "Scala n'apparaît pas sur le portfolio ; Java (utilisé en projet) et PySpark (l'API Python de Spark) sont les compétences transférables." },
+  databricks: { en: "Databricks is not on the portfolio; he works with PySpark on Microsoft Fabric, the same lakehouse and Spark model.",
+    fr: "Databricks n'apparaît pas sur le portfolio ; il travaille avec PySpark sur Microsoft Fabric, le même modèle lakehouse et Spark." }
+};
+const ADJACENT = {
+  hadoop: [SPARK, "hadoop"], hdfs: [SPARK, "hadoop"], mapreduce: [SPARK, "hadoop"], "map reduce": [SPARK, "hadoop"],
+  hive: [SPARK, "hadoop"], yarn: [SPARK, "hadoop"], "big data": [SPARK, "hadoop"],
+  scala: [["skill:java", "skill:pyspark"], "scala"],
+  databricks: [["skill:pyspark", "skill:microsoft-fabric"], "databricks"]
+};
+const DIRECT_EXTRA = { spark: ["skill:pyspark", "quest:platform"], "spark sql": ["skill:pyspark", "skill:sql"] };
+const ALL_KEYS = [...new Set([...Object.keys(TOOLS).filter((k) => !NOT_TOOLS.has(k) && k.length >= 2), ...Object.keys(ADJACENT), ...Object.keys(DIRECT_EXTRA)])];
+const toolKey = (s) => String(s).toLowerCase().replace(/\(.*?\)/g, (m) => " " + m.slice(1, -1) + " ").replace(/[^a-z0-9#+.àâçéèêëîïôûù-]+/g, " ").trim();
+// Returns { status, ids, note } when every word of the requirement is a known tool (or filler), else null.
+const hasKey = (text, k) => new RegExp(`(^|[^a-z0-9#+.])${k.replace(/[.+#]/g, "\\$&")}($|[^a-z0-9#+])`).test(text);
+const idsOf = (keys) => [...new Set(keys.flatMap((k) => ADJACENT[k]?.[0] || DIRECT_EXTRA[k] || TOOLS[k]))]
+  .sort((a, b) => (a.startsWith("skill:") ? 0 : 1) - (b.startsWith("skill:") ? 0 : 1)).slice(0, 4);
 function toolEvidence(req) {
   const text = toolKey(req);
-  if (!text || /\d+\s*\+?\s*(years?|yrs?|ans?|années?)\b/.test(text)) return null;
-  const keys = Object.keys(TOOLS).filter((k) => !NOT_TOOLS.has(k) && k.length >= 2)
-    .filter((k) => new RegExp(`(^|[^a-z0-9#+.])${k.replace(/[.+#]/g, "\\$&")}($|[^a-z0-9#+])`).test(text))
-    .sort((a, b) => b.length - a.length);
-  if (!keys.length) return null;
+  if (!text) return null;
+  const keys = ALL_KEYS.filter((k) => hasKey(text, k)).sort((a, b) => b.length - a.length);
+  // Longer keys win ("spark sql" over "sql"): drop keys that sit inside a longer one already matched.
+  const used = keys.filter((k, i) => !keys.slice(0, i).some((l) => l.includes(k)));
+  const adj = used.filter((k) => ADJACENT[k]);
+  const years = /\d+\s*\+?\s*(years?|yrs?|ans?|années?)\b/.test(text);
+  if (years) {
+    // "3 years of Hadoop": he has none, whatever the model thinks. Other "N years" requirements stay with the model.
+    return adj.length ? { status: "gap", ids: [], note: null, fixed: true } : null;
+  }
+  if (!used.length) return null;
   let rest = " " + text + " ";
   for (const k of keys) rest = rest.split(k).join(" ");
   const left = rest.split(/[\s,/&.-]+/).filter((w) => w && !FILLER.has(w));
-  if (left.length) return null;
-  const ids = [...new Set(keys.flatMap((k) => TOOLS[k]))];
-  return ids.sort((a, b) => (a.startsWith("skill:") ? 0 : 1) - (b.startsWith("skill:") ? 0 : 1)).slice(0, 4);
+  const direct = used.filter((k) => !ADJACENT[k]);
+  const either = /\b(or|ou)\b/.test(text);
+  if (left.length) {
+    // Extra words ("Hadoop streaming at scale"): a known tool alone is not enough to decide, but a tool he has not
+    // used is still only adjacent, never direct and never a gap.
+    if (!adj.length) return null;
+    return { status: "adjacent", ids: idsOf(adj), note: ADJACENT[adj[0]][1] };
+  }
+  // "Scala or Java": one he has is enough. "Hadoop and Python": the one he has not used makes it adjacent.
+  if (adj.length && !(either && direct.length)) return { status: "adjacent", ids: idsOf(used), note: ADJACENT[adj[0]][1] };
+  return { status: "direct", ids: idsOf(either && adj.length ? direct : used), note: null };
 }
 
-export function scoreMatch(raw) {
+export function scoreMatch(raw, lang = "en") {
   const reqs = (Array.isArray(raw?.requirements) ? raw.requirements : []).slice(0, 14).map((r) => {
-    const evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
+    let evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
     let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
+    let note = r.note;
     const known = toolEvidence(r.req);
-    if (known) { status = "direct"; for (const id of known) if (!evidence.includes(id) && evidence.length < 4) evidence.push(id); }
+    if (known) {
+      // Fixed evidence, so the strength (and the score) does not depend on what the model cited.
+      evidence = known.ids.filter((id) => ID_SET.has(id));
+      const fr = lang === "fr";
+      if (known.note) note = ADJ_NOTE[known.note][fr ? "fr" : "en"];
+      else if (known.status === "gap") note = fr ? "Aucune durée d'expérience avec cet outil n'est indiquée sur le portfolio." : "The portfolio shows no years of experience with this tool.";
+      else if (status !== "direct") note = "";
+      status = known.status;
+    }
     if (status !== "gap" && evidence.length === 0) status = "gap"; // a claim without real evidence does not count
     // The model sometimes under-rates: a requirement that names the very skill it cites is a direct match.
     const key = String(r.req || "").toLowerCase().replace(/#/g, "sharp").replace(/[+]/g, "plus").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    if (status === "adjacent" && key && evidence.some((id) => id.startsWith("skill:") && (id.slice(6) === key || key.endsWith("-" + id.slice(6)) || id.slice(6).endsWith("-" + key)))) status = "direct";
+    if (!known && status === "adjacent" && key && evidence.some((id) => id.startsWith("skill:") && (id.slice(6) === key || key.endsWith("-" + id.slice(6)) || id.slice(6).endsWith("-" + key)))) status = "direct";
     return {
       req: clean(r.req, 120), priority: r.priority === "must" ? "must" : "nice", status,
-      evidence: status === "gap" ? [] : evidence, note: sanitizeReply(clean(r.note, 300)) ?? ""
+      evidence: status === "gap" ? [] : evidence, note: sanitizeReply(clean(note, 300)) ?? ""
     };
   }).filter((r) => r.req);
   let got = 0, total = 0;

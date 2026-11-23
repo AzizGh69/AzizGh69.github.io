@@ -230,7 +230,7 @@ async function handlePost(request, env) {
       const raw = await ask(env, systemPrompt("match", lang, jd), [{ role: "user", content: turn }], true);
       let parsed;
       try { parsed = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, "")); } catch { return json({ error: "model_error" }, 502); }
-      return json({ match: scoreMatch(parsed) });
+      return json({ match: scoreMatch(parsed, lang) });
     }
 
     // Only the last few turns, and earlier answers shortened: history counts against the free tiers' token budget.
