@@ -163,17 +163,112 @@ function toolEvidence(req) {
   return { status: "direct", ids: idsOf(either && adj.length ? direct : used), note: null };
 }
 
+/* Soft skills and languages, decided here from the SOFT SKILLS evidence so the same requirement always gets the same
+   status, evidence and note. Matched on accent-free text; a requirement with other words left over
+   ("leading data teams of 10") stays with the model. */
+const deaccent = (s) => String(s).toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[’']/g, " ");
+const SOFT = [
+  { re: /\b(soft skills|savoir etre|qualites humaines)\b/g, status: "direct", ids: ["fact:soft-skills", "cert:hecfa-lead", "fact:awards", "log:concentrix"],
+    en: "Elected co-head of his club's IT department, 3 competition podiums and 16 months of bilingual client support.",
+    fr: "Co-responsable élu du pôle IT de son club, 3 podiums en compétition et 16 mois de support client bilingue." },
+  { re: /\b(communication|communicat\w*|communiquer|interpersonal|people skills|stakeholders?(?: management)?|client facing|customer facing|client relations?|relationnel(?:le)?|relation client|parties prenantes)\b/g,
+    status: "direct", ids: ["fact:soft-skills", "log:concentrix", "quest:epistemia"],
+    en: "16 months of bilingual client support at Concentrix, and he runs the meetings and client communication on Epistemia.",
+    fr: "16 mois de support client bilingue chez Concentrix, et il gère les réunions et la communication client sur Epistemia." },
+  { re: /\b(team ?player|team ?work|team spirit|collaborat\w*|works? (?:well )?(?:in|within|as part of) (?:a )?teams?|esprit d equipe|travail (?:en|d) equipe|travailler en equipe)\b/g,
+    status: "direct", ids: ["fact:soft-skills", "quest:connect", "log:hec-finance-academy"],
+    en: "Most of his projects are team projects, e.g. IHEC Connect over 4 Scrum sprints, plus years of student-club work.",
+    fr: "La plupart de ses projets sont des projets d'équipe, par ex. IHEC Connect en 4 sprints Scrum, plus des années de vie associative." },
+  { re: /\b(leadership|team lead(?:ership)?|leading teams?|lead(?:s)? (?:a )?teams?|encadrement|management d equipe)\b/g,
+    status: "direct", ids: ["fact:soft-skills", "cert:hecfa-lead", "quest:epistemia"],
+    en: "Elected co-head of the IT department at HEC Finance Academy and project manager on several team projects.",
+    fr: "Co-responsable élu du pôle IT de HEC Finance Academy et chef de projet sur plusieurs projets d'équipe." },
+  { re: /\b(public speaking|presentation(?:s| skills)?|presenting|pitch(?:ing|es)?|prise de parole(?: en public)?|aisance (?:a l )?oral(?:e)?)\b/g,
+    status: "direct", ids: ["fact:soft-skills", "quest:connect", "cert:injaz"],
+    en: "Pitched IHEC Connect to 1st prize at Global Entrepreneurship Week; 3rd prize at the INJAZ bootcamp, which covered pitching.",
+    fr: "A présenté IHEC Connect jusqu'au 1er prix de la Global Entrepreneurship Week ; 3e prix au bootcamp INJAZ, qui couvrait le pitch." },
+  { re: /\b(under pressure|pressure|stress(?:ful)?|tight deadlines?|deadlines?|fast paced(?: environment)?|sous pression|gestion du stress|respect des delais|delais serres)\b/g,
+    status: "direct", ids: ["fact:soft-skills", "fact:awards", "quest:codelab"],
+    en: "3 competition podiums, and his department's software ran the 220-participant CodeLab 2.0 hackathon live, delivered on a deadline.",
+    fr: "3 podiums en compétition, et le logiciel de son pôle a fait tourner en direct un hackathon de 220 participants, livré dans les délais." },
+  { re: /\b(project management|gestion de projets?|agile(?: methodolog(?:y|ies))?|scrum|methodes agiles)\b/g,
+    status: "direct", ids: ["skill:project-management", "quest:epistemia", "quest:connect"],
+    en: "Project manager on Epistemia, IHEC Connect (4 Scrum sprints), the BVMT Trading Assistant and RideShare.",
+    fr: "Chef de projet sur Epistemia, IHEC Connect (4 sprints Scrum), le BVMT Trading Assistant et RideShare." },
+  { re: /\b(problem solving|solving problems|resolution de problemes|troubleshooting)\b/g,
+    status: "direct", ids: ["log:concentrix", "skill:client-support"],
+    en: "16 months resolving Uber merchants' cases as a technical support agent at Concentrix.",
+    fr: "16 mois à résoudre les dossiers des marchands Uber comme agent de support technique chez Concentrix." },
+  { re: /\b(autonom\w*|independent(?:ly)?|self starter|self motivated|ownership|initiative|proactiv\w*)\b/g,
+    status: "direct", ids: ["log:kalori", "quest:platform"],
+    en: "He built and runs Kalori on his own as founder and sole developer, and is building its data platform solo.",
+    fr: "Il a créé et fait tourner Kalori seul, comme fondateur et unique développeur, et construit seul sa plateforme de données." },
+  { re: /\b(fast learner|quick learner|learns? (?:fast|quickly)|eager to learn|willingness to learn|curiosity|curious|apprend\w* (?:vite|rapidement)|curiosite|capacite d apprentissage)\b/g,
+    status: "direct", ids: ["quest:platform", "skill:microsoft-fabric"],
+    en: "He is learning the data-platform stack (Kafka, Fabric, PySpark) by building it now.",
+    fr: "Il apprend la stack de la plateforme de données (Kafka, Fabric, PySpark) en la construisant en ce moment." },
+  // Languages, at the level the portfolio gives (from the Concentrix recruitment test), never "fluent".
+  { re: /\b(?:native|mother tongue|langue maternelle)\s+(?:english|anglais|french|francais)\b|\b(?:english|anglais|french|francais)\s+(?:native(?: speaker)?|langue maternelle)\b/g,
+    status: "adjacent", ids: ["fact:languages"],
+    en: "Native level is not stated: English C1 and French B2, from the Concentrix recruitment test.",
+    fr: "Le niveau natif n'est pas indiqué : anglais C1 et français B2, selon le test de recrutement Concentrix." },
+  { re: /\b(english|anglais)\b/g, status: "direct", ids: ["fact:languages", "log:concentrix"],
+    en: "English C1 (Concentrix recruitment test), used daily for 16 months of client support.",
+    fr: "Anglais C1 (test de recrutement Concentrix), utilisé au quotidien pendant 16 mois de support client." },
+  { re: /\b(french|francais)\b/g, status: "direct", ids: ["fact:languages", "log:concentrix"],
+    en: "French B2 (Concentrix recruitment test), used daily for 16 months of client support.",
+    fr: "Français B2 (test de recrutement Concentrix), utilisé au quotidien pendant 16 mois de support client." },
+  { re: /\b(arabic|arabe)\b/g, status: "direct", ids: ["fact:languages"], en: "Arabic is his native language.", fr: "L'arabe est sa langue maternelle." },
+  { re: /\b(bilingual|bilingue|multilingual|multilingue)\b/g, status: "direct", ids: ["fact:languages", "log:concentrix"],
+    en: "Arabic native, English C1, French B2; 16 months of bilingual (French, English) support at Concentrix.",
+    fr: "Arabe natif, anglais C1, français B2 ; 16 mois de support bilingue (français, anglais) chez Concentrix." },
+  { re: /\b(german|allemand|spanish|espagnol|italian|italien|chinese|mandarin|chinois|dutch|neerlandais|portuguese|portugais|japanese|japonais|russian|russe|turkish|turc)\b/g,
+    status: "gap", ids: [], en: "This language is not on the portfolio (Arabic, English C1, French B2).",
+    fr: "Cette langue n'apparaît pas sur le portfolio (arabe, anglais C1, français B2)." }
+];
+const SOFT_FILLER = new Set([...FILLER].map(deaccent).concat(("excellent great very highly good strong solid outstanding effective ability able capacity " +
+  "capable written verbal oral spoken writing speaking both fluent fluency fluently courant courante professional professionnel business level " +
+  "niveau environment environnement speaker speakers capacites ecrite ecrites orale orales aptitude aptitudes with others well work works working team teams thrive in of to a an and or the skills skill excellente " +
+  "bonne bon tres grande sens du de des d l le la et ou en avec forte fort aisance capacite qualites qualite esprit is are be").split(" ")));
+const RANK = { gap: 0, adjacent: 1, direct: 2 };
+function softEvidence(req) {
+  let text = " " + deaccent(req).replace(/[^a-z0-9 ]+/g, " ") + " ";
+  if (/\d/.test(text)) {
+    // "Leading teams of 10+", "managed 5 people": he has led teams, but no team size is stated anywhere.
+    const lead = SOFT[3];
+    lead.re.lastIndex = 0;
+    if (!/\d+\s*\+?\s*(years?|yrs?|ans?|annees?)\b/.test(text) && (lead.re.test(text) || /\b(manag\w*|lead\w*|encadr\w*)\b[^.]{0,30}\b(people|persons|engineers|developers|personnes|teams?|equipes?)\b/.test(text)))
+      return { status: "adjacent", ids: lead.ids, text: { en: "Team sizes are not stated on the portfolio. " + lead.en, fr: "La taille des équipes n'est pas indiquée sur le portfolio. " + lead.fr } };
+    return null; // years, scores: the model decides
+  }
+  const hits = [];
+  for (const s of SOFT) {
+    s.re.lastIndex = 0;
+    if (s.re.test(text)) { hits.push(s); text = text.replace(s.re, " "); }
+  }
+  if (!hits.length) return null;
+  if (text.split(/\s+/).some((w) => w && !SOFT_FILLER.has(w))) return null;
+  const either = /\b(or|ou)\b/.test(deaccent(req));
+  const pick = either ? Math.max(...hits.map((h) => RANK[h.status])) : Math.min(...hits.map((h) => RANK[h.status]));
+  const status = Object.keys(RANK).find((k) => RANK[k] === pick);
+  const counted = hits.filter((h) => !either || RANK[h.status] === pick);
+  const ids = [...new Set(counted.flatMap((h) => h.ids))].slice(0, 4);
+  const notes = [...new Set(counted.map((h) => h))].slice(0, 2);
+  return { status, ids, text: { en: notes.map((h) => h.en).join(" "), fr: notes.map((h) => h.fr).join(" ") } };
+}
+
 export function scoreMatch(raw, lang = "en") {
   const reqs = (Array.isArray(raw?.requirements) ? raw.requirements : []).slice(0, 14).map((r) => {
     let evidence = (Array.isArray(r.evidence) ? r.evidence : []).map((x) => String(x).toLowerCase().replace(/^\[|\]$/g, "")).filter((x) => ID_SET.has(x)).slice(0, 4);
     let status = ["direct", "adjacent", "gap"].includes(r.status) ? r.status : "gap";
     let note = r.note;
-    const known = toolEvidence(r.req);
+    const known = softEvidence(r.req) || toolEvidence(r.req);
     if (known) {
       // Fixed evidence, so the strength (and the score) does not depend on what the model cited.
       evidence = known.ids.filter((id) => ID_SET.has(id));
       const fr = lang === "fr";
-      if (known.note) note = ADJ_NOTE[known.note][fr ? "fr" : "en"];
+      if (known.text) note = known.text[fr ? "fr" : "en"];
+      else if (known.note) note = ADJ_NOTE[known.note][fr ? "fr" : "en"];
       else if (known.status === "gap") note = fr ? "Aucune durée d'expérience avec cet outil n'est indiquée sur le portfolio." : "The portfolio shows no years of experience with this tool.";
       else if (status !== "direct") note = "";
       status = known.status;
