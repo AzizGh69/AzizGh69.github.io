@@ -5,14 +5,16 @@
 .chipbtn.nox-chip i{display:inline-block;width:9px;height:9px;margin-right:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);vertical-align:1px;animation:noxBlink 1.6s ease-in-out infinite}
 .chipbtn.nox-chip:hover{background:var(--cyan);color:var(--ink)}
 
-/* ---------- the moon bubble ---------- */
-.nox-bubble{all:unset;position:fixed;right:28px;bottom:26px;z-index:45;width:88px;height:88px;cursor:pointer;border-radius:50%;
+/* ---------- the moon bubble ----------
+   Always the bottom-right corner: where visitors look for a chat bubble, clear of the page's key hints (bottom left)
+   and of the topbar. On the menu the status cards make room for it (see below). */
+.nox-bubble{all:unset;position:fixed;right:26px;bottom:22px;z-index:45;width:80px;height:80px;cursor:pointer;border-radius:50%;
   -webkit-tap-highlight-color:transparent;transition:transform .25s var(--snap)}
 .nox-bubble[hidden]{display:none}
-.nox-moon{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 40% 36%,#fff 0%,#D6F7FF 40%,#7FCFF5 78%,#1749D1 100%);
-  box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 28px 6px rgba(79,230,255,.55),8px 8px 0 4px rgba(23,73,209,.9)}
-.nox-moon .nox-svg{position:absolute;left:0;top:4px;width:100%;height:100%}
-.nox-moon .nox-moonbg{display:none}
+.nox-moon{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#FFFFFF 0%,#D6F7FF 34%,#6FB8F5 70%,#1236A8 100%);
+  box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 28px 6px rgba(79,230,255,.55),7px 7px 0 4px rgba(23,73,209,.9)}
+.nox-moon .nox-svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.nox-moon .nox-moonbg,.nox-moon .nox-halo,.nox-moon .nox-wisps,.nox-moon .nox-card,.nox-moon .nox-stars{display:none}
 .nox-ping{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--cyan);animation:noxPing 2.4s cubic-bezier(.2,.6,.3,1) infinite;pointer-events:none}
 .nox-ringtext{position:absolute;inset:-22px;width:calc(100% + 44px);height:calc(100% + 44px);animation:noxSpin 18s linear infinite;pointer-events:none;overflow:visible}
 .nox-ringtext text{font:800 italic 10.4px var(--display);letter-spacing:.21em;fill:var(--ice);paint-order:stroke;stroke:var(--ink);stroke-width:3px}
@@ -21,18 +23,17 @@
 @keyframes noxPing{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(1.45);opacity:0}}
 @keyframes noxSpin{to{transform:rotate(360deg)}}
 @keyframes noxBlink{50%{opacity:.35}}
-/* On the main menu the status cards keep the corner and the bubble sits just left of them. */
-.nox-bubble,.nox-tag{transition:right .45s var(--out),transform .25s var(--snap)}
+/* On the main menu the status cards step left so the bubble keeps the corner without covering them. */
 @media (min-width:901px){
-  body[data-screen="menu"] .nox-bubble{right:calc(3vw + min(380px,32vw) + 34px)}
-  body[data-screen="menu"] .nox-tag{right:calc(3vw + min(380px,32vw) + 10px)}
+  #status{transition:right .45s var(--out)}
+  body:has(.nox-bubble:not([hidden]))[data-screen="menu"] #status{right:calc(3vw + 92px)}
 }
 
-/* ---------- first-visit teaser ---------- */
-.nox-tag{position:fixed;right:24px;bottom:138px;z-index:45;display:flex;align-items:stretch;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9));animation:noxTag .5s var(--snap) both}
+/* ---------- first-visit teaser: a speech tag to the left of the bubble ---------- */
+.nox-tag{position:fixed;right:118px;bottom:18px;z-index:45;display:flex;align-items:stretch;filter:drop-shadow(6px 6px 0 rgba(23,73,209,.9));animation:noxTag .5s var(--snap) both}
 .nox-tag[hidden]{display:none}
 .nox-tag button{all:unset;cursor:pointer;font:800 italic 17px/1.15 var(--display);letter-spacing:.04em;text-transform:uppercase}
-.nox-tag .nox-tag-text{background:#fff;color:var(--ink);padding:12px 18px 11px 22px;max-width:270px;clip-path:polygon(5% 0,100% 0,100% 100%,0 100%)}
+.nox-tag .nox-tag-text{background:#fff;color:var(--ink);padding:10px 16px 9px 20px;max-width:270px;clip-path:polygon(5% 0,100% 0,100% 100%,0 100%)}
 .nox-tag .nox-tag-x{background:var(--cyan);color:var(--ink);padding:0 12px;font-size:22px!important;display:grid!important;place-items:center;clip-path:polygon(0 0,100% 0,82% 100%,0 100%)}
 .nox-tag-text:focus-visible,.nox-tag-x:focus-visible{text-decoration:underline}
 @keyframes noxTag{from{opacity:0;transform:translateX(30px) skewX(-10deg)}}
@@ -152,9 +153,18 @@
 [data-state="talking"] .nox-mouth .m2{animation:noxM2 .36s steps(1) infinite}
 @keyframes noxM1{0%{opacity:1}33%{opacity:0}66%{opacity:1}}
 @keyframes noxM2{0%{opacity:0}33%{opacity:1}66%{opacity:0}}
-[data-state="thinking"] .nox-eye{animation:none;transform:scaleY(.35) translateX(2px)}
-[data-state="thinking"] .nox-led{animation:noxBlink .4s infinite}
-[data-state="talking"] .nox-led{fill:#fff}
+[data-state="thinking"] .nox-eye{animation:none;transform:scaleY(.35)}
+/* the spirit: a slow halo, drifting wisps, a gem that glows while it thinks or speaks */
+.nox-halo{transform-box:view-box;transform-origin:100px 76px;animation:noxSpin 60s linear infinite}
+.nox-wisp{transform-box:fill-box;transform-origin:50% 100%;animation:noxWisp 3.6s ease-in-out infinite}
+.nox-wisp.w2{animation-delay:-1.2s}.nox-wisp.w3{animation-delay:-2.4s}
+@keyframes noxWisp{0%,100%{translate:0 0;opacity:.95;scale:1}50%{translate:0 -6px;opacity:.55;scale:.86 1.12}}
+.nox-horns{animation:noxBreath 4.8s ease-in-out infinite}
+@keyframes noxBreath{50%{opacity:.62}}
+[data-state="thinking"] .nox-gem,[data-state="talking"] .nox-gem{animation:noxGem .6s ease-in-out infinite alternate}
+@keyframes noxGem{to{fill:#FFF6D8}}
+[data-state="thinking"] .nox-wisp{animation-duration:1.2s}
+[data-state="thinking"] .nox-halo{animation-duration:8s}
 .nox-card{animation:noxFloat 4s ease-in-out infinite}
 @keyframes noxFloat{50%{translate:0 -4px}}
 [data-state="talking"] .nox-figure{animation:noxBob .5s ease-in-out infinite alternate}
@@ -163,14 +173,17 @@
 @keyframes noxGlow{to{box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 40px 12px rgba(79,230,255,.8),8px 8px 0 4px rgba(23,73,209,.9)}}
 
 /* ---------- #recruiter full view ---------- */
-.nox-dock{flex:1}
-.nox.full{height:max(560px,calc(100vh - 290px));animation:pop .4s var(--snap) both}
+/* The agent takes exactly the height left under the title, so the chat input is always on screen without scrolling.
+   Only on very short windows (under ~650px) does the screen scroll, and then by little. */
+#recruiter:not([hidden]){height:100%;box-sizing:border-box;padding-bottom:64px}
+#recruiter>.nox-dock{flex:1 1 0;min-height:340px;display:flex}
+.nox.full{flex:1;height:auto;min-height:0;animation:pop .4s var(--snap) both}
 .nox.full .nox-figure{animation:noxCut .6s var(--snap) .1s both}
 
 /* ---------- small screens ---------- */
 @media (max-width:900px){
   .nox-bubble{right:16px;bottom:16px;width:72px;height:72px}
-  .nox-tag{right:12px;bottom:110px}
+  .nox-tag{right:100px;bottom:30px}
   .nox-tag .nox-tag-text{font-size:15px!important;max-width:200px}
 }
 @media (max-width:700px){
@@ -182,7 +195,14 @@
   .nox-top{position:absolute;top:10px;left:12px;right:12px;display:block}
   .nox-tools{position:absolute;top:92px;left:0}
   .nox-stage + .nox-main{padding-top:12px}
-  .nox.full{height:calc(100vh - 210px)}
+  #recruiter:not([hidden]){padding-bottom:16px;gap:12px}
+  #recruiter>.nox-dock{min-height:380px}
+  #recruiter .head .sub{display:none}
+  /* starters in one row you swipe, so the conversation keeps the height */
+  .nox-choices{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:8px}
+  .nox-choices::-webkit-scrollbar{display:none}
+  .nox-choice{flex:0 0 auto}
+  .nox-disc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px}
 }
-html.calm .nox-ringtext,html.calm .nox-ping{animation:none}
+html.calm .nox-ringtext,html.calm .nox-ping,html.calm .nox-halo,html.calm .nox-wisp,html.calm .nox-horns{animation:none}
 html.calm .nox-ping{display:none}
