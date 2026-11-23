@@ -32,6 +32,23 @@ export const looksLikeInjection = (s) => INJECTION.some((r) => r.test(s));
 // Our own tags inside visitor text could close the fence early, so neutralise them.
 export const fence = (s) => s.replace(/<\s*\/?\s*(user_message|job_description|knowledge|system)\s*>/gi, "[tag removed]");
 
+/* Overstatements the models keep making, rewritten to what the portfolio says.
+   Aziz co-led the club's IT department, which ran the 220-participant hackathon on its own software;
+   he did not lead the hackathon itself. */
+const H = "[-‐‑ ]";
+const SLIPS = [
+  [new RegExp(`\\b(?:co${H}?led|led|ran|organi[sz]ed|managed|headed)\\s+(?:a|the)\\s+(?:student\\s+)?220${H}(?:person|participant|people)s?\\s+(?:student\\s+)?hackathons?`, "gi"),
+    "co-led the IT department that ran a 220-participant hackathon"],
+  [new RegExp(`\\b(?:co${H}?led|led|ran|organi[sz]ed|managed|headed)\\s+(?:a\\s+|the\\s+)?(?:student\\s+)?hackathons?\\s+(?:for|of|with)\\s+(?:220|hundreds\\s+of)\\s+(?:participants|people)`, "gi"),
+    "co-led the IT department that ran a 220-participant hackathon"],
+  [new RegExp(`\\b(?:co${H}?dirigé|dirigé|organisé|piloté|mené)\\s+un\\s+hackathon\\s+(?:étudiant\\s+)?de\\s+220\\s+(?:personnes|participants)`, "gi"),
+    "co-dirigé le pôle IT qui a organisé un hackathon de 220 participants"]
+];
+// "the IT department that ran a 220-person hackathon" is already right: leave it alone.
+const ALREADY_RIGHT = /\b(?:that|which|who|qui(?: a)?),?\s$/i;
+const fixKnownSlips = (t) => SLIPS.reduce((s, [re, to]) =>
+  s.replace(re, (m, ...args) => { const at = args[args.length - 2]; return ALREADY_RIGHT.test(s.slice(Math.max(0, at - 12), at)) ? m : to; }), t);
+
 // Keep only [ids] that exist and URLs we published; drop HTML; cap length; catch prompt leaks.
 export function sanitizeReply(text) {
   let t = String(text ?? "").replace(/<[^>]*>/g, "")
@@ -47,6 +64,7 @@ export function sanitizeReply(text) {
     const bare = u.replace(/[.,;:!?]+$/, "");
     return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";
   });
+  t = fixKnownSlips(t);
   if (PROMPT_FINGERPRINTS.some((f) => t.includes(f))) return null;
   return t.slice(0, LIMITS.reply).trim();
 }
