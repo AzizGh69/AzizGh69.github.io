@@ -35,7 +35,9 @@ export const fence = (s) => s.replace(/<\s*\/?\s*(user_message|job_description|k
 // Keep only [ids] that exist and URLs we published; drop HTML; cap length; catch prompt leaks.
 export function sanitizeReply(text) {
   let t = String(text ?? "").replace(/<[^>]*>/g, "");
-  t = t.replace(/\[([a-z]+:[a-z0-9-]+)\]/gi, (m, id) => (ID_SET.has(id.toLowerCase()) ? `[${id.toLowerCase()}]` : ""));
+  // Normalise citations ("[ quest:kalori ]", "[skill:sql, skill:python]") to "[id]" and drop ids that do not exist.
+  t = t.replace(/\[\s*((?:[a-z]+:[a-z0-9-]+|cv)(?:\s*[,;]\s*(?:[a-z]+:[a-z0-9-]+|cv))*)\s*\]/gi, (m, list) =>
+    list.split(/\s*[,;]\s*/).map((id) => id.toLowerCase()).filter((id) => ID_SET.has(id)).map((id) => `[${id}]`).join(" "));
   t = t.replace(/\b(?:https?:\/\/|mailto:)[^\s)\]]+/gi, (u) => {
     const bare = u.replace(/[.,;:!?]+$/, "");
     return LINKS.some((l) => bare === l || bare === l.replace(/\/$/, "") || bare.startsWith("https://aziz-ghazouani.pages.dev")) ? u : "";

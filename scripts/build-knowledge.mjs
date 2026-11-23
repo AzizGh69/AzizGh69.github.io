@@ -46,7 +46,7 @@ for (const [dt, ...dds] of UI.en.facts) {
 }
 out.push("");
 out.push("## AVAILABILITY");
-out.push(`${add("fact:availability")} Looking for a 4–6 month final-year internship (PFE) from 02/2027 in data engineering, AI or product (data, AI and product roles). Graduation expected 06/2027. Remote/relocation preference, salary and visa questions are NOT stated in the portfolio: direct the recruiter to email Aziz.`);
+out.push(`${add("fact:availability")} Looking for a 4–6 month final-year internship (PFE) from 02/2027 in data engineering, AI or product (data, AI and product roles). Graduation expected 06/2027. NOT stated anywhere in the portfolio: remote vs on-site preference, relocation, salary, visa or work permit. Never say any of these is fine, possible or acceptable; say Aziz will answer that by email.`);
 out.push("");
 out.push("## CURRENT STATUS");
 data.STATUS.forEach((s) => full(`- ${s.k}: ${s.v} — ${s.meta}`));
