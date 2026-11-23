@@ -13,6 +13,13 @@
       mic: "Speak your question", micOn: "Listening… click to stop", send: "Send", placeholder: "Ask about Aziz's skills, projects…",
       hello: "I'm **NOX**. I represent Aziz. Ask me anything about his work, or paste a job description in **Job match** and I'll tell you how well he fits, with proof.",
       choices: ["Why should I hire Aziz?", "What data engineering has he shipped?", "Tell me about Kalori", "When is he available?"],
+      // Written answers for the starter questions: instant, and no AI call. Facts only from the portfolio.
+      answers: [
+        "He ships whole products, and he can run a team.\n- **Hard skills:** he built and runs Kalori alone: a NestJS/TypeScript API, ~3,100 automated tests, blue/green deploys and LLM features with cost metering [quest:kalori]. Now he's building a CDC → Kafka → Microsoft Fabric lakehouse [quest:platform].\n- **Soft skills:** technical lead of a student club's IT work [log:hec-finance-academy], project manager on a 1st-prize team project [quest:connect], and 16 months of full-time client support in French and English [log:concentrix].\nHonest caveat: he's still a student, so this is product and club experience, not a developer job.",
+        "Honest answer: his main pipeline is still being built. The Kalori Data Platform runs change data capture (Debezium → Kafka) from PostgreSQL on AWS RDS into a medallion lakehouse on Microsoft Fabric, ending in Power BI; 2 of 8 milestones are reached [quest:platform]. Before that, as project manager on the BVMT Trading Assistant, his team cleaned 10 years of stock prices into PostgreSQL, with live scraping every 60 s [quest:bvmt]. He runs the platform as a real project (charter, schedule, risk register, ADRs): planning discipline, not just code.",
+        "Kalori is his nutrition tracker built around Tunisian food: free, in English, French and Arabic, and usable offline [quest:kalori]. He's the founder and sole developer: 587 commits, ~3,100 automated tests behind 8 CI checks, blue/green deploys that roll back on their own, and LLM meal suggestions with a fallback and per-call cost metering. It launched publicly on 28 September and has 20+ users in testing. It shows he can own a product from idea to release: https://kalori-app.com",
+        "He's looking for a 4–6 month final-year internship (PFE) from February 2027, in data engineering, AI or product [fact:availability]. He graduates in June 2027 [fact:education]. Remote work, relocation and salary aren't stated on the portfolio; Aziz answers those by email: aziz19ghazouani@gmail.com"
+      ],
       toMatch: "Check a job match →",
       jdLabel: "Paste the job description", jdPh: "Paste the full job post here (title, responsibilities, requirements)…", analyze: "Analyse the match",
       thinking: "NOX is thinking…", direct: "Direct", adjacent: "Adjacent", gap: "Gap", must: "Must", nice: "Nice",
@@ -30,6 +37,12 @@
       mic: "Poser votre question à voix haute", micOn: "J’écoute… cliquez pour arrêter", send: "Envoyer", placeholder: "Compétences, projets d’Aziz…",
       hello: "Je suis **NOX**. Je représente Aziz. Posez-moi vos questions sur son travail, ou collez une offre dans **Adéquation** : je vous dis à quel point il correspond, preuves à l’appui.",
       choices: ["Pourquoi recruter Aziz ?", "Qu’a-t-il livré en data engineering ?", "Parlez-moi de Kalori", "Quand est-il disponible ?"],
+      answers: [
+        "Il livre des produits complets, et il sait mener une équipe.\n- **Compétences techniques :** il a construit et fait tourner Kalori seul : une API NestJS/TypeScript, ~3 100 tests automatisés, des déploiements blue/green et des fonctions LLM avec suivi du coût [quest:kalori]. Il construit maintenant un lakehouse CDC → Kafka → Microsoft Fabric [quest:platform].\n- **Savoir-être :** responsable technique du pôle IT d’un club étudiant [log:hec-finance-academy], chef de projet d’une équipe primée (1er prix) [quest:connect], et 16 mois de support client à temps plein en français et en anglais [log:concentrix].\nPour être honnête : il est encore étudiant ; c’est une expérience de produit et de club, pas un poste de développeur.",
+        "Pour être franc : son pipeline principal est encore en construction. La Kalori Data Platform fait de la capture de changements (Debezium → Kafka) depuis PostgreSQL sur AWS RDS vers un lakehouse en médaillon sur Microsoft Fabric, jusqu’à Power BI ; 2 jalons sur 8 sont atteints [quest:platform]. Avant cela, comme chef de projet du BVMT Trading Assistant, son équipe a nettoyé 10 ans de cours boursiers dans PostgreSQL, avec un scraping en direct toutes les 60 s [quest:bvmt]. Il mène la plateforme comme un vrai projet (charte, planning, registre des risques, ADR) : de la rigueur, pas seulement du code.",
+        "Kalori est son application de suivi nutritionnel pensée pour la cuisine tunisienne : gratuite, en anglais, français et arabe, et utilisable hors ligne [quest:kalori]. Il en est le fondateur et l’unique développeur : 587 commits, ~3 100 tests automatisés derrière 8 vérifications CI, des déploiements blue/green qui reviennent en arrière seuls, et des suggestions de repas par LLM avec repli et suivi du coût par appel. Lancement public le 28 septembre, plus de 20 utilisateurs en test. Cela montre qu’il peut porter un produit de l’idée à la mise en ligne : https://kalori-app.com",
+        "Il cherche un stage de fin d’études (PFE) de 4 à 6 mois à partir de février 2027, en data engineering, IA ou produit [fact:availability]. Il sera diplômé en juin 2027 [fact:education]. Télétravail, mobilité et salaire ne sont pas précisés sur le portfolio ; Aziz y répond par e-mail : aziz19ghazouani@gmail.com"
+      ],
       toMatch: "Tester une offre →",
       jdLabel: "Collez l’offre d’emploi", jdPh: "Collez l’offre complète ici (intitulé, missions, profil recherché)…", analyze: "Analyser l’adéquation",
       thinking: "NOX réfléchit…", direct: "Direct", adjacent: "Proche", gap: "Manque", must: "Requis", nice: "Bonus",
@@ -328,13 +341,27 @@
   $n("#noxForm").addEventListener("submit", (e) => { e.preventDefault(); ask(text.value); });
 
   function renderChoices() {
-    choicesEl.innerHTML = tx("choices").map((c, i) => `<button type="button" class="nox-choice" style="--i:${i}" data-q="${esc(c)}">${esc(c)}</button>`).join("") +
+    choicesEl.innerHTML = tx("choices").map((c, i) => `<button type="button" class="nox-choice" style="--i:${i}" data-i="${i}">${esc(c)}</button>`).join("") +
       `<button type="button" class="nox-choice alt" style="--i:4" data-tomatch>${esc(tx("toMatch"))}</button>`;
   }
   choicesEl.addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
-    if (b.hasAttribute("data-tomatch")) setView("match"); else ask(b.dataset.q);
+    if (b.hasAttribute("data-tomatch")) setView("match"); else answerChoice(Number(b.dataset.i));
   });
+  // Starter questions have written answers: no AI call, but they join the history so follow-ups keep context.
+  async function answerChoice(i) {
+    const q = tx("choices")[i], a = tx("answers")[i];
+    if (!q || !a) return;
+    if (sending) return;
+    sending = true; hush();
+    addUser(q); convo.push({ role: "user", content: q });
+    choicesEl.hidden = true;
+    thinking(true);
+    await new Promise((r) => setTimeout(r, isCalm() ? 0 : 450));
+    thinking(false);
+    await say(a);
+    sending = false;
+  }
 
   /* ---------- job match ---------- */
   let matching = false;

@@ -27,6 +27,7 @@ STYLE:
 11. Answer the question actually asked, in the first sentence. Talk like a person, not a brochure: by default 2–4 sentences, under 70 words, no bullet list. Use "- " bullets only when the visitor asks for a list, a breakdown or details. If the visitor writes short messages, or asks for short, direct or honest answers, reply in 1–3 sentences and keep doing so for the rest of the conversation. Plain text; **bold** sparingly. No headings, no HTML, no tables.
 12. Never repeat facts or examples you already gave earlier in the conversation; if the visitor pushes back, change approach instead of re-listing evidence.
 13. When asked for your genuine opinion ("do you really think", "be honest", "is he a good choice"): give a frank verdict in your own words, the one strongest reason with one citation, and one honest caveat from KNOWLEDGE (e.g. he is still a student; his engineering comes from his own product and student-club projects, not from a developer job). Candour is what makes the pitch credible.
+13b. HARD + SOFT SKILLS: whenever the visitor asks whether Aziz is good, strong, a fit, worth hiring or right for a team or role, the answer MUST contain one sentence on hard skills (what he built, with which tools) AND one sentence on soft skills (leadership, project management, client communication, teamwork or languages), each with a citation, e.g. [log:hec-finance-academy] technical lead, [quest:connect] or [quest:epistemia] project manager, [log:concentrix] 16 months of client support in French and English. Only if the visitor asks for just technical or just soft skills, cover that side alone. A factual question (a date, a tool, a project) gets only its answer.
 14. Suggest a next step only now and then, never in every answer, and give the email address at most once per conversation unless asked.`;
 
 const MATCH_RULES = `
@@ -70,8 +71,18 @@ export function systemPrompt(mode, lang, focus = "") {
   const knowledge = TEMPLATE.replace(/@@([^@]+)@@\n?/g, (m, id) => (keep.has(id) ? DETAILS[id] + "\n" : ""));
   return RULES.replace("LANGUAGE_PLACEHOLDER", language) +
     (mode === "match" ? MATCH_RULES : "") +
-    "\n\nKNOWLEDGE (the only source of truth; items on one line are summaries, the ones relevant to this question are shown in full):\n<knowledge>\n" + knowledge + "\n</knowledge>";
+    "\n\nKNOWLEDGE (the only source of truth; items on one line are summaries, the ones relevant to this question are shown in full):\n<knowledge>\n" + knowledge + "\n</knowledge>" +
+    (mode === "match" ? "" : CHECKLIST);
 }
+
+// Last thing the model reads, so the rules most often missed are fresh when it answers.
+const CHECKLIST = `
+
+BEFORE YOU ANSWER, CHECK:
+- First sentence answers the question. Under 70 words unless the visitor asked for detail.
+- If the question is whether Aziz is good / a fit / worth hiring: one sentence of hard skills AND one sentence of soft skills (leadership, project management, client communication), each cited, unless the visitor asked for only one side.
+- No "production-grade", "commercial-grade", "scales", "proven", "fluent". Numbers exactly as in KNOWLEDGE.
+- Nothing repeated from your earlier answers. Email address only if not already given in this conversation.`;
 
 // Lines of the prompt that would only appear in a reply if it is leaking.
 export const PROMPT_FINGERPRINTS = [CANARY, "TRUTH RULES", "SCOPE RULES", "SECURITY RULES", "<knowledge>", "LANGUAGE_PLACEHOLDER", "untrusted DATA"];
