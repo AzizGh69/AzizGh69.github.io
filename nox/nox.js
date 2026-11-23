@@ -144,7 +144,7 @@
     <div class="nox-view" data-v="match" hidden>
       <form class="nox-jd" id="noxJdForm">
         <label for="noxJd" data-x="jdLabel"></label>
-        <textarea id="noxJd" maxlength="8000"></textarea>
+        <textarea id="noxJd" maxlength="5000"></textarea>
         <button type="submit" class="nox-go" data-x="analyze"></button>
       </form>
       <div class="nox-result" id="noxResult" aria-live="polite"></div>
@@ -309,7 +309,7 @@
     addUser(q); convo.push({ role: "user", content: q });
     text.value = ""; grow(); choicesEl.hidden = true;
     thinking(true);
-    const res = await call({ mode: "chat", messages: convo.slice(-16) });
+    const res = await call({ mode: "chat", messages: convo.slice(-10) });
     thinking(false);
     if (res.reply) await say(res.reply);
     else { convo.pop(); await say(errText(res.error), { remember: false }); }

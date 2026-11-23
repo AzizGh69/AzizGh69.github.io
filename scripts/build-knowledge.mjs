@@ -29,13 +29,15 @@ const rankOf = {};   // skill id -> rank letter (used for scoring)
 const certStatus = {}; // cert id -> earned | prep
 const out = [];
 const add = (id) => { ids.push(id); return `[${id}]`; };
+// Lines only in the full chat dossier; the job-match dossier leaves them out to fit free-tier token limits.
+const full = (line) => out.push({ full: line });
 
 const { UI } = data;
 out.push("## PROFILE");
 out.push(`${add("fact:profile")} Mohamed Aziz Ghazouani. ${plain(UI.en.tagline)}`);
 out.push("Based in Ben Arous (Tunis area), Tunisia. Contact: aziz19ghazouani@gmail.com · LinkedIn https://www.linkedin.com/in/aziz-ghazouani/ · GitHub https://github.com/AzizGh69 · Portfolio https://aziz-ghazouani.pages.dev");
-out.push("About:");
-UI.en.about.forEach((p) => out.push("- " + plain(p)));
+full("About:");
+UI.en.about.forEach((p) => full("- " + plain(p)));
 out.push("");
 out.push("## FACTS");
 for (const [dt, ...dds] of UI.en.facts) {
@@ -47,7 +49,7 @@ out.push("## AVAILABILITY");
 out.push(`${add("fact:availability")} Looking for a 4–6 month final-year internship (PFE) from 02/2027 in data engineering, AI or product (data, AI and product roles). Graduation expected 06/2027. Remote/relocation preference, salary and visa questions are NOT stated in the portfolio: direct the recruiter to email Aziz.`);
 out.push("");
 out.push("## CURRENT STATUS");
-data.STATUS.forEach((s) => out.push(`- ${s.k}: ${s.v} — ${s.meta}`));
+data.STATUS.forEach((s) => full(`- ${s.k}: ${s.v} — ${s.meta}`));
 out.push("");
 
 out.push("## EXPERIENCE");
@@ -64,23 +66,22 @@ data.QUESTS.forEach((q) => {
   out.push(`${id} ${q.title} — ${q.kind} — ${q.when} — status: ${q.statusLabel || q.status}`);
   out.push(`  Role: ${q.role} · Team: ${q.team}`);
   out.push(`  Objective: ${plain(q.obj)}`);
-  (q.results || []).forEach((r) => out.push("  - " + plain(r)));
+  (q.results || []).forEach((r, i) => (i < 2 ? out.push("  - " + plain(r)) : full("  - " + plain(r))));
   if (q.stack?.length) out.push(`  Stack: ${q.stack.join(", ")}`);
   const proof = (q.proof || []).filter((p) => p.href);
   proof.forEach((p) => links.add(p.href));
-  if (proof.length) out.push(`  Proof: ${proof.map((p) => `${p.label} (${p.href})`).join(", ")}`);
+  if (proof.length) full(`  Proof: ${proof.map((p) => `${p.label} (${p.href})`).join(", ")}`);
 });
 out.push("");
 
 out.push("## SKILLS (evidence level, not self-rating)");
 out.push("Levels: " + Object.entries(data.RANKS).map(([k, r]) => `${k}=${r.l} (${r.d})`).join("; "));
 data.SKILLS.forEach((g) => {
-  out.push(`${g.g}:`);
-  g.items.forEach(([name, r]) => {
+  out.push(`${g.g}: ` + g.items.map(([name, r]) => {
     const id = "skill:" + slug(name);
     rankOf[id] = r;
-    out.push(`  ${add(id)} ${name} — ${data.RANKS[r].l} (${data.RANKS[r].d})`);
-  });
+    return `${add(id)} ${name} (${r})`;
+  }).join(", "));
 });
 out.push("");
 
@@ -90,31 +91,38 @@ data.CERTS.forEach((c) => {
   certStatus[id] = c.status;
   const st = c.status === "prep" ? "IN PREPARATION (not yet earned)" : (c.statusLabel || "earned");
   out.push(`${id} ${c.title} — ${c.issuer} — ${c.date} — ${c.group === "rec" ? "recognition" : c.type} — ${st}`);
-  if (c.blurb) out.push(`  ${plain(c.blurb)}`);
+  if (c.blurb) full(`  ${plain(c.blurb)}`);
   if (c.covers?.length) out.push(`  Covers: ${c.covers.join(", ")}`);
-  if (c.courses?.length) out.push(`  Courses: ${c.courses.map((x) => x[0]).join(", ")}`);
   (c.links || []).filter((l) => l.href).forEach((l) => links.add(l.href));
 });
 out.push("");
 
-out.push("## TIMELINE");
-data.CAL.forEach((y) => out.push(`${y.y}: ` + y.ev.map(([m, h]) => `${m} ${plain(h)}`).join("; ")));
-out.push("");
 
-// The CV text, minus the phone number (recruiters get email/LinkedIn from the agent).
-const cv = readFileSync(join(root, "cv/source/Mohamed-Aziz-Ghazouani-CV.txt"), "utf8")
-  .replace(/\s*·\s*\+?\d[\d\s]{7,}\d/g, "");
-out.push("## CV (plain text)");
-out.push(add("cv") + "\n" + cv.trim());
+// From the CV, only what the portfolio does not already say: education details and the full skills list.
+// (Groq's free tier allows ~8k tokens per minute, so the dossier stays lean. No phone number.)
+const cvLines = readFileSync(join(root, "cv/source/Mohamed-Aziz-Ghazouani-CV.txt"), "utf8").split(/\r?\n/);
+const section = (name) => {
+  const i = cvLines.findIndex((l) => l.trim() === name);
+  if (i < 0) return [];
+  const rest = cvLines.slice(i + 1);
+  const j = rest.findIndex((l) => /^[A-Z][A-Z ,&]+$/.test(l.trim()));
+  return rest.slice(0, j < 0 ? undefined : j).map((l) => l.trim()).filter(Boolean);
+};
+out.push("## CV EXTRACTS");
+out.push(add("cv") + " Education: " + section("EDUCATION").join(" · "));
+out.push("CV skills list: " + section("SKILLS").join(" | "));
+out.push("CV languages & involvement: " + section("CERTIFICATIONS, LANGUAGES & INVOLVEMENT").join(" | "));
 
-const text = out.join("\n");
+const text = out.map((l) => (typeof l === "string" ? l : l.full)).join("\n");
+const lean = out.filter((l) => typeof l === "string").join("\n");
 const file = join(root, "functions/_lib/knowledge.js");
 mkdirSync(dirname(file), { recursive: true });
 writeFileSync(file,
   "// GENERATED by scripts/build-knowledge.mjs from index.html and the CV. Do not edit by hand.\n" +
   `export const KNOWLEDGE = ${JSON.stringify(text)};\n` +
+  `export const KNOWLEDGE_LEAN = ${JSON.stringify(lean)};\n` +
   `export const IDS = ${JSON.stringify(ids)};\n` +
   `export const SKILL_RANK = ${JSON.stringify(rankOf)};\n` +
   `export const CERT_STATUS = ${JSON.stringify(certStatus)};\n` +
   `export const LINKS = ${JSON.stringify([...links])};\n`);
-console.log(`knowledge.js: ${text.length} chars, ${ids.length} ids, ${links.size} links`);
+console.log(`knowledge.js: ${text.length} chars (lean ${lean.length}), ${ids.length} ids, ${links.size} links`);

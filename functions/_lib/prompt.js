@@ -1,4 +1,4 @@
-import { KNOWLEDGE } from "./knowledge.js";
+import { KNOWLEDGE, KNOWLEDGE_LEAN } from "./knowledge.js";
 
 // A marker that only exists in the system prompt: if it ever shows up in a reply, the prompt is leaking.
 export const CANARY = "NX-7F3A-CANARY";
@@ -33,15 +33,16 @@ The visitor pasted a job description. Extract its real requirements (skills, too
 - "status": "direct" if KNOWLEDGE shows this exact skill/tool/qualification; "adjacent" if KNOWLEDGE shows a closely transferable skill (be generous but honest: same family of tool, same concept, same domain); "gap" if nothing relevant.
 - "evidence": the KNOWLEDGE ids that support it (required for direct and adjacent, empty for gap).
 - "note": one short sentence. For adjacent, say which real skill transfers. For gap, be honest and, if possible, mention how fast he picks things up using a real example from KNOWLEDGE.
-Requirements like "N years of experience" are "gap" unless KNOWLEDGE supports the number; never round up.
-Also write "pitch": 2–4 persuasive sentences selling Aziz for THIS role using only real facts with [id] citations, and "verdict": a 3–6 word headline.
+Requirements like "N years of experience" are "gap" unless KNOWLEDGE supports the number; never round up or add durations together.
+Notes must only restate facts from KNOWLEDGE, at their real level: a skill marked R is "used in a project", not "production"; B is "being built now"; F is "self-taught"; language levels come from a recruitment test, not a certificate. Never describe experience Aziz does not have (e.g. internships). If a tool appears in a project or the CV skills list (e.g. Kafka in the data platform), it is "direct".
+Also write "pitch": 2–4 persuasive sentences selling Aziz for THIS role using only real facts, citing at least two items as [id], and "verdict": a 3–6 word headline.
 Return only JSON matching the schema.`;
 
 export function systemPrompt(mode, lang) {
   const language = lang === "fr" ? "French" : "English";
   return RULES.replace("LANGUAGE_PLACEHOLDER", language) +
     (mode === "match" ? MATCH_RULES : "") +
-    "\n\nKNOWLEDGE (the only source of truth):\n<knowledge>\n" + KNOWLEDGE + "\n</knowledge>";
+    "\n\nKNOWLEDGE (the only source of truth):\n<knowledge>\n" + (mode === "match" ? KNOWLEDGE_LEAN : KNOWLEDGE) + "\n</knowledge>";
 }
 
 // Lines of the prompt that would only appear in a reply if it is leaking.

@@ -2,7 +2,7 @@ import { IDS, LINKS, SKILL_RANK, CERT_STATUS } from "./knowledge.js";
 import { PROMPT_FINGERPRINTS } from "./prompt.js";
 
 const ID_SET = new Set(IDS);
-export const LIMITS = { turns: 16, message: 1000, jd: 8000, reply: 2500 };
+export const LIMITS = { turns: 10, message: 1000, jd: 5000, reply: 2500 };
 
 // Strip control, zero-width and bidi characters that hide or reorder text; normalise width tricks.
 export function clean(s, max) {

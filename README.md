@@ -45,10 +45,29 @@ Settings → Variables and Secrets, add (as secrets, for Production and Preview)
   Google may use prompts to improve its products; NOX only sends public
   portfolio content plus what visitors type.
 - `GROQ_API_KEY` (optional): fallback when Gemini is rate limited.
-- `GEMINI_MODEL` / `GROQ_MODEL` (optional): override the defaults
-  `gemini-flash-latest` / `llama-3.3-70b-versatile`.
+- `GEMINI_MODEL` / `GROQ_MODEL` (optional): force a model. By default NOX uses
+  `gemini-flash-latest`, and for Groq asks which chat models the key can use
+  and takes the best (Groq retires models often).
+
+Groq's free tier allows about 8,000 tokens per minute per model, and each NOX
+request uses 5–7k, so roughly one question per minute; past that, visitors get
+a polite "busy, try again in a minute".
 
 Then redeploy. Without a key NOX still opens and tells visitors to email Aziz.
+
+### Deploying
+
+The Cloudflare GitHub app lost access to this repo (11/2026), so pushes no
+longer deploy on their own. Deploy from this folder with Wrangler instead,
+uploading only the public files (never `.dev.vars`, `scripts/` or `cv/source/`):
+
+```
+mkdir ../site-out
+cp -r index.html .nojekyll nox img cv audio ../site-out/ && rm -rf ../site-out/cv/source
+npx wrangler pages deploy ../site-out --project-name aziz-ghazouani --branch main
+```
+
+`functions/` is picked up from this folder automatically.
 
 ### Local run and tests
 

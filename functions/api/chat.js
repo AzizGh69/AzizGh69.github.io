@@ -1,6 +1,6 @@
 // POST /api/chat — NOX, the recruiter agent. Cloudflare Pages Function.
 // Secrets (Pages → Settings → Variables): GEMINI_API_KEY (free tier), optional GROQ_API_KEY as fallback.
-// Optional: GEMINI_MODEL (default gemini-flash-latest), GROQ_MODEL (default llama-3.3-70b-versatile).
+// Optional: GEMINI_MODEL (default gemini-flash-latest), GROQ_MODEL (default: best chat model the key can use).
 import { systemPrompt } from "../_lib/prompt.js";
 import { clean, fence, looksLikeInjection, sanitizeReply, scoreMatch, LIMITS } from "../_lib/guard.js";
 
@@ -71,25 +71,46 @@ async function gemini(env, system, turns, asJson) {
         .map((c) => ({ category: `HARM_CATEGORY_${c}`, threshold: "BLOCK_MEDIUM_AND_ABOVE" }))
     })
   });
-  if (!res.ok) throw Object.assign(new Error(`gemini ${res.status}`), { status: res.status });
+  if (!res.ok) { console.error("gemini", res.status, (await res.text()).slice(0, 400)); throw Object.assign(new Error(`gemini ${res.status}`), { status: res.status }); }
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => (p.thought ? "" : p.text || "")).join("") ?? "";
   if (!text) throw Object.assign(new Error("gemini empty"), { status: 502 });
   return text;
 }
 
+// Groq retires models often: unless GROQ_MODEL is set, ask which chat models this key can use and take the best.
+let groqModel = null;
+const GROQ_PREFER = [/gpt-oss-120b/, /llama-4-maverick/, /kimi-k2/, /qwen3?-.*(32|72|235)b/, /llama-4-scout/, /70b/, /gpt-oss/, /llama/];
+async function pickGroqModel(env) {
+  if (env.GROQ_MODEL) return env.GROQ_MODEL;
+  if (groqModel) return groqModel;
+  const res = await fetch("https://api.groq.com/openai/v1/models", { headers: { authorization: `Bearer ${env.GROQ_API_KEY}` } });
+  if (!res.ok) throw Object.assign(new Error(`groq models ${res.status}`), { status: res.status });
+  const ids = ((await res.json()).data || []).filter((m) => m.active !== false).map((m) => m.id)
+    .filter((id) => !/whisper|tts|guard|playai|orpheus|distil|compound|prompt-guard|safeguard/i.test(id));
+  for (const re of GROQ_PREFER) { const hit = ids.find((id) => re.test(id)); if (hit) { groqModel = hit; break; } }
+  groqModel = groqModel || ids[0];
+  console.log("groq model", groqModel, "of", ids.join(","));
+  return groqModel;
+}
+
 async function groq(env, system, turns, asJson) {
+  const model = await pickGroqModel(env);
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${env.GROQ_API_KEY}` },
     body: JSON.stringify({
-      model: env.GROQ_MODEL || "llama-3.3-70b-versatile",
-      temperature: asJson ? 0.2 : 0.6, max_tokens: asJson ? 3000 : 700,
+      model,
+      // max_tokens counts against the free tier's tokens-per-minute budget, so keep it tight.
+      temperature: asJson ? 0.2 : 0.6, max_tokens: asJson ? 2200 : 900,
+      // Reasoning models spend output tokens thinking: keep that short so the answer fits.
+      ...(/gpt-oss/.test(model) ? { reasoning_effort: "low", include_reasoning: false } : {}),
       messages: [{ role: "system", content: system + (asJson ? "\nJSON schema: " + JSON.stringify(MATCH_SCHEMA) : "") }, ...turns],
       ...(asJson ? { response_format: { type: "json_object" } } : {})
     })
   });
-  if (!res.ok) throw Object.assign(new Error(`groq ${res.status}`), { status: res.status });
+  if (res.status === 404 && !env.GROQ_MODEL) groqModel = null; // model retired since we picked it
+  if (!res.ok) { console.error("groq", res.status, (await res.text()).slice(0, 400)); throw Object.assign(new Error(`groq ${res.status}`), { status: res.status }); }
   const data = await res.json();
   return data?.choices?.[0]?.message?.content ?? "";
 }
