@@ -13,8 +13,8 @@
 .nox-bubble[hidden]{display:none}
 .nox-moon{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#FFFFFF 0%,#D6F7FF 34%,#6FB8F5 70%,#1236A8 100%);
   box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan),0 0 28px 6px rgba(79,230,255,.55),7px 7px 0 4px rgba(23,73,209,.9)}
-.nox-moon .nox-svg{position:absolute;left:0;top:0;width:100%;height:100%}
-.nox-moon .nox-moonbg,.nox-moon .nox-halo,.nox-moon .nox-wisps,.nox-moon .nox-card,.nox-moon .nox-stars{display:none}
+.nox-moon .nox-svg{position:absolute;left:0;top:4px;width:100%;height:100%}
+.nox-moon .nox-moonbg,.nox-moon .nox-card{display:none}
 .nox-ping{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--cyan);animation:noxPing 2.4s cubic-bezier(.2,.6,.3,1) infinite;pointer-events:none}
 .nox-ringtext{position:absolute;inset:-22px;width:calc(100% + 44px);height:calc(100% + 44px);animation:noxSpin 18s linear infinite;pointer-events:none;overflow:visible}
 .nox-ringtext text{font:800 italic 10.4px var(--display);letter-spacing:.21em;fill:var(--ice);paint-order:stroke;stroke:var(--ink);stroke-width:3px}
@@ -160,18 +160,9 @@ html.calm .nox-cool{transition:none}
 [data-state="talking"] .nox-mouth .m2{animation:noxM2 .36s steps(1) infinite}
 @keyframes noxM1{0%{opacity:1}33%{opacity:0}66%{opacity:1}}
 @keyframes noxM2{0%{opacity:0}33%{opacity:1}66%{opacity:0}}
-[data-state="thinking"] .nox-eye{animation:none;transform:scaleY(.35)}
-/* the spirit: a slow halo, drifting wisps, a gem that glows while it thinks or speaks */
-.nox-halo{transform-box:view-box;transform-origin:100px 76px;animation:noxSpin 60s linear infinite}
-.nox-wisp{transform-box:fill-box;transform-origin:50% 100%;animation:noxWisp 3.6s ease-in-out infinite}
-.nox-wisp.w2{animation-delay:-1.2s}.nox-wisp.w3{animation-delay:-2.4s}
-@keyframes noxWisp{0%,100%{translate:0 0;opacity:.95;scale:1}50%{translate:0 -6px;opacity:.55;scale:.86 1.12}}
-.nox-horns{animation:noxBreath 4.8s ease-in-out infinite}
-@keyframes noxBreath{50%{opacity:.62}}
-[data-state="thinking"] .nox-gem,[data-state="talking"] .nox-gem{animation:noxGem .6s ease-in-out infinite alternate}
-@keyframes noxGem{to{fill:#FFF6D8}}
-[data-state="thinking"] .nox-wisp{animation-duration:1.2s}
-[data-state="thinking"] .nox-halo{animation-duration:8s}
+[data-state="thinking"] .nox-eye{animation:none;transform:scaleY(.35) translateX(2px)}
+[data-state="thinking"] .nox-led{animation:noxBlink .4s infinite}
+[data-state="talking"] .nox-led{fill:#fff}
 .nox-card{animation:noxFloat 4s ease-in-out infinite}
 @keyframes noxFloat{50%{translate:0 -4px}}
 [data-state="talking"] .nox-figure{animation:noxBob .5s ease-in-out infinite alternate}
@@ -211,5 +202,5 @@ html.calm .nox-cool{transition:none}
   .nox-choice{flex:0 0 auto}
   .nox-disc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px}
 }
-html.calm .nox-ringtext,html.calm .nox-ping,html.calm .nox-halo,html.calm .nox-wisp,html.calm .nox-horns{animation:none}
+html.calm .nox-ringtext,html.calm .nox-ping,html.calm .nox-led{animation:none}
 html.calm .nox-ping{display:none}

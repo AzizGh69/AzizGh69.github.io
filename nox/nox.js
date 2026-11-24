@@ -62,58 +62,112 @@
 
   /* ---------- the character (inline SVG, ids prefixed so it can appear twice) ---------- */
   function noxSVG(p, view, fit = "xMidYMid meet") {
+    const card = (x, y) => `font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-style="italic" font-size="6" fill="#fff" x="${x}" y="${y}" text-anchor="middle"`;
     return `<svg class="nox-svg" viewBox="${view}" preserveAspectRatio="${fit}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 <defs>
-  <radialGradient id="${p}moon" cx=".42" cy=".38" r=".62"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D6F7FF"/><stop offset=".85" stop-color="#8FD9FF" stop-opacity=".55"/><stop offset="1" stop-color="#4FE6FF" stop-opacity="0"/></radialGradient>
-  <radialGradient id="${p}aura" cx=".5" cy=".42" r=".55"><stop offset="0" stop-color="#7FF6FF" stop-opacity=".42"/><stop offset=".6" stop-color="#3D7BFF" stop-opacity=".14"/><stop offset="1" stop-color="#3D7BFF" stop-opacity="0"/></radialGradient>
-  <linearGradient id="${p}hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A47B8"/><stop offset=".55" stop-color="#14287A"/><stop offset="1" stop-color="#0A1440"/></linearGradient>
-  <linearGradient id="${p}robe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1D3593"/><stop offset=".7" stop-color="#0A1548"/><stop offset="1" stop-color="#0A1548" stop-opacity=".15"/></linearGradient>
-  <linearGradient id="${p}skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF5FF"/><stop offset="1" stop-color="#AFC6F4"/></linearGradient>
-  <linearGradient id="${p}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#C9DCFF"/><stop offset="1" stop-color="#7C9BE6" stop-opacity=".6"/></linearGradient>
-  <filter id="${p}glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <filter id="${p}mist" x="-20%" y="-200%" width="140%" height="500%"><feGaussianBlur stdDeviation="5"/></filter>
+  <radialGradient id="${p}moon" cx=".42" cy=".38" r=".62"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#E4FAFF"/><stop offset=".82" stop-color="#8FD9FF" stop-opacity=".5"/><stop offset="1" stop-color="#4FE6FF" stop-opacity="0"/></radialGradient>
+  <radialGradient id="${p}halo" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#4FE6FF" stop-opacity=".22"/><stop offset="1" stop-color="#4FE6FF" stop-opacity="0"/></radialGradient>
+  <linearGradient id="${p}hair" x1=".1" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#F7FBFF"/><stop offset=".35" stop-color="#C9D7F6"/><stop offset=".75" stop-color="#7D93D6"/><stop offset="1" stop-color="#4A62B4"/></linearGradient>
+  <linearGradient id="${p}lock" gradientUnits="userSpaceOnUse" x1="0" y1="46" x2="0" y2="100"><stop offset="0" stop-color="#F2F7FF"/><stop offset=".5" stop-color="#C3D2F4"/><stop offset="1" stop-color="#8197DA"/></linearGradient>
+  <linearGradient id="${p}hairDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5068B8"/><stop offset="1" stop-color="#1C2A6A"/></linearGradient>
+  <radialGradient id="${p}skin" cx=".42" cy=".36" r=".75"><stop offset="0" stop-color="#FCE9DC"/><stop offset=".55" stop-color="#F2D0BC"/><stop offset="1" stop-color="#D7A68D"/></radialGradient>
+  <linearGradient id="${p}neck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B7836E"/><stop offset=".45" stop-color="#DDAE96"/><stop offset="1" stop-color="#E8C0A9"/></linearGradient>
+  <linearGradient id="${p}coat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2149B8"/><stop offset=".45" stop-color="#11298A"/><stop offset="1" stop-color="#050C2A"/></linearGradient>
+  <linearGradient id="${p}side" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".32" stop-color="#000" stop-opacity="0"/><stop offset=".68" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>
+  <linearGradient id="${p}lapel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2D5BD6"/><stop offset="1" stop-color="#0F2479"/></linearGradient>
+  <linearGradient id="${p}tie" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FF0FF"/><stop offset=".25" stop-color="#2CC3EA"/><stop offset="1" stop-color="#0C4FA0"/></linearGradient>
+  <linearGradient id="${p}visor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14358F" stop-opacity=".9"/><stop offset=".6" stop-color="#071A55" stop-opacity=".78"/><stop offset="1" stop-color="#4FE6FF" stop-opacity=".45"/></linearGradient>
+  <filter id="${p}glow" x="-60%" y="-120%" width="220%" height="340%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="${p}soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.8"/></filter>
+  <filter id="${p}grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".95" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0"/></filter>
+  <clipPath id="${p}coatClip"><path d="M10 230C14 184 40 158 78 148L100 168L122 148C160 158 186 184 190 230Z"/></clipPath>
 </defs>
-<ellipse cx="100" cy="112" rx="98" ry="112" fill="url(#${p}aura)"/>
-<g class="nox-moonbg"><circle cx="100" cy="76" r="62" fill="url(#${p}moon)" opacity=".85"/><circle cx="122" cy="52" r="6" fill="#9BC9E8" opacity=".22"/><circle cx="76" cy="44" r="4" fill="#9BC9E8" opacity=".2"/></g>
-<g class="nox-halo"><circle cx="100" cy="76" r="54" fill="none" stroke="#7FF6FF" stroke-width="1.1" opacity=".75"/><circle cx="100" cy="76" r="60" fill="none" stroke="#FFC547" stroke-width="1" stroke-dasharray="1.5 7" opacity=".7"/><path d="M93 15A8 8 0 1 0 107 15A6.5 6.5 0 1 1 93 15Z" fill="#FFE3A0"/></g>
-<g class="nox-horns" filter="url(#${p}glow)" stroke="#AFF7FF" stroke-width="2.3" fill="none" stroke-linecap="round">
-  <path d="M79 42C71 30 63 21 53 8M67 28C59 25 51 27 44 23M60 19C60 12 57 6 58 0"/>
-  <path d="M121 42C129 30 137 21 147 8M133 28C141 25 149 27 156 23M140 19C140 12 143 6 142 0"/>
+<g class="nox-moonbg">
+  <circle cx="128" cy="70" r="80" fill="url(#${p}halo)"/>
+  <circle cx="128" cy="70" r="64" fill="url(#${p}moon)"/>
+  <circle cx="146" cy="52" r="7" fill="#9BC9E8" opacity=".22"/><circle cx="112" cy="40" r="4" fill="#9BC9E8" opacity=".2"/><circle cx="156" cy="88" r="5" fill="#9BC9E8" opacity=".18"/><circle cx="160" cy="62" r="2.6" fill="#9BC9E8" opacity=".2"/>
+  <circle cx="128" cy="70" r="74" fill="none" stroke="#D6F7FF" stroke-opacity=".25" stroke-width=".6" stroke-dasharray="2 5"/>
 </g>
-<path d="M18 230C22 190 44 160 76 148L100 162L124 148C156 160 178 190 182 230Z" fill="url(#${p}robe)"/>
-<path d="M76 148L100 162L124 148C116 180 110 205 106 230H94C90 205 84 180 76 148Z" fill="#081241"/>
-<path d="M76 148C84 180 90 205 94 230M124 148C116 180 110 205 106 230" stroke="#FFC547" stroke-width="1.2" fill="none" opacity=".85"/>
-<g class="nox-stars" fill="#BFF8FF"><path d="M40 200L52 186L64 192L70 176M150 178L160 194L146 206" stroke="#7FF6FF" stroke-width=".7" fill="none" opacity=".55"/><circle cx="40" cy="200" r="1.6"/><circle cx="52" cy="186" r="1.3"/><circle cx="64" cy="192" r="1.5"/><circle cx="70" cy="176" r="1.2"/><circle cx="150" cy="178" r="1.4"/><circle cx="160" cy="194" r="1.6"/><circle cx="146" cy="206" r="1.2"/></g>
-<ellipse cx="100" cy="226" rx="92" ry="10" fill="#7FF6FF" opacity=".18" filter="url(#${p}mist)"/>
-<path d="M58 74C60 44 76 24 100 22C124 24 140 44 142 74C144 100 140 122 146 148L124 148L100 162L76 148L54 148C60 122 56 100 58 74Z" fill="url(#${p}hood)" stroke="#7FF6FF" stroke-opacity=".45" stroke-width="1"/>
-<path d="M100 36C80 38 70 54 70 78C70 104 80 124 100 131C120 124 130 104 130 78C130 54 120 38 100 36Z" fill="#040A22"/>
-<path d="M76 76C72 96 74 120 66 148L79 134C81 114 81 96 80 84ZM124 76C128 96 126 120 134 148L121 134C119 114 119 96 120 84Z" fill="url(#${p}hair)"/>
-<path d="M100 46C84 47 76 60 76 80C76 102 86 120 100 124C114 120 124 102 124 80C124 60 116 47 100 46Z" fill="url(#${p}skin)"/>
-<path d="M76 81C74 60 84 45 100 44C116 45 126 60 124 81L119 67L114 77L110 60L104 72L100 55L96 72L90 60L86 77L81 67Z" fill="url(#${p}hair)"/>
-<path d="M84 98L90 101M86 103L91 105M116 98L110 101M114 103L109 105" stroke="#4FC8FF" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>
-<path d="M84 80.5L94 79.2M106 79.2L116 80.5" stroke="#6C86D6" stroke-width="1.6" stroke-linecap="round"/>
-<path class="nox-gem" d="M100 63L104 69.5L100 76L96 69.5Z" fill="#FFC547" stroke="#FFF1C9" stroke-width=".6" filter="url(#${p}glow)"/>
-<g class="nox-eyes" filter="url(#${p}glow)"><path class="nox-eye" d="M83.5 87.5Q90 82.5 96.5 87Q90 91.5 83.5 87.5Z" fill="#7FF6FF"/><path class="nox-eye" d="M103.5 87Q110 82.5 116.5 87.5Q110 91.5 103.5 87Z" fill="#7FF6FF"/></g>
-<path d="M100 92L98.5 100L101 101" stroke="#8EA6DA" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M57 100C47 62 59 26 98 21C139 17 156 48 147 92C145 106 141 118 135 126L128 94H72L65 126C60 116 58 108 57 100Z" fill="url(#${p}hairDark)"/>
+<path d="M87 112H113L115 145Q100 156 85 145Z" fill="url(#${p}neck)"/>
+<path d="M88 122Q100 136 112 122L113 130Q100 142 87 130Z" fill="#A5705C" opacity=".45" filter="url(#${p}soft)"/>
+<path d="M10 230C14 184 40 158 78 148L100 168L122 148C160 158 186 184 190 230Z" fill="url(#${p}coat)"/>
+<g clip-path="url(#${p}coatClip)">
+  <rect x="0" y="140" width="200" height="90" fill="url(#${p}side)"/>
+  <rect x="0" y="140" width="200" height="90" filter="url(#${p}grain)" opacity=".07"/>
+  <path d="M40 196Q54 212 48 232M160 194Q148 212 154 232M70 214Q76 222 74 232" stroke="#030820" stroke-width="2.4" fill="none" opacity=".45" stroke-linecap="round"/>
+  <path d="M42 194Q55 208 50 230M158 192Q147 208 152 230" stroke="#6F93F2" stroke-width=".8" fill="none" opacity=".35"/>
+</g>
+<path d="M122 148C158 157 182 180 189 226" stroke="#4FE6FF" stroke-width="1.8" fill="none" opacity=".75" stroke-linecap="round"/>
+<path d="M78 148C44 157 20 178 12 214" stroke="#D6F7FF" stroke-width="1" fill="none" opacity=".3" stroke-linecap="round"/>
+<path d="M56 160L84 208M144 160L116 208" stroke="#4FE6FF" stroke-width="1.1" opacity=".4"/>
+<path d="M84 148L100 187L116 148L108 143L100 158L92 143Z" fill="#EEF5FF"/>
+<path d="M92 143L100 158L108 143L110 146L100 164L90 146Z" fill="#C9D6EE"/>
+<path d="M96.5 156H103.5L102.6 162.5H97.4Z" fill="#2CC3EA"/>
+<path d="M97.4 162.5H102.6L105 168L102.6 199L100 204L97.4 199L95 168Z" fill="url(#${p}tie)"/>
+<path d="M99.2 165L98.6 196" stroke="#fff" stroke-opacity=".45" stroke-width=".8"/>
+<path d="M77 149L86 121L98 160L92 178Z" fill="url(#${p}lapel)" stroke="#4FE6FF" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M123 149L114 121L102 160L108 178Z" fill="url(#${p}lapel)" stroke="#4FE6FF" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M86 121L89 132L95 156" stroke="#9FEFFF" stroke-width=".7" fill="none" opacity=".7"/>
+<path d="M114 121L111 132L105 156" stroke="#9FEFFF" stroke-width=".7" fill="none" opacity=".5"/>
+<g filter="url(#${p}glow)"><circle cx="115" cy="166" r="3.6" fill="#FFC547"/><circle cx="116.6" cy="164.8" r="3.1" fill="#12298B"/></g>
+<circle cx="100" cy="214" r="2.1" fill="#0A1A58" stroke="#4FE6FF" stroke-width=".8"/>
+<g filter="url(#${p}glow)"><circle cx="64" cy="190" r="6" fill="#4FE6FF"/><circle cx="66.6" cy="188" r="5.4" fill="#0D2266"/></g>
+<path d="M68 84C60.5 81.5 59 98 69 103Z" fill="#E7BBA3"/><path d="M67 88C64 89 64.5 96 68 98" stroke="#B9826C" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M132 84C139.5 81.5 141 98 131 103Z" fill="#D7A68D"/>
+<path d="M68 72C68 44 132 44 132 72L130 100C127 118 114 132 100 133C86 132 73 118 70 100Z" fill="url(#${p}skin)"/>
+<path d="M70 100C73 118 86 132 100 133C114 132 127 118 130 100C125 115 113 125 100 126C87 125 75 115 70 100Z" fill="#B8806A" opacity=".32"/>
+<path d="M130 74L130 100C128 112 122 122 114 128C122 118 126 104 126 90Z" fill="#9C6B5A" opacity=".22"/>
+<path d="M131 78L130 100C128 112 121 123 112 129" stroke="#4FE6FF" stroke-width="1.1" fill="none" opacity=".55" stroke-linecap="round"/>
+<path d="M70 76C82 68 118 66 132 74L132 82C116 76 84 78 70 86Z" fill="#2A3D86" opacity=".28" filter="url(#${p}soft)"/>
+<ellipse cx="79" cy="108" rx="6.5" ry="3.2" fill="#F08A8A" opacity=".24" filter="url(#${p}soft)"/><ellipse cx="121" cy="108" rx="6.5" ry="3.2" fill="#F08A8A" opacity=".24" filter="url(#${p}soft)"/>
+<path d="M78 77Q86 72.5 95 74.5M105 74.5Q114 72.5 122 76" stroke="#3E56A8" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M64 81L137 78L135 98Q100 102.5 67 100Z" fill="url(#${p}visor)" stroke="#4FE6FF" stroke-width="1" stroke-linejoin="round"/>
+<g class="nox-eyes" filter="url(#${p}glow)">
+  <g class="nox-eye"><path d="M79.5 90.5Q87 84.5 94.5 89.5Q87 95.5 79.5 90.5Z" fill="#4FE6FF"/><circle cx="88.5" cy="89.2" r="1.3" fill="#fff"/></g>
+  <g class="nox-eye"><path d="M105.5 89.5Q113 84 120.5 89Q113 95 105.5 89.5Z" fill="#4FE6FF"/><circle cx="114.5" cy="88.4" r="1.3" fill="#fff"/></g>
+</g>
+<path d="M66 83.5L136 80.5L135.7 83L66.3 86Z" fill="#fff" opacity=".32"/>
+<path d="M107 79L116 78.6L109.5 99.5L100.5 100Z" fill="#fff" opacity=".1"/>
+<path d="M70 96.5H76M124 94.5H130M72 98.5H74" stroke="#4FE6FF" stroke-width=".8" opacity=".7"/>
+<path d="M100.6 101L98 107.4Q100.2 109.2 102.8 107.8" stroke="#B07A66" stroke-width="1.15" fill="none" stroke-linecap="round"/>
+<path d="M101.2 101.5L100.4 105" stroke="#fff" stroke-opacity=".45" stroke-width=".9" stroke-linecap="round"/>
 <g class="nox-mouth">
-  <path class="m0" d="M94 110Q100 113 106 109" stroke="#6F5A9A" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-  <path class="m1" d="M95 109Q100 108 105 109Q100 114 95 109Z" fill="#3A2A6A"/>
-  <path class="m2" d="M94 108Q100 106.5 106 108Q100 118 94 108Z" fill="#3A2A6A"/>
+  <g class="m0"><path d="M92 116.5Q100 121 108 115" stroke="#8A4A45" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M95 119.5Q100 122 105 119" stroke="#D99484" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/></g>
+  <path class="m1" d="M93 116Q100 114.5 107 116Q100 123 93 116Z" fill="#5A2430"/>
+  <path class="m2" d="M92 115Q100 112.5 108 115Q101 128 92 115Z" fill="#5A2430"/>
 </g>
-<path d="M80 128L100 140L120 128L124 150L100 160L76 150Z" fill="#0C1A52" stroke="#FFC547" stroke-width=".9" stroke-linejoin="round"/>
-<circle cx="100" cy="152" r="5" fill="#FFC547"/><circle cx="102.4" cy="150.6" r="4.3" fill="#0C1A52"/>
-<g class="nox-wisps" filter="url(#${p}glow)" fill="#9FF6FF">
-  <path class="nox-wisp w1" d="M38 111C43 117 44 123 38 127C32 123 33 117 38 111Z"/>
-  <path class="nox-wisp w2" d="M163 95C167 100 168 105 163 108C158 105 159 100 163 95Z"/>
-  <path class="nox-wisp w3" d="M28 160C31 164 32 168 28 170C24 168 25 164 28 160Z"/>
+<path d="M60 88C55 58 72 31 100 29C129 27 147 48 142 86C131 72 114 63 100 63C86 63 71 71 60 88Z" fill="url(#${p}hair)"/>
+<g fill="url(#${p}lock)" stroke="#5B72C2" stroke-width=".6" stroke-opacity=".6" stroke-linejoin="round">
+  <path d="M62 62C63 76 66 90 71 99C71 86 73 72 80 61Z"/>
+  <path d="M74 54C77 66 79 75 83 81C84 71 87 61 94 53Z"/>
+  <path d="M88 49C91 62 95 72 101 79C100 68 102 58 109 50Z"/>
+  <path d="M103 49C107 61 112 71 119 78C117 67 117 58 121 52Z"/>
+  <path d="M116 53C122 63 127 73 133 84C131 73 131 63 130 57Z"/>
+  <path d="M127 58C134 68 137 79 138 92C141 80 141 69 136 60Z"/>
 </g>
+<path d="M66 70C70 64 76 60 82 58M80 62C86 56 94 53 100 52M97 56C104 52 112 52 118 55" stroke="#fff" stroke-width="1" fill="none" opacity=".5" stroke-linecap="round"/>
+<path d="M84 40Q90 50 90 60M100 36Q104 46 104 58M116 40Q121 50 122 60" stroke="#4A62B4" stroke-width=".9" fill="none" opacity=".4"/>
+<path d="M62 78L55 122L68 103L72 86Z" fill="url(#${p}hair)"/>
+<path d="M139 76L145 114L134 101Z" fill="url(#${p}hair)"/>
+<path d="M98 30C104 15 121 11 128 20C117 17 109 22 104 32Z" fill="#DCE6FB"/>
+<path d="M77 41C91 33 112 33 126 41" stroke="#fff" stroke-opacity=".7" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<path d="M127 33C141 45 147 66 142 86M139 77L145 114" stroke="#4FE6FF" stroke-width="1.3" fill="none" opacity=".7" stroke-linecap="round"/>
+<rect x="130" y="86" width="8" height="14" rx="3.5" fill="#0B1E57" stroke="#4FE6FF" stroke-width="1"/>
+<path d="M132 88.5H136" stroke="#fff" stroke-opacity=".35" stroke-width=".8" stroke-linecap="round"/>
+<circle class="nox-led" cx="134" cy="94" r="1.7" fill="#4FE6FF"/>
+<path d="M134 100Q131 116 116 120" stroke="#0B1E57" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="116" cy="120" r="2" fill="#4FE6FF"/>
 <g class="nox-card" transform="translate(138 156) rotate(12)">
   <rect width="38" height="58" rx="3" fill="#040A1C" stroke="#4FE6FF" stroke-width="1.4"/>
   <rect x="3" y="3" width="32" height="52" rx="2" fill="none" stroke="#FFC547" stroke-width=".7"/>
+  <path d="M6 6L10 6M6 6L6 10M32 6L28 6M32 6L32 10M6 52L10 52M6 52L6 48M32 52L28 52M32 52L32 48" stroke="#FFC547" stroke-width=".9"/>
+  <circle cx="19" cy="22" r="11" fill="#4FE6FF" opacity=".18"/>
   <circle cx="19" cy="22" r="9" fill="#D6F7FF"/><circle cx="23" cy="19" r="8" fill="#040A1C"/>
+  <circle cx="9" cy="14" r=".7" fill="#fff"/><circle cx="29" cy="30" r=".6" fill="#fff"/><circle cx="28" cy="11" r=".5" fill="#fff"/>
   <path d="M8 34L30 34" stroke="#FFC547" stroke-width=".6"/>
-  <text x="19" y="43" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-style="italic" font-size="6" fill="#fff">THE</text>
-  <text x="19" y="50" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-style="italic" font-size="6" fill="#fff" letter-spacing=".2">CANDIDATE</text>
+  <text ${card(19, 43)}>THE</text>
+  <text ${card(19, 50)} letter-spacing=".2">CANDIDATE</text>
+  <path d="M4 4L34 4L30 18Z" fill="#fff" opacity=".06"/>
 </g>
 </svg>`;
   }
@@ -122,7 +176,7 @@
   const bubble = document.createElement("button");
   bubble.type = "button"; bubble.className = "nox-bubble"; bubble.id = "noxBubble";
   bubble.innerHTML = `<svg class="nox-ringtext" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="noxRingPath" d="M60 60m-50 0a50 50 0 1 1 100 0a50 50 0 1 1 -100 0"/></defs><text><textPath href="#noxRingPath" id="noxRingText"></textPath></text></svg>
-    <span class="nox-moon">${noxSVG("b", "42 16 116 116")}</span><span class="nox-ping" aria-hidden="true"></span>`;
+    <span class="nox-moon">${noxSVG("b", "50 30 100 100")}</span><span class="nox-ping" aria-hidden="true"></span>`;
 
   const tag = document.createElement("div");
   tag.className = "nox-tag"; tag.hidden = true;
