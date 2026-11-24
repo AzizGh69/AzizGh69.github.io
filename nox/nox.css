@@ -113,6 +113,13 @@
 .nox-input textarea::placeholder,.nox-jd textarea::placeholder{color:var(--muted);opacity:.8}
 .nox-send{background:var(--cyan);color:var(--ink);width:46px}
 .nox-send:disabled{opacity:.5;cursor:wait}
+/* Message limit reached: the send icon dims, and hovering, focusing or tapping it shows the time left. */
+.nox-input{position:relative}
+.nox-input.is-cool .nox-send{background:rgba(214,247,255,.14);color:var(--muted);cursor:not-allowed}
+.nox-cool{position:absolute;right:0;bottom:calc(100% + 8px);z-index:3;max-width:250px;padding:7px 12px 6px;background:#fff;color:var(--ink);font:700 13.5px/1.3 var(--body);font-variant-numeric:tabular-nums;box-shadow:4px 4px 0 var(--blue);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s,transform .12s,visibility .12s;pointer-events:none}
+.nox-cool::after{content:"";position:absolute;right:18px;top:100%;border:6px solid transparent;border-top-color:#fff}
+.nox-input.is-cool .nox-send:hover~.nox-cool,.nox-input.is-cool .nox-send:focus-visible~.nox-cool,.nox-input.is-cool.show-tip .nox-cool{opacity:1;visibility:visible;transform:none}
+html.calm .nox-cool{transition:none}
 .nox-disc{margin:8px 0 0;font:500 11.5px/1.3 var(--body);color:var(--muted);opacity:.85}
 
 /* job match */

@@ -10,7 +10,7 @@
       title: "Recruiter liaison", ring: "ASK NOX · RECRUITER MODE · ASK NOX · RECRUITER MODE · ",
       open: "Ask NOX, the recruiter assistant", tag: "Hiring? I'll tell you why Aziz fits.", tagClose: "Dismiss",
       chat: "Chat", match: "Job match", full: "Full view", close: "Close", voiceOn: "Voice: on", voiceOff: "Voice: off", noVoice: "No voice for this language in your browser",
-      mic: "Speak your question", micOn: "Listening… click to stop", send: "Send", placeholder: "Ask about Aziz's skills, projects…",
+      mic: "Speak your question", micOn: "Listening… click to stop", send: "Send", cool: "Message limit reached. You can send again in {t}.", placeholder: "Ask about Aziz's skills, projects…",
       hello: "I'm **NOX**. I represent Aziz. Ask me anything about his work, or paste a job description in **Job match** and I'll tell you how well he fits, with proof.",
       choices: ["Why should I hire Aziz?", "What data engineering has he shipped?", "Tell me about Kalori", "When is he available?"],
       // Written answers for the starter questions: instant, and no AI call. Facts only from the portfolio.
@@ -34,7 +34,7 @@
       title: "Agent recruteur", ring: "DEMANDEZ À NOX · MODE RECRUTEUR · DEMANDEZ À NOX · MODE RECRUTEUR · ",
       open: "Demander à NOX, l’assistant recruteur", tag: "Vous recrutez ? Je vous dis pourquoi Aziz correspond.", tagClose: "Fermer",
       chat: "Discussion", match: "Adéquation", full: "Plein écran", close: "Fermer", voiceOn: "Voix : activée", voiceOff: "Voix : coupée", noVoice: "Pas de voix pour cette langue dans votre navigateur",
-      mic: "Poser votre question à voix haute", micOn: "J’écoute… cliquez pour arrêter", send: "Envoyer", placeholder: "Compétences, projets d’Aziz…",
+      mic: "Poser votre question à voix haute", micOn: "J’écoute… cliquez pour arrêter", send: "Envoyer", cool: "Limite de messages atteinte. Vous pourrez renvoyer dans {t}.", placeholder: "Compétences, projets d’Aziz…",
       hello: "Je suis **NOX**. Je représente Aziz. Posez-moi vos questions sur son travail, ou collez une offre dans **Adéquation** : je vous dis à quel point il correspond, preuves à l’appui.",
       choices: ["Pourquoi recruter Aziz ?", "Qu’a-t-il livré en data engineering ?", "Parlez-moi de Kalori", "Quand est-il disponible ?"],
       answers: [
@@ -159,6 +159,7 @@
         <button type="button" class="nox-tool nox-mic" id="noxMic" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="currentColor" stroke-width="2.2" fill="none"/></svg></button>
         <textarea id="noxText" rows="1" maxlength="1000"></textarea>
         <button type="submit" class="nox-send" id="noxSend"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20L21 12L3 4L6 12Z" fill="currentColor"/></svg></button>
+        <span class="nox-cool" id="noxCool" role="tooltip"></span>
       </form>
     </div>
     <div class="nox-view" data-v="match" hidden>
@@ -314,7 +315,7 @@
     try {
       const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, lang: L() }) });
       const data = await r.json().catch(() => ({}));
-      if (!r.ok) return { error: data.error || "default" };
+      if (!r.ok) return { error: data.error || "default", retryAfter: data.retryAfter };
       return data;
     } catch { return { error: "default" }; }
   }
@@ -327,9 +328,47 @@
   }
   const errText = (e) => T[L()].err[e] || T[L()].err.default;
 
+  /* ---------- cooldown after the message limit ---------- */
+  // The server says how long until the next message is allowed; the send icon shows the time left on hover.
+  const COOL_KEY = "nox-cool";
+  let coolUntil = 0, coolTimer = 0, tipTimer = 0;
+  try { coolUntil = Number(localStorage.getItem(COOL_KEY)) || 0; } catch {}
+  const coolLeft = () => Math.max(0, Math.ceil((coolUntil - Date.now()) / 1000));
+  const clock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  function paintCool() {
+    clearTimeout(coolTimer);
+    const left = coolLeft(), on = left > 0, form = $n("#noxForm"), send = $n("#noxSend"), tip = $n("#noxCool");
+    form.classList.toggle("is-cool", on);
+    send.setAttribute("aria-disabled", String(on));
+    if (on) {
+      tip.textContent = tx("cool").replace("{t}", clock(left));
+      send.setAttribute("aria-label", tip.textContent);
+      send.setAttribute("aria-describedby", "noxCool");
+      coolTimer = setTimeout(paintCool, 1000);
+    } else {
+      form.classList.remove("show-tip");
+      send.setAttribute("aria-label", tx("send"));
+      send.removeAttribute("aria-describedby");
+      try { localStorage.removeItem(COOL_KEY); } catch {}
+    }
+    return on;
+  }
+  function startCool(seconds) {
+    coolUntil = Date.now() + Math.min(Number(seconds) || 60, 900) * 1000;
+    try { localStorage.setItem(COOL_KEY, String(coolUntil)); } catch {}
+    paintCool();
+  }
+  // Touch screens have no hover: a tap on the cooling icon shows the time for a few seconds.
+  function flashTip() {
+    const form = $n("#noxForm");
+    form.classList.add("show-tip");
+    clearTimeout(tipTimer); tipTimer = setTimeout(() => form.classList.remove("show-tip"), 3000);
+  }
+
   let sending = false;
   async function ask(q) {
     q = q.trim().slice(0, 1000);
+    if (paintCool()) { flashTip(); return; }
     if (!q || sending) return;
     sending = true; hush();
     $n("#noxSend").disabled = true;
@@ -339,7 +378,7 @@
     const res = await call({ mode: "chat", messages: convo.slice(-10) });
     thinking(false);
     if (res.reply) await say(res.reply);
-    else { convo.pop(); await say(errText(res.error), { remember: false }); }
+    else { convo.pop(); text.value = q; grow(); if (res.retryAfter) startCool(res.retryAfter); await say(errText(res.error), { remember: false }); }
     sending = false; $n("#noxSend").disabled = false;
   }
   function grow() { text.style.height = "auto"; text.style.height = Math.min(text.scrollHeight, 140) + "px"; }
@@ -377,12 +416,14 @@
     const jd = $n("#noxJd").value.trim();
     if (matching) return;
     const out = $n("#noxResult");
+    if (paintCool()) { out.innerHTML = `<p class="nox-err">${esc($n("#noxCool").textContent)}</p>`; return; }
     if (jd.length < 40) { out.innerHTML = `<p class="nox-err">${esc(errText("jd_too_short"))}</p>`; return; }
     matching = true; hush(); setState("thinking");
     const btn = $n(".nox-go"); btn.disabled = true;
     out.innerHTML = `<div class="nox-msg nox-says nox-dots"><span></span><span></span><span></span><em>${esc(tx("thinking"))}</em></div>`;
     const res = await call({ mode: "match", jd });
     matching = false; btn.disabled = false;
+    if (res.retryAfter) startCool(res.retryAfter);
     if (!res.match) { out.innerHTML = `<p class="nox-err">${esc(errText(res.error))}</p>`; setState("idle"); return; }
     renderMatch(res.match);
     const m = res.match;
@@ -479,6 +520,7 @@
     agent.querySelectorAll("[data-x]").forEach((el) => { el.textContent = tx(el.dataset.x); });
     text.placeholder = tx("placeholder"); $n("#noxJd").placeholder = tx("jdPh");
     $n("#noxSend").setAttribute("aria-label", tx("send"));
+    paintCool();
     $n("#noxFull").setAttribute("aria-label", tx("full")); $n("#noxFull").title = tx("full");
     $n("#noxClose").setAttribute("aria-label", tx("close")); $n("#noxClose").title = tx("close");
     $n("#noxMic").setAttribute("aria-label", tx("mic")); $n("#noxMic").title = tx("mic");
