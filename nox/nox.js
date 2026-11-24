@@ -66,7 +66,7 @@
   const bubble = document.createElement("button");
   bubble.type = "button"; bubble.className = "nox-bubble"; bubble.id = "noxBubble";
   bubble.innerHTML = `<svg class="nox-ringtext" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="noxRingPath" d="M60 60m-50 0a50 50 0 1 1 100 0a50 50 0 1 1 -100 0"/></defs><text><textPath href="#noxRingPath" id="noxRingText"></textPath></text></svg>
-    <span class="nox-moon"><img class="nox-photo" src="nox/nox-bubble.webp?v=2" alt="" width="192" height="192" decoding="async"></span><span class="nox-ping" aria-hidden="true"></span>`;
+    <span class="nox-moon"><img class="nox-photo" src="nox/nox-bubble.webp?v=3" alt="" width="192" height="192" decoding="async"></span><span class="nox-ping" aria-hidden="true"></span>`;
 
   const tag = document.createElement("div");
   tag.className = "nox-tag"; tag.hidden = true;
@@ -81,7 +81,7 @@
   agent.innerHTML = `
   <div class="nox-stage" aria-hidden="true">
     <div class="nox-slash"></div><div class="nox-slash s2"></div>
-    <div class="nox-figure"><img class="nox-photo" src="nox/nox-portrait.webp?v=2" alt="" width="720" height="720" loading="lazy" decoding="async"></div>
+    <div class="nox-figure"><img class="nox-photo" src="nox/nox-portrait.webp?v=3" alt="" width="720" height="720" loading="lazy" decoding="async"></div>
   </div>
   <div class="nox-main">
     <div class="nox-top">
