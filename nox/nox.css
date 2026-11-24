@@ -179,7 +179,7 @@ html.calm .nox-cool{transition:none}
   .nox-float{inset:0;width:auto;height:auto}
   .nox{grid-template-columns:1fr;grid-template-rows:150px 1fr;clip-path:none}
   .nox-figure{inset:0}
-  .nox-photo{object-position:50% 32%}
+  .nox-photo{object-position:50% 42%}
   .nox-main{padding:10px 12px 10px}
   .nox-plate b{font-size:36px}
   .nox-top{position:absolute;top:10px;left:12px;right:12px;display:block}
